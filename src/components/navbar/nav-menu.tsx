@@ -42,7 +42,7 @@ const NavMenu: FC = () => {
   // Admins
   const adminItems = [
     { label: en ? "Grants" : "Subventions", href: PageRoutes.allGrants },
-    { label: en ? "Events" : "Événements", href: PageRoutes.allEvents },
+    { label: en ? "Our Events" : "Événements", href: PageRoutes.allEvents },
     {
       label: en ? "Supervisions" : "Supervisions",
       href: PageRoutes.allSupervisions,
