@@ -1,3 +1,4 @@
+import { institute } from "@prisma/client";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { selectAllProductInfo } from "../../../../../prisma/helpers";
 import db from "../../../../../prisma/prisma-client";
@@ -12,6 +13,7 @@ export type UpdateProductPublicParams = {
   doi?: string;
   product_type_id?: number | null;
   note?: string;
+  institutes?: number[];
   deleteTargets?: number[];
   addTargets?: number[];
   deletePartners?: number[];
@@ -20,7 +22,7 @@ export type UpdateProductPublicParams = {
   deleteMembers?: number[];
 };
 
-function updateProduct(
+async function updateProduct(
   id: number,
   {
     title_en,
@@ -30,15 +32,26 @@ function updateProduct(
     doi,
     product_type_id,
     note,
+    institutes = [],
     deleteTargets = [],
     addTargets = [],
     deletePartners = [],
     addPartners = [],
     addMembers = [],
     deleteMembers = [],
-
   }: UpdateProductPublicParams
 ) {
+  await db.productInstitute.deleteMany({
+    where: { productId: id },
+  });
+
+  await db.productInstitute.createMany({
+    data: institutes.map((instituteId) => ({
+      instituteId,
+      productId: id,
+    })),
+  });
+
   return db.product.update({
     where: { id },
     data: {
@@ -51,22 +64,22 @@ function updateProduct(
       product_type: product_type_id
         ? { connect: { id: product_type_id } }
         : product_type_id === null
-          ? { disconnect: true }
-          : undefined,
+        ? { disconnect: true }
+        : undefined,
       product_target: {
         deleteMany: deleteTargets.map((id) => ({ target_id: id })),
         createMany: { data: addTargets.map((id) => ({ target_id: id })) },
       },
       product_partnership: {
         deleteMany: deletePartners.map((id) => ({ organization_id: id })),
-        createMany: { data: addPartners.map((id) => ({ organization_id: id })) },
+        createMany: {
+          data: addPartners.map((id) => ({ organization_id: id })),
+        },
       },
       product_member_author: {
         deleteMany: deleteMembers.map((id) => ({ member_id: id })),
         createMany: { data: addMembers.map((id) => ({ member_id: id })) },
       },
-
-
     },
     select: selectAllProductInfo,
   });

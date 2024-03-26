@@ -11,6 +11,7 @@ export type UpdatePartnerPublicParams = {
   scope_id: number | null;
   type_id: number | null;
   description: string | null;
+  institute_id: number[];
 };
 
 function updatePartner(
@@ -21,9 +22,8 @@ function updatePartner(
     scope_id,
     type_id,
     description,
-
-  }: UpdatePartnerPublicParams) {
-
+  }: UpdatePartnerPublicParams
+) {
   return db.organization.update({
     where: { id },
     data: {
@@ -32,13 +32,13 @@ function updatePartner(
       org_scope: scope_id
         ? { connect: { id: scope_id } }
         : scope_id === null
-          ? { disconnect: true }
-          : undefined,
+        ? { disconnect: true }
+        : undefined,
       org_type: type_id
         ? { connect: { id: type_id } }
         : type_id === null
-          ? { disconnect: true }
-          : undefined,
+        ? { disconnect: true }
+        : undefined,
       description,
     },
     select: selectAllPartnerInfo,
@@ -61,9 +61,24 @@ export default async function handler(
 
     const authorized = currentUser.is_admin || currentUser.member?.id === id;
     if (!authorized)
-      return res.status(401).send("You are not authorized to edit this partner information.");
+      return res
+        .status(401)
+        .send("You are not authorized to edit this partner information.");
 
     const updated = await updatePartner(id, params);
+
+    await db.organizationInstitute.deleteMany({
+      where: {
+        organizationId: id,
+      },
+    });
+
+    await db.organizationInstitute.createMany({
+      data: params.institute_id.map((instituteId) => ({
+        instituteId,
+        organizationId: id,
+      })),
+    });
 
     return res.status(200).send(updated);
   } catch (e: any) {

@@ -193,6 +193,7 @@ const AllMembers: FC = () => {
     loading,
     refresh: refreshMembers,
   } = useContext(AllMembersCtx);
+
   const { refresh: refreshKeywords } = useContext(AllKeywordsCtx);
 
   useEffect(() => {
@@ -287,7 +288,7 @@ const AllMembers: FC = () => {
     [allMembers, facultyFilter, keywordFilter, memberTypeFilter, nameFilter]
   );
 
-  type MemberColumnType = ColumnType<typeof filteredMembers[number]>;
+  type MemberColumnType = ColumnType<(typeof filteredMembers)[number]>;
 
   const nameColumn: MemberColumnType = useMemo(
     () => ({

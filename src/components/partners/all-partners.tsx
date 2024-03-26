@@ -30,6 +30,7 @@ import { AllPartnersCtx } from "../../services/context/all-partners-ctx";
 import OrgTypeFilter from "../filters/org-type-filter";
 import OrgScopeFilter from "../filters/org-scope-filter";
 import OrgNameFilter from "../filters/org-name-filter";
+import { useSelectedInstitute } from "../../services/context/selected-institute-ctx";
 
 function nameSorter(en: boolean) {
   return (
@@ -169,6 +170,7 @@ function getPopupContainer(): HTMLElement {
 
 const AllPartners: FC = () => {
   const { en } = useContext(LanguageCtx);
+  const { institute } = useSelectedInstitute();
 
   const {
     allPartners,
@@ -179,7 +181,12 @@ const AllPartners: FC = () => {
   const { localAccount } = useContext(ActiveAccountCtx);
 
   const handleRegisterPartner = () => {
-    router.push("partners/register");
+    if (institute) {
+      router.push({
+        pathname: "/[instituteId]/partners/register",
+        query: { instituteId: institute.urlIdentifier },
+      });
+    }
   };
 
   useEffect(() => {

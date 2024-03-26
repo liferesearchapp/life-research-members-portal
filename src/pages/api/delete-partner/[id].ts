@@ -4,10 +4,23 @@ import db from "../../../../prisma/prisma-client";
 import getAccountFromRequest from "../../../utils/api/get-account-from-request";
 import type { PrivatePartnerDBRes } from "../partner/[id]/private";
 
-async function deletePartner(id: number): Promise<organization | null> {
-  return db.organization.delete({
-    where: { id },
+async function deletePartner(
+  organizationId: number
+): Promise<organization | null> {
+  // Begin a transaction
+  const transaction = await db.$transaction(async (prisma) => {
+    // Delete related OrganizationInstitute entries
+    await prisma.organizationInstitute.deleteMany({
+      where: { organizationId },
+    });
+
+    // Now safe to delete the organization itself
+    return await prisma.organization.delete({
+      where: { id: organizationId },
+    });
   });
+
+  return transaction;
 }
 
 export default async function handler(
@@ -30,6 +43,7 @@ export default async function handler(
 
     return res.status(200).send(partner);
   } catch (e: any) {
+    console.log(e);
     return res.status(500).send({ ...e, message: e.message }); // prisma error messages are getters
   }
 }

@@ -40,6 +40,7 @@ import type { organization } from "@prisma/client";
 import TargetSelector from "../targets/target-selector";
 import PartnerSelector from "../partners/partner-selector";
 import MemberSelector from "../members/member-selector";
+import { MemberInstituteCtx } from "../../services/context/member-institutes-ctx";
 
 const { Option } = Select;
 
@@ -69,6 +70,7 @@ type Data = {
   product_type_id?: number;
   note?: string;
   members: Map<number, MemberPublicInfo>;
+  institutes: number[];
 };
 
 const PublicProductForm: FC<Props> = ({ product, onSuccess }) => {
@@ -77,6 +79,7 @@ const PublicProductForm: FC<Props> = ({ product, onSuccess }) => {
   const { productTypes } = useContext(ProductTypesCtx);
   const [loading, setLoading] = useState(false);
   const { dirty, setDirty, setSubmit } = useContext(SaveChangesCtx);
+  const { institutes } = useContext(MemberInstituteCtx);
   useResetDirtyOnUnmount();
 
   const diffMembers = useCallback(
@@ -174,6 +177,7 @@ const PublicProductForm: FC<Props> = ({ product, onSuccess }) => {
         addPartners,
         deleteMembers,
         addMembers,
+        institutes: data.institutes,
       };
 
       const newInfo = await updateProductPublic(product.id, params);
@@ -260,6 +264,9 @@ const PublicProductForm: FC<Props> = ({ product, onSuccess }) => {
     organizations: getInitialPartners(),
     // @ts-ignore
     members: getInitialMembers(product.product_member_author),
+    institutes: product.institutes
+      ? product.institutes.map((i) => i.institute.id)
+      : [],
   };
 
   return (
@@ -342,6 +349,20 @@ const PublicProductForm: FC<Props> = ({ product, onSuccess }) => {
           <MemberSelector
             setErrors={(e) => form.setFields([{ name: "members", errors: e }])}
           />
+        </Form.Item>
+
+        <Form.Item
+          label={en ? "Select Institute" : "Sélectionnez l'institut"}
+          name="institutes"
+        >
+          <Select mode="multiple">
+            <Option value="">{""}</Option>
+            {institutes.map((f) => (
+              <Option key={f.id} value={f.id}>
+                {`${f.name} - ${f.urlIdentifier}`}
+              </Option>
+            ))}
+          </Select>
         </Form.Item>
 
         <Form.Item label={en ? "DOI" : "DOI"} name="doi">

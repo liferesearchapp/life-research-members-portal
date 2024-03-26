@@ -2,12 +2,16 @@ import {
   createContext,
   FC,
   PropsWithChildren,
+  useCallback,
+  useContext,
   useEffect,
   useState,
 } from "react";
 import ApiRoutes from "../../routing/api-routes";
 import Notification from "../notifications/notification";
 import type { ProductPublicInfo } from "../_types";
+import getAuthHeader from "../headers/auth-header";
+import { useSelectedInstitute } from "./selected-institute-ctx";
 
 export const AllProductsCtx = createContext<{
   allProducts: ProductPublicInfo[];
@@ -18,28 +22,42 @@ export const AllProductsCtx = createContext<{
 
 export const AllProductsCtxProvider: FC<PropsWithChildren> = ({ children }) => {
   const [allProducts, setAllProducts] = useState<ProductPublicInfo[]>([]);
-  const [loading, setLoading] = useState(true); // true so loading icons are served from server
+  const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const { institute } = useSelectedInstitute();
 
-  async function fetchAllProducts() {
+  const fetchAllProducts = useCallback(async () => {
+    if (!institute) {
+      console.log("Institute not found.");
+      setLoading(false);
+      return;
+    }
+
     try {
-      const result = await fetch(ApiRoutes.allProducts);
+      const queryParam = `?instituteId=${institute?.urlIdentifier}`;
+      const authHeader = await getAuthHeader();
+      if (!authHeader) return;
+      const result = await fetch(`${ApiRoutes.allProducts}${queryParam}`, {
+        headers: authHeader,
+      });
       if (!result.ok) throw await result.text();
       let products: ProductPublicInfo[] = await result.json();
 
       setAllProducts(products);
     } catch (e: any) {
-      new Notification().error(e);
+      new Notification().error(e.message);
+    } finally {
+      setLoading(false);
     }
-  }
+  }, [institute]);
 
   useEffect(() => {
     async function firstLoad() {
-      await fetchAllProducts();
+      institute && (await fetchAllProducts());
       setLoading(false);
     }
     firstLoad();
-  }, []);
+  }, [fetchAllProducts, institute]);
 
   async function refresh() {
     if (loading || refreshing) return;
@@ -53,7 +71,7 @@ export const AllProductsCtxProvider: FC<PropsWithChildren> = ({ children }) => {
 
   return (
     <AllProductsCtx.Provider
-      value={{ allProducts, loading, refresh, refreshing }}
+      value={{ allProducts, loading, refreshing, refresh }}
     >
       {children}
     </AllProductsCtx.Provider>

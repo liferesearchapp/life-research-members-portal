@@ -16,6 +16,7 @@ import { LanguageCtx } from "../../services/context/language-ctx";
 import { FacultiesCtx } from "../../services/context/faculties-ctx";
 import { LevelsCtx } from "../../services/context/levels-ctx";
 import GetLanguage from "../../utils/front-end/get-language";
+import { useSelectedInstitute } from "../../services/context/selected-institute-ctx";
 
 const { Option } = Select;
 const { RangePicker } = DatePicker;
@@ -34,6 +35,7 @@ const RegisterSupervision: FC = () => {
   const { en } = useContext(LanguageCtx);
   const { faculties } = useContext(FacultiesCtx);
   const { levels } = useContext(LevelsCtx);
+  const { institute } = useSelectedInstitute();
 
   async function handleRegister({
     last_name,
@@ -43,6 +45,7 @@ const RegisterSupervision: FC = () => {
     level_id,
     note,
   }: SupervisionData) {
+    if (!institute) return;
     const res = await registerSupervision({
       last_name,
       first_name,
@@ -51,6 +54,7 @@ const RegisterSupervision: FC = () => {
       faculty_id: faculty_id || null,
       level_id: level_id || null,
       note: note || null,
+      institute_id: institute.id,
     });
     if (res) form.resetFields();
   }

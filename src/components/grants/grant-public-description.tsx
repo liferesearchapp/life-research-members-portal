@@ -102,6 +102,12 @@ const PublicGrantDescription: FC<Props> = ({ grant }) => {
         {grant.topic ? (en ? grant.topic.name_en : grant.topic.name_fr) : ""}
       </Item>
 
+      <Item label={en ? "Institute" : "L'institut"}>
+        <Tag
+          key={grant.institute.id}
+        >{`${grant.institute.name} - ${grant.institute.urlIdentifier}`}</Tag>
+      </Item>
+
       <Item label={en ? "Note" : "Note"} style={{ whiteSpace: "break-spaces" }}>
         {grant.note}
       </Item>

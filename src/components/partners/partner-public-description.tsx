@@ -43,6 +43,15 @@ const PublicPartnerDescription: FC<Props> = ({ partner }) => {
       <Item label={en ? "Organization Scope" : "Portée de l'organisation"}>
         <PartnerScopeLink org_scope={partner.org_scope} />
       </Item>
+
+      <Item label={en ? "Institute" : "L'institut"}>
+        {partner.organizationInstitute.map((entry, i) => (
+          <Tag
+            key={entry.institute.id}
+          >{`${entry.institute.name} - ${entry.institute.urlIdentifier}`}</Tag>
+        ))}
+      </Item>
+
       <Item label={en ? "Description" : "Description"}>
         {partner.description}
       </Item>

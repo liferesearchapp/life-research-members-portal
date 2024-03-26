@@ -27,6 +27,8 @@ import { OrgTypesCtx } from "../../services/context/org-types-ctx";
 import { OrgScopeCtx } from "../../services/context/org-scopes-ctx";
 import { Select } from "antd";
 import GetLanguage from "../../utils/front-end/get-language";
+import { MemberInstituteCtx } from "../../services/context/member-institutes-ctx";
+import { useSelectedInstitute } from "../../services/context/selected-institute-ctx";
 
 type Props = {
   partner: PartnerPublicInfo;
@@ -41,6 +43,7 @@ type Data = {
   scope_id?: number;
   type_id?: number;
   description: string | null;
+  institute_id: number[];
 };
 
 const PublicPartnerForm: FC<Props> = ({ partner, onSuccess }) => {
@@ -48,6 +51,8 @@ const PublicPartnerForm: FC<Props> = ({ partner, onSuccess }) => {
   const { en } = useContext(LanguageCtx);
   const { orgTypes } = useContext(OrgTypesCtx);
   const { orgScopes } = useContext(OrgScopeCtx);
+  const { institutes } = useContext(MemberInstituteCtx);
+  const { institute } = useSelectedInstitute();
   const [loading, setLoading] = useState(false);
   const { dirty, setDirty, setSubmit } = useContext(SaveChangesCtx);
   useResetDirtyOnUnmount();
@@ -65,6 +70,7 @@ const PublicPartnerForm: FC<Props> = ({ partner, onSuccess }) => {
         scope_id: data.scope_id || null,
         type_id: data.type_id || null,
         description: data.description,
+        institute_id: data.institute_id,
       };
 
       const newPartner = await updatePartnerPublic(partner.id, params);
@@ -99,6 +105,9 @@ const PublicPartnerForm: FC<Props> = ({ partner, onSuccess }) => {
     scope_id: partner.org_scope?.id,
     type_id: partner.org_type?.id,
     description: partner.description || "",
+    institute_id: partner.organizationInstitute
+      ? partner.organizationInstitute.map((i) => i.institute.id)
+      : [],
   };
 
   return (
@@ -155,6 +164,21 @@ const PublicPartnerForm: FC<Props> = ({ partner, onSuccess }) => {
             {orgTypes.map((f) => (
               <Option key={f.id} value={f.id}>
                 <GetLanguage obj={f} />
+              </Option>
+            ))}
+          </Select>
+        </Form.Item>
+
+        <Form.Item
+          label={en ? "Select Institute" : "Sélectionnez l'institut"}
+          name="institute_id"
+          initialValue={[institute?.id]}
+        >
+          <Select mode="multiple">
+            <Option value="">{""}</Option>
+            {institutes.map((f) => (
+              <Option key={f.id} value={f.id}>
+                {`${f.name} - ${f.urlIdentifier}`}
               </Option>
             ))}
           </Select>

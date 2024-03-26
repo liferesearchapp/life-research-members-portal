@@ -11,6 +11,7 @@ import GetLanguage from "../../utils/front-end/get-product-language";
 import GetProductLanguage from "../../utils/front-end/get-product-language";
 import SafeLink from "../link/safe-link";
 import { queryKeys } from "../products/all-products";
+import { useSelectedInstitute } from "../../services/context/selected-institute-ctx";
 
 type Props = {
   product: product;
@@ -36,6 +37,7 @@ const ProductTag: FC<Props> = ({
   style,
 }) => {
   const [modalOpen, setModalOpen] = useState(false);
+  const { institute } = useSelectedInstitute();
 
   const classList = ["product-tag"];
   if (linked || editable || onClick) classList.push("cursor-pointer");
@@ -48,7 +50,7 @@ const ProductTag: FC<Props> = ({
   const content = linked ? (
     <SafeLink
       href={{
-        pathname: PageRoutes.allProducts,
+        pathname: PageRoutes.allProducts(institute?.urlIdentifier || ""),
         //query: { [queryKeys.products]: p.id },
       }}
     >

@@ -32,6 +32,7 @@ import { AllGrantsCtx } from "../../services/context/all-grants-ctx";
 import type { GrantPublicInfo } from "../../services/_types";
 import getMemberInvolved from "../getters/grant-member-involved-getter";
 import getInvestigatorMember from "../getters/grant-investigator-member-getter";
+import { useSelectedInstitute } from "../../services/context/selected-institute-ctx";
 
 function nameSorter(a: { title: string }, b: { title: string }) {
   return a.title.localeCompare(b.title);
@@ -208,6 +209,7 @@ function getPopupContainer(): HTMLElement {
 
 const AllGrants: FC = () => {
   const { en } = useContext(LanguageCtx);
+  const { institute } = useSelectedInstitute();
 
   const {
     allGrants,
@@ -218,7 +220,12 @@ const AllGrants: FC = () => {
   const { localAccount } = useContext(ActiveAccountCtx);
 
   const handleCreateGrant = () => {
-    router.push("grants/register");
+    if (institute) {
+      router.push({
+        pathname: "/[instituteId]/grants/register",
+        query: { instituteId: institute.urlIdentifier },
+      });
+    }
   };
 
   useEffect(() => {

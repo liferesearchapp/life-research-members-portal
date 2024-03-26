@@ -11,11 +11,17 @@ export type RegisterSupervisionParams = {
   faculty_id: number | null;
   level_id: number | null;
   note: string | null;
+  institute_id: number;
 };
 
-export type RegisterSupervisionRes = Awaited<ReturnType<typeof registerSupervision>>;
+export type RegisterSupervisionRes = Awaited<
+  ReturnType<typeof registerSupervision>
+>;
 
-function registerSupervision(params: RegisterSupervisionParams, memberId: number) {
+function registerSupervision(
+  params: RegisterSupervisionParams,
+  memberId: number
+) {
   return db.supervision.create({
     data: {
       last_name: params.last_name,
@@ -30,6 +36,7 @@ function registerSupervision(params: RegisterSupervisionParams, memberId: number
           member_id: memberId,
         },
       },
+      instituteId: params.institute_id,
     },
     select: {
       id: true,

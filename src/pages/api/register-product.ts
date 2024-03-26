@@ -14,12 +14,12 @@ export type RegisterProductParams = {
   all_author: string;
   product_type_id: number;
   note: string;
-  on_going: boolean;  // Include on_going field
-  peer_reviewed: boolean;  // Include peer_reviewed field
+  institute_id: number[];
+  on_going: boolean; // Include on_going field
+  peer_reviewed: boolean; // Include peer_reviewed field
 };
 
 export type RegisterProductRes = Awaited<ReturnType<typeof registerProduct>>;
-
 
 function registerProduct(params: RegisterProductParams) {
   return db.product.create({
@@ -31,10 +31,10 @@ function registerProduct(params: RegisterProductParams) {
       all_author: params.all_author,
       product_type_id: Number(params.product_type_id),
       note: params.note,
-      on_going: params.on_going,  // Set on_going field from params
-      peer_reviewed: params.peer_reviewed,  // Set peer_reviewed field from params
-
-    }, select: {
+      on_going: params.on_going, // Set on_going field from params
+      peer_reviewed: params.peer_reviewed, // Set peer_reviewed field from params
+    },
+    select: {
       id: true, // Add this line to select the id of the created product
     },
   });
@@ -51,7 +51,6 @@ async function fetchMembers() {
 
 // Replace the useState line in the handler function with this line:
 
-
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<RegisterProductRes | string>
@@ -65,14 +64,19 @@ export default async function handler(
     on_going,
     peer_reviewed,
     product_type_id,
-
   } = params;
-  if (typeof title_en !== "string") return res.status(400).send("Please provide the title in english");
-  if (typeof title_fr !== "string") return res.status(400).send("Please provide the title in french");
-  if (!["boolean", "undefined"].includes(typeof on_going)) return res.status(400).send("on_going is required.");
-  if (!["boolean", "undefined"].includes(typeof peer_reviewed)) return res.status(400).send("peer_reviewed is required.");
-  if (typeof all_author !== "string") return res.status(400).send("Author is required.");
-  if (isNaN(product_type_id)) return res.status(400).send("product_type_id is required.");
+  if (typeof title_en !== "string")
+    return res.status(400).send("Please provide the title in english");
+  if (typeof title_fr !== "string")
+    return res.status(400).send("Please provide the title in french");
+  if (!["boolean", "undefined"].includes(typeof on_going))
+    return res.status(400).send("on_going is required.");
+  if (!["boolean", "undefined"].includes(typeof peer_reviewed))
+    return res.status(400).send("peer_reviewed is required.");
+  if (typeof all_author !== "string")
+    return res.status(400).send("Author is required.");
+  if (isNaN(product_type_id))
+    return res.status(400).send("product_type_id is required.");
 
   try {
     const currentUser = await getAccountFromRequest(req, res);
@@ -87,22 +91,24 @@ export default async function handler(
     const members = await fetchMembers();
 
     const authors = all_author.split(/[,;&]/).map((author) => author.trim());
+    console.log("authors", authors);
+
     const matchedAuthors = Array.from(
       new Set(
         authors
           .map((author) => {
-            const foundAccount = members.find((member) =>
-              member &&
-              member.account &&
-              member.account.first_name &&
-              member.account.last_name &&
-              isAuthorMatch(
-                removeDiacritics(author), // Add removeDiacritics here
-                member.account.first_name,
-                member.account.last_name
-              )
+            const foundAccount = members.find(
+              (member) =>
+                member &&
+                member.account &&
+                member.account.first_name &&
+                member.account.last_name &&
+                isAuthorMatch(
+                  removeDiacritics(author), // Add removeDiacritics here
+                  member.account.first_name,
+                  member.account.last_name
+                )
             );
-
 
             return foundAccount ? foundAccount.id : null;
           })
@@ -123,9 +129,23 @@ export default async function handler(
       )
     );
 
+    await Promise.all(
+      params.institute_id.map((instituteId) =>
+        db.productInstitute.create({
+          data: {
+            instituteId: instituteId,
+            productId: newProduct.id,
+          },
+        })
+      )
+    );
+
     return res.status(200).send(newProduct);
   } catch (e: any) {
     console.error("Error while registering product:", e);
-    return res.status(500).send({ ...e, message: "An error occurred while registering the product." });
+    return res.status(500).send({
+      ...e,
+      message: "An error occurred while registering the product.",
+    });
   }
 }

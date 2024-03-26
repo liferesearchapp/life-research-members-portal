@@ -4,10 +4,20 @@ import db from "../../../../prisma/prisma-client";
 import getAccountFromRequest from "../../../utils/api/get-account-from-request";
 import type { PrivateProductDBRes } from "../product/[id]/private";
 
-async function deleteProduct(id: number): Promise<product | null> {
-  return db.product.delete({
-    where: { id },
+async function deleteProduct(productId: number): Promise<product | null> {
+  const transaction = await db.$transaction(async (prisma) => {
+    // Delete related OrganizationInstitute entries
+    await prisma.productInstitute.deleteMany({
+      where: { productId: productId },
+    });
+
+    // Now safe to delete the organization itself
+    return await prisma.product.delete({
+      where: { id: productId },
+    });
   });
+
+  return transaction;
 }
 
 async function isProductMemberAuthor(memberId: number | undefined, productId: number) {

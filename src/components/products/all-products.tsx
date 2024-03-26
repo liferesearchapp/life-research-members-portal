@@ -34,6 +34,7 @@ import type { PublicMemberRes } from "../../pages/api/member/[id]/public";
 import colorFromString from "../../utils/front-end/color-from-string";
 import ProductAllAuthorFilter from "../filters/product-all-author-filter";
 import getMemberAuthor from "../getters/product-member-author-getter";
+import { useSelectedInstitute } from "../../services/context/selected-institute-ctx";
 
 function getTitle(product: ProductPublicInfo, en: boolean) {
   return en ? product.title_en : product.title_fr;
@@ -212,6 +213,7 @@ function getPopupContainer(): HTMLElement {
 
 const AllProducts: FC = () => {
   const { en } = useContext(LanguageCtx);
+  const { institute } = useSelectedInstitute();
   const {
     allProducts,
     loading,
@@ -219,7 +221,12 @@ const AllProducts: FC = () => {
   } = useContext(AllProductsCtx);
 
   const handleRegisterProduct = () => {
-    router.push("products/register");
+    if (institute) {
+      router.push({
+        pathname: "/[instituteId]/products/register",
+        query: { instituteId: institute.urlIdentifier },
+      });
+    }
   };
 
   useEffect(() => {
@@ -304,20 +311,6 @@ const AllProducts: FC = () => {
     clearQueries();
     refreshProducts();
   }
-
-  const [members, setAccounts] = useState<PublicMemberRes[]>([]);
-
-  useEffect(() => {
-    const fetchAccounts = async () => {
-      const res = await fetch("api/all-members");
-      const data = await res.json();
-      setAccounts(data);
-
-      //console.log(data);
-    };
-
-    fetchAccounts();
-  }, []);
 
   const filteredProducts = useMemo(
     () =>

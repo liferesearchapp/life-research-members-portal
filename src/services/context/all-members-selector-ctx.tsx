@@ -3,6 +3,7 @@ import {
   createContext,
   FC,
   PropsWithChildren,
+  useCallback,
   useContext,
   useEffect,
   useState,
@@ -10,17 +11,8 @@ import {
 import ApiRoutes from "../../routing/api-routes";
 import Notification from "../notifications/notification";
 import { LanguageCtx } from "./language-ctx";
-
-async function fetchAllMembers(): Promise<MemberPublicInfo[]> {
-  try {
-    const res = await fetch(ApiRoutes.allMembers);
-    if (!res.ok) throw await res.text();
-    return await res.json();
-  } catch (e: any) {
-    new Notification().error(e);
-    return [];
-  }
-}
+import { useSelectedInstitute } from "./selected-institute-ctx";
+import getAuthHeader from "../headers/auth-header";
 
 function enSorter(a: MemberPublicInfo, b: MemberPublicInfo): number {
   const aFullName = `${a.account.first_name} ${a.account.last_name}`;
@@ -37,6 +29,8 @@ export const AllMembersSelectorCtx = createContext<{
   memberMap: Map<number, MemberPublicInfo>;
   refresh: () => void;
   set: (member: MemberPublicInfo) => void;
+  loading: boolean;
+  refreshing: boolean;
 }>(null as any);
 
 export const AllMembersSelectorCtxProvider: FC<PropsWithChildren> = ({
@@ -46,38 +40,70 @@ export const AllMembersSelectorCtxProvider: FC<PropsWithChildren> = ({
   const [memberMap, setMemberMap] = useState(
     new Map<number, MemberPublicInfo>()
   );
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const { en } = useContext(LanguageCtx);
+  const { institute } = useSelectedInstitute();
 
-  async function getMembers() {
-    const members = await fetchAllMembers();
-    setMembers(members.sort(en ? enSorter : frSorter));
-    setMemberMap(new Map(members.map((m) => [m.id, m])));
-  }
+  const fetchAllMembers = useCallback(async () => {
+    if (!institute) {
+      console.log("Institute not found.");
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const queryParam = `?instituteId=${institute.urlIdentifier}`;
+      const authHeader = await getAuthHeader();
+      if (!authHeader) return;
+      const res = await fetch(`${ApiRoutes.allMembers}${queryParam}`, {
+        headers: authHeader,
+      });
+      if (!res.ok) throw await res.text();
+      const fetchedMembers: MemberPublicInfo[] = await res.json();
+
+      console.log("Fetched members: ", fetchedMembers);
+
+      setMembers(fetchedMembers.sort(en ? enSorter : frSorter));
+      setMemberMap(new Map(fetchedMembers.map((m) => [m.id, m])));
+    } catch (e: any) {
+      new Notification().error(e.message);
+    } finally {
+      setLoading(false);
+    }
+  }, [en, institute]);
 
   useEffect(() => {
-    getMembers();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    setMembers((prev) => prev.sort(en ? enSorter : frSorter));
-  }, [en]);
+    async function firstLoad() {
+      institute && (await fetchAllMembers());
+      setLoading(false);
+    }
+    firstLoad();
+  }, [fetchAllMembers, institute]);
 
   function refresh() {
-    getMembers();
+    if (loading || refreshing) return;
+    const notification = new Notification("bottom-right");
+    setRefreshing(true);
+    notification.loading("Refreshing...");
+    fetchAllMembers().then(() => {
+      setRefreshing(false);
+      notification.close();
+    });
   }
 
   function set(member: MemberPublicInfo) {
     setMembers((prev) => {
-      const curr = prev.filter((m) => m.id !== member.id);
-      curr.push(member);
-      return curr.sort(en ? enSorter : frSorter);
+      const updatedMembers = prev.filter((m) => m.id !== member.id);
+      updatedMembers.push(member);
+      return updatedMembers.sort(en ? enSorter : frSorter);
     });
   }
 
   return (
     <AllMembersSelectorCtx.Provider
-      value={{ members, memberMap, refresh, set }}
+      value={{ members, memberMap, refresh, set, loading, refreshing }}
     >
       {children}
     </AllMembersSelectorCtx.Provider>

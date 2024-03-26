@@ -1,13 +1,16 @@
 import {
   createContext,
   FC,
+  PropsWithChildren,
+  useCallback,
+  useContext,
   useEffect,
   useState,
-  PropsWithChildren,
 } from "react";
 import ApiRoutes from "../../routing/api-routes";
 import Notification from "../notifications/notification";
 import type { EventPublicInfo } from "../_types";
+import { useSelectedInstitute } from "./selected-institute-ctx"; // Adjust this path as necessary.
 
 export const AllEventsCtx = createContext<{
   allEvents: EventPublicInfo[];
@@ -18,12 +21,20 @@ export const AllEventsCtx = createContext<{
 
 export const AllEventsCtxProvider: FC<PropsWithChildren> = ({ children }) => {
   const [allEvents, setAllEvents] = useState<EventPublicInfo[]>([]);
-  const [loading, setLoading] = useState(true); // true so loading icons are served from server
+  const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const { institute } = useSelectedInstitute();
 
-  async function fetchAllEvents() {
+  const fetchAllEvents = useCallback(async () => {
+    if (!institute) {
+      console.log("Institute not found.");
+      setLoading(false);
+      return;
+    }
+
     try {
-      const result = await fetch(ApiRoutes.allEvents);
+      const queryParam = `?instituteId=${institute.urlIdentifier}`;
+      const result = await fetch(`${ApiRoutes.allEvents}${queryParam}`);
       if (!result.ok) throw await result.text();
       let events: EventPublicInfo[] = await result.json();
 
@@ -32,15 +43,17 @@ export const AllEventsCtxProvider: FC<PropsWithChildren> = ({ children }) => {
     } catch (e: any) {
       new Notification().error(e);
     }
-  }
+  }, [institute]);
 
   useEffect(() => {
     async function firstLoad() {
-      await fetchAllEvents();
+      if (institute) {
+        await fetchAllEvents();
+      }
       setLoading(false);
     }
     firstLoad();
-  }, []);
+  }, [fetchAllEvents, institute]);
 
   async function refresh() {
     if (loading || refreshing) return;

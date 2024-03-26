@@ -32,6 +32,7 @@ import EventDateFilter from "../filters/event-date-filter";
 import type { EventPublicInfo } from "../../services/_types";
 import moment, { Moment } from "moment";
 import type { RangeValue } from "rc-picker/lib/interface";
+import { useSelectedInstitute } from "../../services/context/selected-institute-ctx";
 
 function nameSorter(en: boolean) {
   return (
@@ -197,6 +198,7 @@ function getPopupContainer(): HTMLElement {
 
 const AllEvents: FC = () => {
   const { en } = useContext(LanguageCtx);
+  const { institute } = useSelectedInstitute();
 
   const {
     allEvents,
@@ -210,7 +212,12 @@ const AllEvents: FC = () => {
   }, []);
 
   const handleCreateEvent = () => {
-    router.push("events/register");
+    if (institute) {
+      router.push({
+        pathname: "/[instituteId]/events/register",
+        query: { instituteId: institute.urlIdentifier },
+      });
+    }
   };
 
   const { localAccount } = useContext(ActiveAccountCtx);

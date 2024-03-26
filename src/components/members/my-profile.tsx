@@ -23,6 +23,8 @@ import PrivateMemberForm from "./member-private-form";
 import MemberInsightForm from "./member-insight-form";
 import { SaveChangesCtx } from "../../services/context/save-changes-ctx";
 import router from "next/router";
+import { useSelectedInstitute } from "../../services/context/selected-institute-ctx";
+import PageRoutes from "../../routing/page-routes";
 
 type Tab = { label: string; key: string; children: ReactNode };
 
@@ -33,15 +35,18 @@ const MyProfile: FC = () => {
   const { localAccount, setLocalAccount, loading, refresh } =
     useContext(ActiveAccountCtx);
   const [editMode, setEditMode] = useState(false);
+  const { institute } = useSelectedInstitute();
   const [activeTabKey, setActiveTabKey] = useState(keys.public);
   const { saveChangesPrompt } = useContext(SaveChangesCtx);
 
   const handleRegisterPartner = () => {
-    router.push("/partners/register-partner");
+    if (institute)
+      router.push(PageRoutes.registerPartner(institute?.urlIdentifier));
   };
 
   const handleRegisterSupervision = () => {
-    router.push("/supervisions/register-supervision");
+    if (institute)
+      router.push(PageRoutes.registerSupervision(institute?.urlIdentifier));
   };
 
   useEffect(() => {

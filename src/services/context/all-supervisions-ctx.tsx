@@ -1,13 +1,16 @@
 import {
   createContext,
   FC,
+  PropsWithChildren,
+  useCallback,
+  useContext,
   useEffect,
   useState,
-  PropsWithChildren,
 } from "react";
 import ApiRoutes from "../../routing/api-routes";
 import Notification from "../notifications/notification";
 import type { SupervisionPublicInfo } from "../_types";
+import { useSelectedInstitute } from "./selected-institute-ctx"; // Adjust this path as necessary.
 
 export const AllSupervisionsCtx = createContext<{
   allSupervisions: SupervisionPublicInfo[];
@@ -22,29 +25,41 @@ export const AllSupervisionsCtxProvider: FC<PropsWithChildren> = ({
   const [allSupervisions, setAllSupervisions] = useState<
     SupervisionPublicInfo[]
   >([]);
-  const [loading, setLoading] = useState(true); // true so loading icons are served from server
+  const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const { institute } = useSelectedInstitute();
 
-  async function fetchAllSupervisions() {
+  const fetchAllSupervisions = useCallback(async () => {
+    if (!institute) {
+      console.log("Institute not found.");
+      setLoading(false);
+      return;
+    }
+
     try {
-      const result = await fetch(ApiRoutes.allSupervisions);
+      const queryParam = `?instituteId=${institute.urlIdentifier}`;
+      const result = await fetch(`${ApiRoutes.allSupervisions}${queryParam}`);
       if (!result.ok) throw await result.text();
-      let supervision: SupervisionPublicInfo[] = await result.json();
+      let supervisions: SupervisionPublicInfo[] = await result.json();
 
-      supervision.sort((a, b) => a.first_name?.localeCompare(b.first_name));
-      setAllSupervisions(supervision);
+      supervisions.sort((a, b) => a.first_name.localeCompare(b.first_name));
+      setAllSupervisions(supervisions);
     } catch (e: any) {
       new Notification().error(e);
+    } finally {
+      setLoading(false);
     }
-  }
+  }, [institute]);
 
   useEffect(() => {
     async function firstLoad() {
-      await fetchAllSupervisions();
+      if (institute) {
+        await fetchAllSupervisions();
+      }
       setLoading(false);
     }
     firstLoad();
-  }, []);
+  }, [fetchAllSupervisions, institute]);
 
   async function refresh() {
     if (loading || refreshing) return;
@@ -58,7 +73,7 @@ export const AllSupervisionsCtxProvider: FC<PropsWithChildren> = ({
 
   return (
     <AllSupervisionsCtx.Provider
-      value={{ allSupervisions, loading, refresh, refreshing }}
+      value={{ allSupervisions, loading, refreshing, refresh }}
     >
       {children}
     </AllSupervisionsCtx.Provider>

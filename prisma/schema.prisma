@@ -4,8 +4,48 @@ generator client {
 
 datasource db {
   provider = "sqlserver"
-  url      = env("DATABASE_URL")
+  url      = env("DATABASE_URL_TEST")
 }
+
+model institute {
+  id             Int                 @id @default(autoincrement())
+  name           String              @unique
+  urlIdentifier  String              @unique
+  description_en    String?
+  description_fr    String?
+  members       memberInstitute[]
+  products      productInstitute[]
+  organizations OrganizationInstitute[]
+  grants        grant[]
+  events        event[]
+  supervisions  supervision[]
+}
+
+model memberInstitute {
+  memberId    Int
+  instituteId Int
+  member      member    @relation(fields: [memberId], references: [id])
+  institute   institute @relation(fields: [instituteId], references: [id])
+  @@id([memberId, instituteId])
+}
+
+model productInstitute {
+  productId   Int
+  instituteId Int
+  product     product    @relation(fields: [productId], references: [id])
+  institute   institute  @relation(fields: [instituteId], references: [id])
+  @@id([productId, instituteId])
+}
+
+model OrganizationInstitute {
+  organizationId Int
+  instituteId    Int
+  organization   organization @relation(fields: [organizationId], references: [id])
+  institute      institute    @relation(fields: [instituteId], references: [id])
+  @@id([organizationId, instituteId])
+}
+
+
 
 model account {
   id           Int       @id(map: "PK_account") @default(autoincrement())
@@ -14,6 +54,7 @@ model account {
   first_name   String    @db.NVarChar(255)
   last_name    String    @db.NVarChar(255)
   is_admin     Boolean   @default(false, map: "DF_account_is_admin")
+  is_super_admin Boolean  @default(false, map: "DF_account_is_super_admin")
   last_login   DateTime? @db.Date
   member       member?
 }
@@ -67,6 +108,9 @@ model event {
   event_previous_event_event_previous_event_previous_event_idToevent event_previous_event[]   @relation("event_previous_event_previous_event_idToevent")
   event_product_resulted                                             event_product_resulted[]
   event_topic                                                        event_topic[]
+
+  instituteId                                                        Int
+  institute                                                          institute @relation(fields: [instituteId], references: [id])
 }
 
 model event_event {
@@ -173,6 +217,9 @@ model grant {
   topic                     topic?                      @relation(fields: [topic_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_grant_topic")
   grant_investigator_member grant_investigator_member[]
   grant_member_involved     grant_member_involved[]
+
+  instituteId               Int
+  institute                 institute @relation(fields: [instituteId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model grant_investigator_member {
@@ -314,6 +361,7 @@ model member {
   supervision_committee            supervision_committee[]
   supervision_principal_supervisor supervision_principal_supervisor[]
   supervision_trainee              supervision_trainee[]
+  institutes                       memberInstitute[]
 }
 
 model member_type {
@@ -351,6 +399,7 @@ model organization {
   org_type               org_type?                @relation(fields: [type_id], references: [id], onUpdate: SetNull, map: "FK_organization_type_id")
   partnership_member_org partnership_member_org[]
   product_partnership    product_partnership[]
+  organizationInstitute  OrganizationInstitute[]
 }
 
 model partnership_member_org {
@@ -388,6 +437,7 @@ model product {
   product_partnership    product_partnership[]
   product_target         product_target[]
   product_topic          product_topic[]
+  institutes             productInstitute[]
 }
 
 model product_member_all_author {
@@ -477,6 +527,8 @@ model supervision {
   supervision_committee            supervision_committee[]
   supervision_principal_supervisor supervision_principal_supervisor[]
   supervision_trainee              supervision_trainee[]
+  instituteId                      Int
+  institute                        institute? @relation(fields: [instituteId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model supervision_co_supervisor {

@@ -13,6 +13,7 @@ import { LanguageCtx } from "../../services/context/language-ctx";
 import { EventTypesCtx } from "../../services/context/event-types-ctx";
 import { AllTopicsCtx } from "../../services/context/all-topics-ctx";
 import GetLanguage from "../../utils/front-end/get-language";
+import { useSelectedInstitute } from "../../services/context/selected-institute-ctx";
 
 const { Option } = Select;
 const { RangePicker } = DatePicker; // Add RangePicker import
@@ -23,12 +24,14 @@ type EventData = {
   date_range: [Moment | null, Moment | null];
   event_type_id: number;
   note: string;
+  institute_id: number;
 };
 
 const RegisterEvent: FC = () => {
   const [form] = useForm<EventData>();
   const { en } = useContext(LanguageCtx);
   const { eventTypes } = useContext(EventTypesCtx);
+  const { institute } = useSelectedInstitute();
 
   async function handleRegister({
     name_en,
@@ -37,14 +40,15 @@ const RegisterEvent: FC = () => {
     event_type_id,
     note,
   }: EventData) {
+    if (!institute) return;
     const res = await registerEvent({
       name_en,
       name_fr,
       start_date: date_range[0] ? date_range[0].toDate() : null, // Access start_date from date_range
       end_date: date_range[1] ? date_range[1].toDate() : null, // Access end_date from date_range
       event_type_id,
-
       note,
+      institute_id: institute.id,
     });
     if (res) form.resetFields();
   }

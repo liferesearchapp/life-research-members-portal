@@ -29,6 +29,8 @@ const PageAuthGuard: FC<PropsWithChildren<Props>> = ({ auths, id, loadingIcon, c
   if (!localAccount) return notAuthorized;
   if (auths.includes(Authorizations.registered)) return c;
   if (auths.includes(Authorizations.admin) && localAccount.is_admin) return c;
+  if (auths.includes(Authorizations.superAdmin) && localAccount.is_super_admin)
+    return c;
   if (auths.includes(Authorizations.matchAccountId) && localAccount.id === id) return c;
   if (!localAccount.member) return notAuthorized;
   if (auths.includes(Authorizations.matchMemberId) && localAccount.member.id === id) return c;

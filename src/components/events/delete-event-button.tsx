@@ -22,6 +22,7 @@ import deleteEvent from "../../services/delete-event"; // Update the import stat
 import { useRouter } from "next/router";
 import PageRoutes from "../../routing/page-routes";
 import Notification from "../../services/notifications/notification";
+import { useSelectedInstitute } from "../../services/context/selected-institute-ctx";
 
 type Data = { confirmation: string };
 type Props = {
@@ -32,6 +33,7 @@ type Props = {
 
 const DeleteEventButton: FC<Props> = ({ event, setEvent, style }) => {
   const { en } = useContext(LanguageCtx);
+  const { institute } = useSelectedInstitute();
   const router = useRouter();
   const [modalOpen, setModalOpen] = useState(false);
   const [form] = useForm<Data>();
@@ -40,9 +42,9 @@ const DeleteEventButton: FC<Props> = ({ event, setEvent, style }) => {
 
   async function submit() {
     const res = await deleteEvent(event.id);
-    if (res) {
+    if (res && institute?.urlIdentifier) {
       setModalOpen(false);
-      router.push(PageRoutes.allEvents);
+      router.push(PageRoutes.allEvents(institute?.urlIdentifier));
     }
   }
 

@@ -3,6 +3,7 @@ import {
   createContext,
   FC,
   PropsWithChildren,
+  useCallback,
   useContext,
   useEffect,
   useState,
@@ -10,17 +11,7 @@ import {
 import ApiRoutes from "../../routing/api-routes";
 import Notification from "../notifications/notification";
 import { LanguageCtx } from "./language-ctx";
-
-async function fetchAllProducts(): Promise<product[]> {
-  try {
-    const res = await fetch(ApiRoutes.allProducts);
-    if (!res.ok) throw await res.text();
-    return await res.json();
-  } catch (e: any) {
-    new Notification().error(e);
-    return [];
-  }
-}
+import { useSelectedInstitute } from "./selected-institute-ctx";
 
 function enSorter(a: product, b: product): number {
   return (a.title_en || a.title_fr || "").localeCompare(
@@ -44,22 +35,35 @@ export const ProductsCtx = createContext<{
 export const ProductsCtxProvider: FC<PropsWithChildren> = ({ children }) => {
   const [products, setProducts] = useState<product[]>([]);
   const [productMap, setProductMap] = useState(new Map<number, product>());
+  const { institute } = useSelectedInstitute();
   const { en } = useContext(LanguageCtx);
 
-  async function getProducts() {
-    const products = await fetchAllProducts();
-    setProducts(products.sort(en ? enSorter : frSorter));
-    setProductMap(new Map(products.map((p) => [p.id, p])));
-  }
+  const fetchAllProducts = useCallback(async () => {
+    if (!institute) {
+      return [];
+    }
 
+    try {
+      const queryParam = `?instituteId=${institute.urlIdentifier}`;
+      const res = await fetch(`${ApiRoutes.allProducts}${queryParam}`);
+      if (!res.ok) throw await res.text();
+      return await res.json();
+    } catch (e: any) {
+      new Notification().error(e);
+      return [];
+    }
+  }, [institute]);
+
+  const getProducts = useCallback(async () => {
+    const products = await fetchAllProducts();
+    const sorter = en ? enSorter : frSorter;
+    setProducts(products.sort(sorter));
+    setProductMap(new Map(products.map((p: product) => [p.id, p])));
+  }, [fetchAllProducts, en]);
   useEffect(() => {
     getProducts();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    setProducts((prev) => prev.sort(en ? enSorter : frSorter));
-  }, [en]);
+  }, [getProducts]);
+  
 
   function refresh() {
     getProducts();

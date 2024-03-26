@@ -22,6 +22,7 @@ import deleteGrant from "../../services/delete-grant";
 import { useRouter } from "next/router";
 import PageRoutes from "../../routing/page-routes";
 import Notification from "../../services/notifications/notification";
+import { useSelectedInstitute } from "../../services/context/selected-institute-ctx";
 
 type Data = { confirmation: string };
 type Props = {
@@ -35,6 +36,7 @@ const DeleteGrantButton: FC<Props> = ({ grant, setGrant, style }) => {
   const router = useRouter();
   const [modalOpen, setModalOpen] = useState(false);
   const [form] = useForm<Data>();
+  const { institute } = useSelectedInstitute();
 
   const grantName = grant.title;
 
@@ -42,7 +44,8 @@ const DeleteGrantButton: FC<Props> = ({ grant, setGrant, style }) => {
     const res = await deleteGrant(grant.id);
     if (res) {
       setModalOpen(false);
-      router.push(PageRoutes.allGrants);
+      if (institute)
+        router.push(PageRoutes.allGrants(institute?.urlIdentifier));
     }
   }
 

@@ -17,21 +17,36 @@ import PageRoutes from "../../routing/page-routes";
 import SafeLink from "../link/safe-link";
 import type { UrlObject } from "url";
 
-const NavMenu: FC = () => {
+const NavMenu: FC<{ urlIdentifier: string | undefined }> = ({
+  urlIdentifier,
+}) => {
   const { localAccount, loading } = useContext(ActiveAccountCtx);
   const router = useRouter();
   const { en } = useContext(LanguageCtx);
+  if (!urlIdentifier) return <Spin />;
 
   // Everyone
   const generalItems = [
-    { label: en ? "Home" : "Accueil", href: PageRoutes.home },
+    {
+      label: en ? "Home" : "Accueil",
+      href: PageRoutes.instituteHome(urlIdentifier),
+    },
   ];
 
   // Registered Acounts
   const registeredItemsFirst = [
-    { label: en ? "Members" : "Membres", href: PageRoutes.allMembers },
-    { label: en ? "Products" : "Produits", href: PageRoutes.products },
-    { label: en ? "Partners" : "Partenaires", href: PageRoutes.allPartners },
+    {
+      label: en ? "Members" : "Membres",
+      href: PageRoutes.allMembers(urlIdentifier),
+    },
+    {
+      label: en ? "Products" : "Produits",
+      href: PageRoutes.allProducts(urlIdentifier),
+    },
+    {
+      label: en ? "Partners" : "Partenaires",
+      href: PageRoutes.allPartners(urlIdentifier),
+    },
   ];
 
   // Registered Acounts
@@ -41,20 +56,26 @@ const NavMenu: FC = () => {
 
   // Admins
   const adminItems = [
-    { label: en ? "Grants" : "Subventions", href: PageRoutes.allGrants },
-    { label: en ? "Events" : "Événements", href: PageRoutes.allEvents },
+    {
+      label: en ? "Grants" : "Subventions",
+      href: PageRoutes.allGrants(urlIdentifier),
+    },
+    {
+      label: en ? "Events" : "Événements",
+      href: PageRoutes.allEvents(urlIdentifier),
+    },
     {
       label: en ? "Supervisions" : "Supervisions",
-      href: PageRoutes.allSupervisions,
+      href: PageRoutes.allSupervisions(urlIdentifier),
     },
 
     {
       label: en ? "Accounts" : "Comptes",
-      href: PageRoutes.allAccounts,
+      href: PageRoutes.allAccounts(urlIdentifier),
       children: [
         {
           label: en ? "All accounts" : "Tous les comptes",
-          href: PageRoutes.allAccounts,
+          href: PageRoutes.allAccounts(urlIdentifier),
         },
         {
           label: en ? "Register an account" : "Enregistrer un compte",
@@ -64,10 +85,21 @@ const NavMenu: FC = () => {
     },
   ];
 
+  const superAdminItems = [
+    {
+      label: en ? "Institutes" : "Instituts",
+      href: PageRoutes.allInstitutes(),
+    },
+  ];
+
+  console.log("NavMenu", { localAccount, loading });
+
   const items: { label: string; href: string; children?: any }[] = generalItems;
   if (!loading) {
     if (localAccount) for (const it of registeredItemsFirst) items.push(it);
     if (localAccount?.is_admin) for (const it of adminItems) items.push(it);
+    if (localAccount?.is_super_admin)
+      for (const it of superAdminItems) items.push(it);
     if (localAccount) for (const it of registeredItemsLast) items.push(it);
   }
 

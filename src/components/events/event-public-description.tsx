@@ -153,6 +153,12 @@ const PublicEventDescription: FC<Props> = ({ event }) => {
         </ol>
       </Item>
 
+      <Item label={en ? "Institute" : "L'institut"}>
+        <Tag
+          key={event.institute.id}
+        >{`${event.institute.name} - ${event.institute.urlIdentifier}`}</Tag>
+      </Item>
+
       <Item label={en ? "Event Topic" : "Sujet de l'événement"}>
         {event.event_topic.map((entry, i) => (
           <Tag key={i} color="blue">

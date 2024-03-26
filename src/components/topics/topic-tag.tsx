@@ -9,6 +9,7 @@ import GetLanguage from "../../utils/front-end/get-language";
 import GetOppositeLanguage from "../../utils/front-end/get-opposite-language";
 import SafeLink from "../link/safe-link";
 import { queryKeys } from "../products/all-products";
+import { useSelectedInstitute } from "../../services/context/selected-institute-ctx";
 
 type Props = {
   topic: topic;
@@ -34,6 +35,7 @@ const TopicTag: FC<Props> = ({
   style,
 }) => {
   const [modalOpen, setModalOpen] = useState(false);
+  const { institute } = useSelectedInstitute();
 
   const classList = ["keyword-tag"];
   if (linked || editable || onClick) classList.push("cursor-pointer");
@@ -46,7 +48,7 @@ const TopicTag: FC<Props> = ({
   const content = linked ? (
     <SafeLink
       href={{
-        pathname: PageRoutes.allProducts,
+        pathname: PageRoutes.allProducts(institute?.urlIdentifier || ""),
         //query: { [queryKeys.topics]: k.id },
       }}
     >

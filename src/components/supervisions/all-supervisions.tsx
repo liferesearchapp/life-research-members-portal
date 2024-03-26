@@ -31,6 +31,7 @@ import FacultyFilter from "../filters/faculty-filter";
 import SupervisionNameFilter from "../filters/supervision-name-filter";
 import type { ParsedUrlQueryInput } from "querystring";
 import { ActiveAccountCtx } from "../../services/context/active-account-ctx";
+import { useSelectedInstitute } from "../../services/context/selected-institute-ctx";
 
 function nameSorter(a: { name: string }, b: { name: string }) {
   return a.name.localeCompare(b.name);
@@ -185,6 +186,7 @@ function getPopupContainer(): HTMLElement {
 
 const AllSupervisions: FC = () => {
   const { en } = useContext(LanguageCtx);
+  const { institute } = useSelectedInstitute();
 
   const {
     allSupervisions,
@@ -193,7 +195,12 @@ const AllSupervisions: FC = () => {
   } = useContext(AllSupervisionsCtx);
 
   const handleCreateEvent = () => {
-    router.push("supervisions/register");
+    if (institute) {
+      router.push({
+        pathname: "/[instituteId]/supervisions/register",
+        query: { instituteId: institute.urlIdentifier },
+      });
+    }
   };
 
   const { localAccount } = useContext(ActiveAccountCtx);

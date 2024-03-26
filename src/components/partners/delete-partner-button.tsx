@@ -25,6 +25,7 @@ import deletePartner from "../../services/delete-partner"; // Update the import 
 import { useRouter } from "next/router";
 import PageRoutes from "../../routing/page-routes";
 import Notification from "../../services/notifications/notification";
+import { useSelectedInstitute } from "../../services/context/selected-institute-ctx";
 
 type Data = { confirmation: string };
 type Props = {
@@ -38,6 +39,7 @@ const DeletePartnerButton: FC<Props> = ({ partner, setPartner, style }) => {
   const router = useRouter();
   const [modalOpen, setModalOpen] = useState(false);
   const [form] = useForm<Data>();
+  const { institute } = useSelectedInstitute();
 
   const partnerName = en ? partner.name_en : partner.name_fr;
 
@@ -45,7 +47,8 @@ const DeletePartnerButton: FC<Props> = ({ partner, setPartner, style }) => {
     const res = await deletePartner(partner.id);
     if (res) {
       setModalOpen(false);
-      router.push(PageRoutes.allPartners); // Update the route
+      if (institute?.urlIdentifier)
+        router.push(PageRoutes.allPartners(institute?.urlIdentifier));
     }
   }
 

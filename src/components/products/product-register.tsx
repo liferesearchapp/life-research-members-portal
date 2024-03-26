@@ -15,6 +15,8 @@ import registerProduct from "../../services/register-product";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import { ProductTypesCtx } from "../../services/context/products-types-ctx";
 import GetLanguage from "../../utils/front-end/get-language";
+import { MemberInstituteCtx } from "../../services/context/member-institutes-ctx";
+import { useSelectedInstitute } from "../../services/context/selected-institute-ctx";
 
 const { Option } = Select;
 
@@ -27,12 +29,15 @@ type Data = {
   on_going: boolean;
   peer_reviewed: boolean;
   product_type_id: number;
+  institute_id: number[];
   note: string;
 };
 
 const RegisterProduct: FC = () => {
   const [form] = useForm<Data>();
   const { en } = useContext(LanguageCtx);
+  const { institutes } = useContext(MemberInstituteCtx);
+  const { institute } = useSelectedInstitute();
   const { productTypes } = useContext(ProductTypesCtx);
   const [onGoing, setOnGoing] = useState(false);
   const [peerReviewed, setPeerReviewed] = useState(false);
@@ -44,6 +49,7 @@ const RegisterProduct: FC = () => {
     doi,
     all_author,
     product_type_id,
+    institute_id,
     note,
   }: Omit<Data, "on_going" | "peer_reviewed">) {
     const res = await registerProduct({
@@ -55,6 +61,7 @@ const RegisterProduct: FC = () => {
       on_going: onGoing,
       peer_reviewed: peerReviewed,
       product_type_id,
+      institute_id,
       note,
     });
     if (res) form.resetFields();
@@ -116,6 +123,22 @@ const RegisterProduct: FC = () => {
             ))}
           </Select>
         </Form.Item>
+        {institute && (
+          <Form.Item
+            label={en ? "Select Institute" : "Sélectionnez l'institut"}
+            name="institute_id"
+            initialValue={[institute.id]}
+          >
+            <Select mode="multiple">
+              <Option value="">{""}</Option>
+              {institutes.map((f) => (
+                <Option key={f.id} value={f.id}>
+                  {`${f.name} - ${f.urlIdentifier}`}
+                </Option>
+              ))}
+            </Select>
+          </Form.Item>
+        )}
 
         <Row gutter={16}>
           <Col span={12}>

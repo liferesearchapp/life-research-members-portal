@@ -18,6 +18,8 @@ import { GrantSourcesCtx } from "../../services/context/grant-sources-ctx";
 import { GrantStatusCtx } from "../../services/context/grant-statuses-ctx";
 import { AllTopicsCtx } from "../../services/context/all-topics-ctx";
 import GetLanguage from "../../utils/front-end/get-language";
+import { MemberInstituteCtx } from "../../services/context/member-institutes-ctx";
+import { useSelectedInstitute } from "../../services/context/selected-institute-ctx";
 
 const { Option } = Select;
 
@@ -32,6 +34,7 @@ type GrantData = {
   all_investigator: string;
   topic_id: number;
   note: string;
+  institute_id: number;
 };
 
 const RegisterGrant: FC = () => {
@@ -40,6 +43,7 @@ const RegisterGrant: FC = () => {
   const { grantSources } = useContext(GrantSourcesCtx);
   const { grantStatuses } = useContext(GrantStatusCtx);
   const { topics } = useContext(AllTopicsCtx);
+  const { institute } = useSelectedInstitute();
   const [throughtLRI, setThroughtLRI] = useState(false);
 
   async function handleRegister({
@@ -54,6 +58,7 @@ const RegisterGrant: FC = () => {
     topic_id,
     note,
   }: GrantData) {
+    if (!institute) return;
     const res = await registerGrant({
       title,
       amount: parseFloat(amount), // Convert amount to a float
@@ -66,6 +71,7 @@ const RegisterGrant: FC = () => {
       all_investigator,
       topic_id,
       note,
+      institute_id: institute?.id,
     });
     if (res) form.resetFields();
   }

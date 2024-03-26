@@ -22,6 +22,7 @@ import deleteProduct from "../../services/delete-product";
 import { useRouter } from "next/router";
 import PageRoutes from "../../routing/page-routes";
 import Notification from "../../services/notifications/notification";
+import { useSelectedInstitute } from "../../services/context/selected-institute-ctx";
 
 type Data = { confirmation: string };
 type Props = {
@@ -35,14 +36,15 @@ const DeleteProductButton: FC<Props> = ({ product, setProduct, style }) => {
   const router = useRouter();
   const [modalOpen, setModalOpen] = useState(false);
   const [form] = useForm<Data>();
+  const { institute } = useSelectedInstitute();
 
   const productName = en ? product.title_en : product.title_fr;
 
   async function submit() {
     const res = await deleteProduct(product.id);
-    if (res) {
+    if (res && institute) {
       setModalOpen(false);
-      router.push(PageRoutes.products);
+      router.push(PageRoutes.allProducts(institute?.urlIdentifier));
     }
   }
 

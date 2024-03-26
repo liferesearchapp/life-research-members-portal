@@ -105,7 +105,13 @@ const PublicSupervisionDescription: FC<Props> = ({ supervision }) => {
           </SafeLink>
         ))}
       </Item>
-
+      {supervision.institute && (
+        <Item label={en ? "Institute" : "L'institut"}>
+          <Tag
+            key={supervision.institute.id}
+          >{`${supervision.institute.name} - ${supervision.institute.urlIdentifier}`}</Tag>
+        </Item>
+      )}
       <Item label={en ? "Committee Members" : "Membres du comité"}>
         {supervision.supervision_committee.map((entry, i) => (
           <SafeLink
