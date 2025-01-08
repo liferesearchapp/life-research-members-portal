@@ -5,7 +5,7 @@ import getAuthHeader from "./headers/auth-header";
 import { contentTypeJsonHeader } from "./headers/content-type-headers";
 import Notification from "./notifications/notification";
 import type { AccountInfo } from "./_types";
-import { addInstituteParams } from "../pages/api/update-account/[id]/add-institute";
+import type { addInstituteParams } from "../pages/api/update-account/[id]/add-institute";
 
 export default async function addInstitute(
   id: number,

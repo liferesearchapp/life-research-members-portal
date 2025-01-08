@@ -1,4 +1,3 @@
-import { member } from "@prisma/client";
 import db from "../../../prisma/prisma-client";
 import getAccountFromRequest from "../../utils/api/get-account-from-request";
 import type { NextApiRequest, NextApiResponse } from "next";
@@ -9,6 +8,7 @@ export type MemberInstitutesRes = {
   urlIdentifier: string;
   description_en: string | null;
   description_fr: string | null;
+  is_active: boolean;
 };
 
 async function getMemberInstitutes(
@@ -26,6 +26,7 @@ async function getMemberInstitutes(
           urlIdentifier: true,
           description_en: true,
           description_fr: true,
+          is_active: true,
         },
       },
     },

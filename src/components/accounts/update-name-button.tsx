@@ -3,7 +3,7 @@ import Button from "antd/lib/button";
 import Form from "antd/lib/form";
 import Input from "antd/lib/input";
 import Modal from "antd/lib/modal";
-import { Dispatch, FC, SetStateAction, useContext, useEffect, useState } from "react";
+import { type Dispatch, type FC, type SetStateAction, useContext, useEffect, useState } from "react";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import type { AccountInfo } from "../../services/_types";
 import updateAccountName from "../../services/update-account-name";

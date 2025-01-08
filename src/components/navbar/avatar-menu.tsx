@@ -48,12 +48,19 @@ const AvatarMenu: FC = () => {
     </Typography>
   ) : null;
 
+  const superAdmin = localAccount?.is_super_admin ? (
+    <Typography>
+      {en ? "Super Admin" : "Super Administrateur"} &nbsp; <CheckCircleTwoTone />
+    </Typography>
+  ) : null;
+
   const dropdown = (
     <Card bodyStyle={{ padding: 0 }}>
       <div className="avatar-dropdown">
         <Typography>{name}</Typography>
         <Typography>{email}</Typography>
         {registered}
+        {superAdmin}
         {administrator}
         {member}
         <div style={{ height: 16 }}></div>

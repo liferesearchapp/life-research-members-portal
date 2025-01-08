@@ -8,9 +8,9 @@ import Input from "antd/lib/input";
 import Modal from "antd/lib/modal";
 import {
   CSSProperties,
-  Dispatch,
-  FC,
-  SetStateAction,
+  type Dispatch,
+  type FC,
+  type SetStateAction,
   useContext,
   useState,
 } from "react";
@@ -21,7 +21,6 @@ import Text from "antd/lib/typography/Text";
 import deleteEvent from "../../services/delete-event"; // Update the import statement
 import { useRouter } from "next/router";
 import PageRoutes from "../../routing/page-routes";
-import Notification from "../../services/notifications/notification";
 import { useSelectedInstitute } from "../../services/context/selected-institute-ctx";
 
 type Data = { confirmation: string };

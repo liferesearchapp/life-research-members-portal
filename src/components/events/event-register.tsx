@@ -1,17 +1,15 @@
 // This component allows users to register a new event by providing the event's name in English and French, date range, event type, and a note.
 
-import { Button, Col, DatePicker, Row, Switch } from "antd";
+import { Button, DatePicker } from "antd";
 import Select from "antd/lib/select";
 import Form from "antd/lib/form";
 import Input from "antd/lib/input";
-import React, { FC, useContext, useState } from "react";
+import React, { type FC, useContext } from "react";
 import { useForm } from "antd/lib/form/Form";
-import moment from "moment";
 import type { Moment } from "moment";
 import registerEvent from "../../services/register-event";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import { EventTypesCtx } from "../../services/context/event-types-ctx";
-import { AllTopicsCtx } from "../../services/context/all-topics-ctx";
 import GetLanguage from "../../utils/front-end/get-language";
 import { useSelectedInstitute } from "../../services/context/selected-institute-ctx";
 

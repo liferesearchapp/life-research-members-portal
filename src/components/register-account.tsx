@@ -4,7 +4,7 @@
 import { Button, Select } from "antd";
 import Form from "antd/lib/form";
 import Input from "antd/lib/input";
-import { FC, useContext } from "react";
+import { type FC, useContext } from "react";
 import registerAccount from "../services/register-account";
 import Checkbox from "antd/lib/checkbox/Checkbox";
 import { useForm } from "antd/lib/form/Form";
@@ -15,6 +15,7 @@ import {
   useSelectedInstitute,
 } from "../services/context/selected-institute-ctx";
 import { ActiveAccountCtx } from "../services/context/active-account-ctx";
+
 type Data = {
   login_email: string;
   confirm_email: string;

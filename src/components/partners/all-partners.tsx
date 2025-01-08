@@ -145,8 +145,15 @@ function handleShowTypeChange(value: boolean) {
   Router.push({ query }, undefined, { scroll: false });
 }
 
-function clearQueries() {
-  Router.push({ query: null }, undefined, { scroll: false });
+function clearQueries(institute: { urlIdentifier: string | null }) {
+  if (institute?.urlIdentifier) {
+    const url = PageRoutes.allMembers(institute.urlIdentifier);
+    console.log("Redirecting to:", url); 
+    Router.push(url); 
+  } else {
+    console.error("Unable to reset filters: Institute ID is missing.");
+    alert("Unable to reset filters: Institute ID is missing.");
+  }
 }
 
 function getIdsFromQueryParams(key: string): Set<number> {
@@ -236,8 +243,13 @@ const AllPartners: FC = () => {
   }, [scopeQuery]);
 
   function refreshAndClearFilters() {
-    clearQueries();
-    refreshOrganizations();
+    const instituteUrlIdentifier = institute?.urlIdentifier; // Retrieve urlIdentifier instead of id
+    if (instituteUrlIdentifier) {
+      clearQueries({ urlIdentifier: instituteUrlIdentifier }); // Pass as an object
+      refreshOrganizations();
+    } else {
+      console.error("Cannot reset filters: Institute ID is missing.");
+    }
   }
 
   const filteredOrganisation = useMemo(

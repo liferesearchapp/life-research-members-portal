@@ -1,5 +1,3 @@
-import registerInstitute from "../services/register-institute";
-
 // Make sure these start with forward slash '/' - indicates domain root
 const ApiRoutes = {
   allMembers: "/api/all-members",
@@ -23,7 +21,9 @@ const ApiRoutes = {
   activeAccount: "/api/active-account",
   activeAccountUpdateLastLogin: "/api/active-account/update-last-login",
   memberInstitute: "/api/member-institute",
+  instituteSelector: "/api/institute-selector",
   account: (id: number) => "/api/account/" + id,
+  institute: (id: number) => "/api/institute/" +id,
   publicMemberInfo: (id: number) => "/api/member/" + id + "/public",
   publicPartnerInfo: (id: number) => "/api/partner/" + id + "/public",
   privatePartnerInfo: (id: number) => "/api/partner/" + id + "/private",
@@ -55,6 +55,7 @@ const ApiRoutes = {
     "/api/update-account/" + id + "/register-member",
   updateAccountDeleteMember: (id: number) =>
     "/api/update-account/" + id + "/delete-member",
+  updateInstitute: (id: number) => "/api/update-institute/" + id + "/private",
   updateMemberPublic: (id: number) => "/api/update-member/" + id + "/public",
   updateMemberPrivate: (id: number) => "/api/update-member/" + id + "/private",
   updateProductPublic: (id: number) => "/api/update-product/" + id + "/public",

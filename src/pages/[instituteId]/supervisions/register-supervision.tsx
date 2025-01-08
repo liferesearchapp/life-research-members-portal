@@ -6,7 +6,7 @@ import RegisterSupervision from "../../../components/supervisions/supervision-me
 
 const Register: NextPage = () => {
   return (
-    <PageAuthGuard auths={[Authorizations.registered]}>
+    <PageAuthGuard auths={[Authorizations.member]}>
       <Layout>
         <RegisterSupervision />
       </Layout>

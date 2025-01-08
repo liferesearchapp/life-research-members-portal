@@ -2,7 +2,7 @@
 // It also uses the updateEventPublic API function from the services to update the event data on the backend
 
 import React, { FC, useContext, useState, useCallback, useEffect } from "react";
-import { Form, Input, Select, Button, DatePicker, Divider } from "antd";
+import { Form, Input, Select, Button, DatePicker } from "antd";
 import TextArea from "antd/lib/input/TextArea";
 
 import { useForm } from "antd/lib/form/Form";
@@ -13,10 +13,7 @@ import {
 } from "../../services/context/save-changes-ctx";
 import moment, { Moment } from "moment";
 import Notification from "../../services/notifications/notification";
-import type { event, organization } from "@prisma/client";
-import type { grant } from "@prisma/client";
-import type { product } from "@prisma/client";
-import type { topic } from "@prisma/client";
+import type { event, grant, organization, product, topic } from "@prisma/client";
 import type {
   EventPrivateInfo,
   EventPublicInfo,

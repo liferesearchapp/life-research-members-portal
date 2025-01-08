@@ -6,9 +6,7 @@ import Button from "antd/lib/button";
 import Table, { ColumnType } from "antd/lib/table";
 import Title from "antd/lib/typography/Title";
 import {
-  FC,
-  Fragment,
-  useCallback,
+  type FC,
   useContext,
   useEffect,
   useMemo,
@@ -173,8 +171,15 @@ function handleShowEndDateChange(value: boolean) {
   Router.push({ query }, undefined, { scroll: false });
 }
 
-function clearQueries() {
-  Router.push({ query: null }, undefined, { scroll: false });
+function clearQueries(institute: { urlIdentifier: string | null }) {
+  if (institute?.urlIdentifier) {
+    const url = PageRoutes.allEvents(institute.urlIdentifier);
+    console.log("Redirecting to:", url); 
+    Router.push(url); 
+  } else {
+    console.error("Unable to reset filters: Institute ID is missing.");
+    alert("Unable to reset filters: Institute ID is missing.");
+  }
 }
 
 function getIdsFromQueryParams(key: string): Set<number> {
@@ -289,8 +294,14 @@ const AllEvents: FC = () => {
   }, [typeQuery]);
 
   function refreshAndClearFilters() {
-    clearQueries();
-    refreshEvents();
+    const instituteUrlIdentifier = institute?.urlIdentifier; 
+    if (instituteUrlIdentifier) {
+      clearQueries({ urlIdentifier: instituteUrlIdentifier }); 
+       refreshEvents();
+    }else {
+      console.error("Cannot reset filters: Institute ID is missing.");
+    }
+    
   }
   const filteredEvents = useMemo(
     () =>

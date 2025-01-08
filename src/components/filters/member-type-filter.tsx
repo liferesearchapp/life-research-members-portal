@@ -4,7 +4,7 @@ Uses MemberTypesCtx and LanguageCtx from context for data and translation.
 */
 
 import Select, { SelectProps } from "antd/lib/select";
-import { FC, useContext, useMemo } from "react";
+import { type FC, useContext, useMemo } from "react";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import { MemberTypesCtx } from "../../services/context/member-types-ctx";
 import GetLanguage from "../../utils/front-end/get-language";

@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "sqlserver"
-  url      = env("DATABASE_URL_TEST")
+  url      = env("DATABASE_URL")
 }
 
 model institute {
@@ -17,9 +17,10 @@ model institute {
   grants         grant[]
   instituteAdmin instituteAdmin[]
   members        memberInstitute[]
-  organizations  OrganizationInstitute[]
+  organizations  organizationInstitute[]
   products       productInstitute[]
   supervisions   supervision[]
+  is_active      Boolean @default(true, map: "DF_institute_is_active")
 }
 
 model memberInstitute {
@@ -40,7 +41,7 @@ model productInstitute {
   @@id([productId, instituteId])
 }
 
-model OrganizationInstitute {
+model organizationInstitute {
   organizationId Int
   instituteId    Int
   institute      institute    @relation(fields: [instituteId], references: [id])
@@ -398,7 +399,7 @@ model organization {
   event_partner_involved event_partner_involved[]
   org_scope              org_scope?               @relation(fields: [scope_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_organization_scope_id")
   org_type               org_type?                @relation(fields: [type_id], references: [id], onUpdate: SetNull, map: "FK_organization_type_id")
-  organizationInstitute  OrganizationInstitute[]
+  organizationInstitute  organizationInstitute[]
   partnership_member_org partnership_member_org[]
   product_partnership    product_partnership[]
 }

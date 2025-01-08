@@ -2,7 +2,7 @@
 // The component uses the Ant Design Select component and the `allSupervisions` context from `AllSupervisionsCtx`.
 
 import Select, { SelectProps } from "antd/lib/select";
-import { FC, useContext, useMemo } from "react";
+import { type FC, useContext, useMemo } from "react";
 import { AllSupervisionsCtx } from "../../services/context/all-supervisions-ctx";
 import type { SupervisionPublicInfo } from "../../services/_types";
 import fuzzyIncludes from "../../utils/front-end/fuzzy-includes";

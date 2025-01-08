@@ -3,7 +3,7 @@
 //It allows for multiple selections and updating the filtered event types with the onChange prop.
 
 import Select, { SelectProps } from "antd/lib/select";
-import { FC, useContext, useMemo } from "react";
+import { type FC, useContext, useMemo } from "react";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import { EventTypesCtx } from "../../services/context/event-types-ctx";
 import GetLanguage from "../../utils/front-end/get-language";

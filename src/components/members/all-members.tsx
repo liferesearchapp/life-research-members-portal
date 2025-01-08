@@ -30,6 +30,10 @@ import FacultyFilter from "../filters/faculty-filter";
 import MemberNameFilter from "../filters/member-name-filter";
 import { AllKeywordsCtx } from "../../services/context/all-keywords-ctx";
 import type { ParsedUrlQueryInput } from "querystring";
+import {
+  useAdminDetails,
+  useSelectedInstitute,
+} from "../../services/context/selected-institute-ctx";
 
 function nameSorter(a: { name: string }, b: { name: string }) {
   return a.name.localeCompare(b.name);
@@ -162,8 +166,15 @@ function handleKeywordFilterChange(next: Set<number>) {
   );
 }
 
-function clearQueries() {
-  Router.push({ query: null }, undefined, { scroll: false });
+function clearQueries(institute: { urlIdentifier: string | null }) {
+  if (institute?.urlIdentifier) {
+    const url = PageRoutes.allMembers(institute.urlIdentifier);
+    console.log("Redirecting to:", url);
+    Router.push(url); 
+  } else {
+    console.error("Unable to reset filters: Institute ID is missing.");
+    alert("Unable to reset filters: Institute ID is missing.");
+  }
 }
 
 function getIdsFromQueryParams(key: string): Set<number> {
@@ -188,6 +199,8 @@ function getPopupContainer(): HTMLElement {
 
 const AllMembers: FC = () => {
   const { en } = useContext(LanguageCtx);
+  const { institute } = useSelectedInstitute();
+  
   const {
     allMembers,
     loading,
@@ -261,8 +274,13 @@ const AllMembers: FC = () => {
   }, [keywordsQuery]);
 
   function refreshAndClearFilters() {
-    clearQueries();
-    refreshMembers();
+    const instituteUrlIdentifier = institute?.urlIdentifier; // Retrieve urlIdentifier instead of id
+    if (instituteUrlIdentifier) {
+      clearQueries({ urlIdentifier: instituteUrlIdentifier }); // Pass as an object
+    refreshMembers();}
+    else {
+      console.error("Cannot reset filters: Institute ID is missing.");
+    }
     refreshKeywords();
   }
 

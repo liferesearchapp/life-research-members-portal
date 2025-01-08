@@ -3,7 +3,7 @@ import { includeAllAccountInfo } from "../../../prisma/helpers";
 import db from "../../../prisma/prisma-client";
 import getAccountFromRequest from "../../utils/api/get-account-from-request";
 import type { AccountDBRes } from "./account/[id]";
-import { institute } from "@prisma/client";
+import type { institute } from "@prisma/client";
 
 function getAllInstitutes() {
   return db.institute.findMany();

@@ -1,14 +1,14 @@
 import Button from "antd/lib/button";
 import Table, { ColumnType } from "antd/lib/table";
 import Title from "antd/lib/typography/Title";
-import { FC, useContext, useEffect } from "react";
+import { type FC, useContext, useEffect } from "react";
 import type { AccountRes } from "../../pages/api/account/[id]";
 import PageRoutes from "../../routing/page-routes";
 import { useRouter } from "next/router";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import { AllAccountsCtx } from "../../services/context/all-accounts-ctx";
 import { useSelectedInstitute } from "../../services/context/selected-institute-ctx";
-import { AccountInfo } from "../../services/_types";
+import type { AccountInfo } from "../../services/_types";
 
 const AllAccounts: FC = () => {
   const router = useRouter();
@@ -22,6 +22,15 @@ const AllAccounts: FC = () => {
   ) => {
     return account.instituteAdmin.some(
       (admin) => admin.instituteId === instituteId
+    );
+  };
+
+  const isMemberOfInstitute = (
+    account: AccountInfo,
+    instituteId: number | undefined
+  ) => {
+    return account.member?.institutes.some(
+      (member) => member.instituteId === instituteId
     );
   };
 
@@ -63,12 +72,15 @@ const AllAccounts: FC = () => {
     },
     {
       title: en ? "Member" : "Membre",
-      dataIndex: "member",
+      dataIndex: "is_member",
       width: "6rem",
-      render: (text, record, index) => {
-        return record.member ? (en ? "Yes" : "Oui") : en ? "No" : "Non";
+      render: (_, account) => {
+        const is_member = isMemberOfInstitute(account, institute?.id);
+        return is_member ? (en ? "Yes" : "Oui") : en ? "No" : "Non";
       },
-      sorter: (a, b) => (a.member ? 0 : 1) - (b.member ? 0 : 1),
+      sorter: (a, b) =>
+        (isMemberOfInstitute(a, institute?.id) ? -1 : 1) -
+        (isMemberOfInstitute(b, institute?.id) ? -1 : 1),
     },
     {
       title: en ? "Active" : "Actif",

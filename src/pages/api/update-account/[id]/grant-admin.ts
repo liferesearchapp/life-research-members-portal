@@ -1,4 +1,3 @@
-import { institute } from "@prisma/client";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { includeAllAccountInfo } from "../../../../../prisma/helpers";
 import db from "../../../../../prisma/prisma-client";

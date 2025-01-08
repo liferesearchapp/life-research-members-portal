@@ -6,9 +6,7 @@ import Button from "antd/lib/button";
 import Table, { ColumnType } from "antd/lib/table";
 import Title from "antd/lib/typography/Title";
 import {
-  FC,
-  Fragment,
-  useCallback,
+  type FC,
   useContext,
   useEffect,
   useMemo,
@@ -16,8 +14,6 @@ import {
 } from "react";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import PageRoutes from "../../routing/page-routes";
-import Descriptions from "antd/lib/descriptions";
-import Item from "antd/lib/descriptions/Item";
 import SafeLink from "../link/safe-link";
 import Router, { useRouter } from "next/router";
 import Form from "antd/lib/form";
@@ -186,8 +182,15 @@ function handleShowInvestigatorMemberChange(value: boolean) {
   Router.push({ query }, undefined, { scroll: false });
 }
 
-function clearQueries() {
-  Router.push({ query: null }, undefined, { scroll: false });
+function clearQueries(institute: { urlIdentifier: string | null }) {
+  if (institute?.urlIdentifier) {
+    const url = PageRoutes.allGrants(institute.urlIdentifier);
+    console.log("Redirecting to:", url); 
+    Router.push(url); 
+  } else {
+    console.error("Unable to reset filters: Institute ID is missing.");
+    alert("Unable to reset filters: Institute ID is missing.");
+  }
 }
 
 function getIdsFromQueryParams(key: string): Set<number> {
@@ -325,8 +328,13 @@ const AllGrants: FC = () => {
   }, [sourceQuery]);
 
   function refreshAndClearFilters() {
-    clearQueries();
-    refreshGrants();
+    const instituteUrlIdentifier = institute?.urlIdentifier; 
+    if (instituteUrlIdentifier) {
+      clearQueries({ urlIdentifier: instituteUrlIdentifier }); 
+       refreshGrants();
+    }else {
+      console.error("Cannot reset filters: Institute ID is missing.");
+    }
   }
 
   const filteredGrants = useMemo(

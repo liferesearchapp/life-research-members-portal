@@ -16,7 +16,8 @@ import { LanguageCtx } from "../../services/context/language-ctx";
 import PageRoutes from "../../routing/page-routes";
 import SafeLink from "../link/safe-link";
 import type { UrlObject } from "url";
-import { useAdminDetails } from "../../services/context/selected-institute-ctx";
+import { useAdminDetails, useMemberDetails } from "../../services/context/selected-institute-ctx";
+import { useSelectedInstitute } from "../../services/context/selected-institute-ctx";
 
 const NavMenu: FC<{ urlIdentifier: string | undefined }> = ({
   urlIdentifier,
@@ -25,6 +26,8 @@ const NavMenu: FC<{ urlIdentifier: string | undefined }> = ({
   const router = useRouter();
   const { en } = useContext(LanguageCtx);
   const isAdmin = useAdminDetails();
+  const isMember = useMemberDetails();
+  const { institute } = useSelectedInstitute();
   if (!urlIdentifier) return <Spin />;
 
   // Everyone
@@ -35,7 +38,7 @@ const NavMenu: FC<{ urlIdentifier: string | undefined }> = ({
     },
   ];
 
-  // Registered Acounts
+  // Member Acounts
   const registeredItemsFirst = [
     {
       label: en ? "Members" : "Membres",
@@ -70,22 +73,22 @@ const NavMenu: FC<{ urlIdentifier: string | undefined }> = ({
       label: en ? "Supervisions" : "Supervisions",
       href: PageRoutes.allSupervisions(urlIdentifier),
     },
-
-    {
-      label: en ? "Accounts" : "Comptes",
-      href: PageRoutes.allAccounts(urlIdentifier),
-      children: [
-        {
-          label: en ? "All accounts" : "Tous les comptes",
-          href: PageRoutes.allAccounts(urlIdentifier),
-        },
-        {
-          label: en ? "Register an account" : "Enregistrer un compte",
-          href: PageRoutes.register,
-        },
-      ],
-    },
   ];
+
+  const adminSuperAdminItems = {
+    label: en ? "Accounts" : "Comptes",
+    href: PageRoutes.allAccounts(urlIdentifier),
+    children: [
+      {
+        label: en ? "All accounts" : "Tous les comptes",
+        href: PageRoutes.allAccounts(urlIdentifier),
+      },
+      {
+        label: en ? "Register an account" : "Enregistrer un compte",
+        href: PageRoutes.register,
+      },
+    ],
+  };
 
   const superAdminItems = [
     {
@@ -96,9 +99,11 @@ const NavMenu: FC<{ urlIdentifier: string | undefined }> = ({
 
   const items: { label: string; href: string; children?: any }[] = generalItems;
   if (!loading) {
-    if (localAccount) for (const it of registeredItemsFirst) items.push(it);
-    if (localAccount?.is_super_admin || isAdmin)
+    if (localAccount && isMember) for (const it of registeredItemsFirst) items.push(it);
+    if (isAdmin)
       for (const it of adminItems) items.push(it);
+    if (isAdmin || localAccount?.is_super_admin)
+      items.push(adminSuperAdminItems)
     if (localAccount?.is_super_admin)
       for (const it of superAdminItems) items.push(it);
     if (localAccount) for (const it of registeredItemsLast) items.push(it);

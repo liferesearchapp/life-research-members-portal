@@ -1,4 +1,5 @@
-import { organization, Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
+import type { organization } from "@prisma/client";
 import type { NextApiRequest, NextApiResponse } from "next";
 import db from "../../../prisma/prisma-client";
 import getAccountFromRequest from "../../utils/api/get-account-from-request";

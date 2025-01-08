@@ -7,7 +7,7 @@ import Authorizations from "../../../components/auth-guard/authorizations";
 const Product: NextPage = () => {
   return (
     <Layout>
-      <PageAuthGuard auths={[Authorizations.registered]}>
+      <PageAuthGuard auths={[Authorizations.member]}>
         <AllProducts />
       </PageAuthGuard>
     </Layout>

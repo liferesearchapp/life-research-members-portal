@@ -35,11 +35,12 @@ export const AllProductsCtxProvider: FC<PropsWithChildren> = ({ children }) => {
 
     try {
       const queryParam = `?instituteId=${institute?.urlIdentifier}`;
-      const authHeader = await getAuthHeader();
-      if (!authHeader) return;
-      const result = await fetch(`${ApiRoutes.allProducts}${queryParam}`, {
-        headers: authHeader,
-      });
+      //const authHeader = await getAuthHeader();
+      //if (!authHeader) return;
+      //const result = await fetch(`${ApiRoutes.allProducts}${queryParam}`, {
+      //  headers: authHeader,
+      //});
+      const result = await fetch(`${ApiRoutes.allProducts}${queryParam}`);
       if (!result.ok) throw await result.text();
       let products: ProductPublicInfo[] = await result.json();
 

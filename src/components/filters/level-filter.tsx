@@ -3,7 +3,7 @@
 // Props include the id, value, onChange and getPopupContainer for the Select component
 
 import Select, { SelectProps } from "antd/lib/select";
-import { FC, useContext, useMemo } from "react";
+import { type FC, useContext, useMemo } from "react";
 import { LevelsCtx } from "../../services/context/levels-ctx";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import GetLanguage from "../../utils/front-end/get-language";

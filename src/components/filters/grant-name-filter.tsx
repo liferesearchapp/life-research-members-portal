@@ -5,7 +5,7 @@ Renders antd Select component with multiple select mode, filter option, clear bu
 */
 
 import Select, { SelectProps } from "antd/lib/select";
-import { FC, useContext, useMemo } from "react";
+import { type FC, useContext, useMemo } from "react";
 import { AllGrantsCtx } from "../../services/context/all-grants-ctx";
 import type { GrantPublicInfo } from "../../services/_types";
 import fuzzyIncludes from "../../utils/front-end/fuzzy-includes";

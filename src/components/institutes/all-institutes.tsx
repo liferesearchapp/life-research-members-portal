@@ -6,7 +6,7 @@ import PageRoutes from "../../routing/page-routes";
 import { useRouter } from "next/router";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import { AllInstitutesCtx } from "../../services/context/all-institutes-ctx";
-import { institute } from "@prisma/client";
+import type { institute } from "@prisma/client";
 import { useSelectedInstitute } from "../../services/context/selected-institute-ctx";
 
 const AllInstitutes: FC = () => {
@@ -39,6 +39,23 @@ const AllInstitutes: FC = () => {
       title: en ? "URL Identifier" : "Identifiant URL",
       dataIndex: "urlIdentifier",
       sorter: (a, b) => a.urlIdentifier.localeCompare(b.urlIdentifier),
+    },
+    {
+      title: en ? "Active" : "Actif",
+      dataIndex: "is_active",
+      width: "6rem",
+      render: (text, record, index) => {
+        return record.is_active
+          ? en
+            ? "Yes"
+            : "Oui"
+          : en
+          ? "No"
+          : "Non";
+      },
+      sorter: (a, b) =>
+        (a.is_active ? 0 : 1) -
+        (b.is_active ? 0 : 1),
     },
     {
       title: en ? "Description (EN)" : "Description (EN)",
@@ -81,6 +98,11 @@ const AllInstitutes: FC = () => {
       rowClassName={(_, index) =>
         "table-row " + (index % 2 === 0 ? "even" : "odd")
       }
+      onRow={(record, _) => ({
+        onClick: (_) => {
+          router.push(PageRoutes.instituteProfile(record.id));
+        },
+      })}
     />
   );
 };

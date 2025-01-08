@@ -4,10 +4,7 @@ import getAuthHeader from "../headers/auth-header";
 import Notification from "../notifications/notification";
 import type { AccountInfo } from "../_types";
 import { ActiveAccountCtx } from "./active-account-ctx";
-import {
-  useAdminDetails,
-  useSelectedInstitute,
-} from "./selected-institute-ctx";
+import { useAdminDetails } from "./selected-institute-ctx";
 
 export const AllAccountsCtx = createContext<{
   allAccounts: AccountInfo[];
@@ -21,15 +18,13 @@ export const AllAccountsCtxProvider: FC<PropsWithChildren> = ({ children }) => {
   const [allAccounts, setAllAccounts] = useState<AccountInfo[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const { institute } = useSelectedInstitute();
   const isAdmin = useAdminDetails();
 
   async function fetchAllAccounts() {
     try {
       const authHeader = await getAuthHeader();
-      const queryParam = `?instituteId=${institute?.urlIdentifier}`;
       if (!authHeader) return;
-      const result = await fetch(`${ApiRoutes.allAccounts}${queryParam}`, {
+      const result = await fetch(`${ApiRoutes.allAccounts}`, {
         headers: authHeader,
       });
       if (!result.ok) throw await result.text();

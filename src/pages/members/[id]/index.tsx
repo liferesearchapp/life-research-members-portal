@@ -26,7 +26,7 @@ const PrivateMemberPage: NextPage = () => {
     }
 
     router.replace(PageRoutes.publicMemberProfile(id));
-  }, [localAccount, loading, idString, router]);
+  }, [localAccount, loading, idString, router, isAdmin]);
 
   return <CardSkeleton />;
 };

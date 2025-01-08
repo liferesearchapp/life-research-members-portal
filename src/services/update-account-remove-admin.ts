@@ -1,10 +1,8 @@
-import { institute } from "@prisma/client";
 import ApiRoutes from "../routing/api-routes";
 import { en } from "./context/language-ctx";
 import getAuthHeader from "./headers/auth-header";
 import Notification from "./notifications/notification";
 import type { AccountInfo } from "./_types";
-import { AccountDBRes } from "../pages/api/account/[id]";
 
 export default async function updateAccountRemoveAdmin(
   id: number,

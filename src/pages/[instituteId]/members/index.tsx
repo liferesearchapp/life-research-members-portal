@@ -10,7 +10,7 @@ const MembersPage: NextPage = () => {
   const router = useRouter();
   return (
     <Layout>
-      <PageAuthGuard auths={[Authorizations.registered]}>
+      <PageAuthGuard auths={[Authorizations.member]}>
         <AllMembers />
       </PageAuthGuard>
     </Layout>

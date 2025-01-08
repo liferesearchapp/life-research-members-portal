@@ -35,11 +35,12 @@ export const AllPartnersCtxProvider: FC<PropsWithChildren> = ({ children }) => {
 
     try {
       const queryParam = `?instituteId=${institute?.urlIdentifier}`;
-      const authHeader = await getAuthHeader();
-      if (!authHeader) return;
-      const result = await fetch(`${ApiRoutes.allPartners}${queryParam}`, {
-        headers: authHeader,
-      });
+      //const authHeader = await getAuthHeader();
+      //if (!authHeader) return;
+      //const result = await fetch(`${ApiRoutes.allPartners}${queryParam}`, {
+      //  headers: authHeader,
+      //});
+      const result = await fetch(`${ApiRoutes.allPartners}${queryParam}`);
       if (!result.ok) throw await result.text();
       let partners: PartnerPublicInfo[] = await result.json();
 

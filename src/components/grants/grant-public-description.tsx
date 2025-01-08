@@ -42,7 +42,7 @@ const PublicGrantDescription: FC<Props> = ({ grant }) => {
 
       <Item label={en ? "Amount" : "Montant"}>{grant.amount}</Item>
 
-      <Item label={en ? "Throught LRI" : "Throught LRI"}>
+      <Item label={en ? "Through Institute" : "Through Institut"}>
         {grant.throught_lri ? (en ? "Yes" : "Oui") : en ? "No" : "Non"}
       </Item>
 

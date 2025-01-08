@@ -1,4 +1,3 @@
-import { institute } from "@prisma/client";
 import type {
   RegisterEventParams,
   RegisterEventRes,

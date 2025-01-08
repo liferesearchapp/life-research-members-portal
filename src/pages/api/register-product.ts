@@ -1,4 +1,3 @@
-import { product, Prisma } from "@prisma/client";
 import type { NextApiRequest, NextApiResponse } from "next";
 import db from "../../../prisma/prisma-client";
 import isAuthorMatch from "../../components/products/author-match";

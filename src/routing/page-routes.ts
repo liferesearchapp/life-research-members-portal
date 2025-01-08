@@ -14,6 +14,8 @@ const PageRoutes = {
   registerSupervision: (urlIdentifier: string) =>
     `/${urlIdentifier}/supervisions/register-supervision`,
 
+  accountProfile: (id: number) => "/accounts/" + id,
+  instituteProfile: (id: number) => "/institutes/" +id,
   memberProfile: (id: number) => "/members/" + id,
   productProfile: (id: number) => "/products/" + id,
   grantProfile: (id: number) => "/grants/" + id,
@@ -35,8 +37,6 @@ const PageRoutes = {
 
   myProfile: "/my-profile",
   //TODO: remove this products route
-  products: "/products",
-  accountProfile: (id: number) => "/accounts/" + id,
   register: "/register",
   _404: "/404",
 } as const;

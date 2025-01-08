@@ -3,7 +3,7 @@
 import Grid from "antd/lib/grid";
 import Descriptions from "antd/lib/descriptions";
 import Item from "antd/lib/descriptions/Item";
-import { FC, useContext } from "react";
+import { type FC, useContext } from "react";
 import type { EventPublicInfo } from "../../services/_types";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import React from "react";

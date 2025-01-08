@@ -26,7 +26,7 @@ const PrivateGrantPage: NextPage = () => {
     }
 
     router.replace(PageRoutes.publicGrantProfile(id));
-  }, [localAccount, loading, idString, router]);
+  }, [localAccount, loading, idString, router, isAdmin]);
 
   return <CardSkeleton />;
 };

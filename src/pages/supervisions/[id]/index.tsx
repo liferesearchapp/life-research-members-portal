@@ -30,7 +30,7 @@ const PrivateSupervisionPage: NextPage = () => {
 
       return;
     }
-  }, [localAccount, loading, idString, router]);
+  }, [localAccount, loading, idString, router, isAdmin]);
 
   return <CardSkeleton />;
 };

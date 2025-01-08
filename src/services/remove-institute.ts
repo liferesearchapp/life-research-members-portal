@@ -4,7 +4,7 @@ import getAuthHeader from "./headers/auth-header";
 import { contentTypeJsonHeader } from "./headers/content-type-headers";
 import Notification from "./notifications/notification";
 import type { AccountInfo } from "./_types";
-import { RemoveInstituteParams } from "../pages/api/update-account/[id]/remove-institute";
+import type { RemoveInstituteParams } from "../pages/api/update-account/[id]/remove-institute";
 
 export default async function removeInstitute(
   id: number,

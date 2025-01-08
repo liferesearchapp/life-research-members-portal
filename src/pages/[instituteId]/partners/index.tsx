@@ -7,7 +7,7 @@ import PageAuthGuard from "../../../components/auth-guard/page-auth-guard";
 const PartnersPage: NextPage = () => {
   return (
     <Layout>
-      <PageAuthGuard auths={[Authorizations.registered]}>
+      <PageAuthGuard auths={[Authorizations.member]}>
         <AllPartners />
       </PageAuthGuard>
     </Layout>

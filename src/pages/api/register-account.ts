@@ -1,4 +1,4 @@
-import { account, Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import type { NextApiRequest, NextApiResponse } from "next";
 import db from "../../../prisma/prisma-client";
 import getAccountFromRequest from "../../utils/api/get-account-from-request";
@@ -24,7 +24,7 @@ function registerAccount(params: RegisterAccountParams) {
         first_name: params.first_name,
         last_name: params.last_name,
         member: params.is_member
-          ? { create: { date_joined: new Date() } }
+          ? { create: { work_email: params.login_email, date_joined: new Date() } }
           : undefined,
       },
       include: { member: true },

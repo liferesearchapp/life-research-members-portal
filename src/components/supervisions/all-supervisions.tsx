@@ -161,10 +161,16 @@ function handleShowEndDateChange(value: boolean) {
   Router.push({ query }, undefined, { scroll: false });
 }
 
-function clearQueries() {
-  Router.push({ query: null }, undefined, { scroll: false });
+function clearQueries(institute: { urlIdentifier: string | null }) {
+  if (institute?.urlIdentifier) {
+    const url = PageRoutes.allSupervisions(institute.urlIdentifier);
+    console.log("Redirecting to:", url); // Debug log
+    Router.push(url); // Redirect to the correct route
+  } else {
+    console.error("Unable to reset filters: Institute ID is missing.");
+    alert("Unable to reset filters: Institute ID is missing.");
+  }
 }
-
 function getIdsFromQueryParams(key: string): Set<number> {
   const res = new Set<number>();
   const query = Router.query[key];
@@ -280,8 +286,13 @@ const AllSupervisions: FC = () => {
   }, [levelsQuery]);
 
   function refreshAndClearFilters() {
-    clearQueries();
-    refreshSupervisions();
+    const instituteUrlIdentifier = institute?.urlIdentifier; 
+    if (instituteUrlIdentifier) {
+      clearQueries({ urlIdentifier: instituteUrlIdentifier }); 
+    refreshSupervisions();}
+    else {
+      console.error("Cannot reset filters: Institute ID is missing.");
+    }
   }
   const filteredSupervisions = useMemo(
     () =>

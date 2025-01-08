@@ -1,11 +1,9 @@
 //This component is a form element that allows a user to search for existing events and select one or more of them.
 
-import PlusOutlined from "@ant-design/icons/lib/icons/PlusOutlined";
 import type { event } from "@prisma/client";
 import AutoComplete from "antd/lib/auto-complete";
-import Button from "antd/lib/button/button";
 import Card from "antd/lib/card";
-import { FC, useContext, useEffect, useState } from "react";
+import { type FC, useContext, useEffect, useState } from "react";
 import { EventsCtx } from "../../services/context/events-ctx";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import type { EventPublicInfo } from "../../services/_types";

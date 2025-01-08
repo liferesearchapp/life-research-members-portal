@@ -4,16 +4,14 @@ import Form from "antd/lib/form";
 import Modal from "antd/lib/modal";
 import Select from "antd/lib/select";
 import {
-  Dispatch,
-  FC,
-  SetStateAction,
+  type Dispatch,
+  type FC,
+  type SetStateAction,
   useContext,
-  useEffect,
   useState,
 } from "react";
 import { LanguageCtx } from "../../services/context/language-ctx";
-import { AccountInfo } from "../../services/_types";
-import { institute } from "@prisma/client";
+import type { AccountInfo } from "../../services/_types";
 import { ActiveAccountCtx } from "../../services/context/active-account-ctx";
 import addInstitute from "../../services/add-institute";
 

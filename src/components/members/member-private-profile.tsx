@@ -18,6 +18,7 @@ import { SaveChangesCtx } from "../../services/context/save-changes-ctx";
 import router from "next/router";
 import { ActiveAccountCtx } from "../../services/context/active-account-ctx";
 import { useAdminDetails } from "../../services/context/selected-institute-ctx";
+import PageRoutes from "../../routing/page-routes";
 
 type Tab = { label: string; key: string; children: ReactNode };
 
@@ -40,6 +41,16 @@ const PrivateMemberProfile: FC<Props> = ({ id }) => {
 
   const { localAccount } = useContext(ActiveAccountCtx);
   const isAdmin = useAdminDetails();
+
+  /** check if admin of an institute member is part of, send to public profile if not */
+  if (isAdmin) {
+    var adminInstituteIds = localAccount?.instituteAdmin.map((admin) => admin.institute.id) || [];
+    var memberInstituteIds = member?.institutes.map((institute) => institute.instituteId) || [];
+    var hasPermission = false;
+    for (var a of adminInstituteIds) if (memberInstituteIds.includes(a)) hasPermission = true;
+    if (!hasPermission)
+      router.replace(PageRoutes.publicMemberProfile(id));
+  }
 
   /** After saving changes via submit button - dependency of form's submit */
   const onSuccess = useCallback(
@@ -157,7 +168,6 @@ const PrivateMemberProfile: FC<Props> = ({ id }) => {
         ]
       : []),
   ];
-
   return (
     <Card title={header} bodyStyle={{ paddingTop: 0 }}>
       <Tabs

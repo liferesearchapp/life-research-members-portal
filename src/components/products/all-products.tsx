@@ -171,8 +171,15 @@ function handleProductAllAuthorFilterChange(next: Set<string>) {
   );
 }
 
-function clearQueries() {
-  Router.push({ query: null }, undefined, { scroll: false });
+function clearQueries(institute: { urlIdentifier: string | null }) {
+  if (institute?.urlIdentifier) {
+    const url = PageRoutes.allProducts(institute.urlIdentifier);
+    console.log("Redirecting to:", url); 
+    Router.push(url); 
+  } else {
+    console.error("Unable to reset filters: Institute ID is missing.");
+    alert("Unable to reset filters: Institute ID is missing.");
+  }
 }
 
 function getIdsFromQueryParams(key: string): Set<number> {
@@ -223,8 +230,8 @@ const AllProducts: FC = () => {
   const handleRegisterProduct = () => {
     if (institute) {
       router.push({
-        pathname: "/[instituteId]/products/register",
-        query: { instituteId: institute.urlIdentifier },
+         pathname: "/[instituteId]/products/register",
+         query: { instituteId: institute.urlIdentifier },
       });
     }
   };
@@ -308,8 +315,13 @@ const AllProducts: FC = () => {
   }, [productTypesQuery]);
 
   function refreshAndClearFilters() {
-    clearQueries();
+    const instituteUrlIdentifier = institute?.urlIdentifier; // Retrieve urlIdentifier instead of id
+    if (instituteUrlIdentifier) {
+    clearQueries({ urlIdentifier: instituteUrlIdentifier }); // Pass as an object
     refreshProducts();
+  } else {
+    console.error("Cannot reset filters: Institute ID is missing.");
+  }
   }
 
   const filteredProducts = useMemo(

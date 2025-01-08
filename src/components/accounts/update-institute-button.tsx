@@ -4,16 +4,14 @@ import Form from "antd/lib/form";
 import Modal from "antd/lib/modal";
 import Select from "antd/lib/select";
 import {
-  Dispatch,
-  FC,
-  SetStateAction,
+  type Dispatch,
+  type FC,
+  type SetStateAction,
   useContext,
-  useEffect,
   useState,
 } from "react";
 import { LanguageCtx } from "../../services/context/language-ctx";
-import { AccountInfo } from "../../services/_types";
-import { institute } from "@prisma/client";
+import type { AccountInfo } from "../../services/_types";
 import { ActiveAccountCtx } from "../../services/context/active-account-ctx";
 
 const { Option } = Select;
@@ -40,8 +38,9 @@ const UpdateInstituteButton: FC<Props> = ({ account, setAccount }) => {
   //     form.setFieldsValue({ institutes: account.institutes });
   //   }, [form, account, modalOpen]);
 
+  //TODO: Fix This if/when used
   async function submit(data: Data) {
-    const res = await updateInstituteName(account.id, data);
+    const res = "";//await updateInstituteName(account.id, data);
     if (res) {
       setAccount(res);
       setModalOpen(false);

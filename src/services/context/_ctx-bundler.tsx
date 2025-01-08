@@ -30,10 +30,12 @@ import { EventsCtxProvider } from "./events-ctx";
 import { MemberInstituteCtxProvider } from "./member-institutes-ctx";
 import { SelectedInstituteCtxProvider } from "./selected-institute-ctx";
 import { AllInstitutesCtxProvider } from "./all-institutes-ctx";
+import { InstituteSelectorCtxProvider } from "./institute-selector-ctx";
 
 // Bundles context providers, first element in array is the outer-most provider
 const AllContextProviders: FC<PropsWithChildren> = [
   ActiveAccountCtxProvider,
+  InstituteSelectorCtxProvider,
   SelectedInstituteCtxProvider,
   LanguageCtxProvider,
   AllAccountsCtxProvider,

@@ -6,7 +6,7 @@ import Layout from "../../../components/layout/layout";
 
 const Register: NextPage = () => {
   return (
-    <PageAuthGuard auths={[Authorizations.registered]}>
+    <PageAuthGuard auths={[Authorizations.member]}>
       <Layout>
         <RegisterProduct />
       </Layout>

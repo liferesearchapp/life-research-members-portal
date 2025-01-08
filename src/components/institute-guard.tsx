@@ -1,9 +1,7 @@
 // components/InstituteGuard.tsx
 import { useContext, type FC, type ReactNode } from "react";
-import { useRouter } from "next/router";
 import { useSelectedInstitute } from "../services/context/selected-institute-ctx";
-import { Spin, Typography } from "antd";
-import { MemberInstituteCtx } from "../services/context/member-institutes-ctx";
+import { Typography } from "antd";
 import InstituteSelector from "./navbar/institute-selector";
 import Layout from "./layout/layout";
 import { LanguageCtx } from "../services/context/language-ctx";

@@ -4,7 +4,7 @@
 
 
 import Select, { SelectProps } from "antd/lib/select";
-import { FC, useContext, useMemo } from "react";
+import { type FC, useContext, useMemo } from "react";
 import { AllMembersCtx } from "../../services/context/all-members-ctx";
 import type { MemberPublicInfo } from "../../services/_types";
 import fuzzyIncludes from "../../utils/front-end/fuzzy-includes";

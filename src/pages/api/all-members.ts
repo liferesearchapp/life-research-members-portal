@@ -1,4 +1,3 @@
-import { account } from "@prisma/client";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { selectPublicMemberInfo } from "../../../prisma/helpers";
 import db from "../../../prisma/prisma-client";

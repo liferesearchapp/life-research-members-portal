@@ -41,6 +41,15 @@ export const useSelectedInstitute = () => {
   return context;
 };
 
+export const useMemberDetails = () => {
+  const { institute } = useContext(SelectedInstituteCtx);
+  const { localAccount } = useContext(ActiveAccountCtx);
+  const isMember = localAccount?.member?.institutes.some(
+    (member) => member.instituteId === institute?.id
+  );
+  return isMember;
+};
+
 export const useAdminDetails = () => {
   const { institute } = useContext(SelectedInstituteCtx);
   const { localAccount } = useContext(ActiveAccountCtx);

@@ -4,7 +4,7 @@
 import Empty from "antd/lib/empty";
 import Card from "antd/lib/card/Card";
 import Title from "antd/lib/typography/Title";
-import { FC, useContext } from "react";
+import { type FC, useContext } from "react";
 import usePublicEventInfo from "../../services/use-public-event-info";
 import CardSkeleton from "../loading/card-skeleton";
 import PublicEventDescription from "./event-public-description";

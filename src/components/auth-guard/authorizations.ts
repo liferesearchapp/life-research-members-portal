@@ -1,5 +1,6 @@
 enum Authorizations {
   admin = "admin",
+  member = "member",
   superAdmin = "superadmin",
   registered = "registered",
   matchAccountId = "match account id",

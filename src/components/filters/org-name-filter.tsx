@@ -6,7 +6,7 @@
 // Allows clearing the selection, and calls the onChange prop with an empty Set when it is cleared
 
 import Select, { SelectProps } from "antd/lib/select";
-import { FC, useContext, useMemo } from "react";
+import { type FC, useContext, useMemo } from "react";
 import { AllPartnersCtx } from "../../services/context/all-partners-ctx";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import type { PartnerPublicInfo } from "../../services/_types";

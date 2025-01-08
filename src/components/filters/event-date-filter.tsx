@@ -5,7 +5,7 @@
 // The component stores the selected date range in its state (dateRange)
 // The component can receive additional props, such as an ID and a getPopupContainer function, to customize the DatePicker component
 
-import { FC, useContext, useState } from "react";
+import { type FC, useContext, useState } from "react";
 import { AllEventsCtx } from "../../services/context/all-events-ctx";
 import type { EventPublicInfo } from "../../services/_types";
 import moment, { Moment } from "moment";

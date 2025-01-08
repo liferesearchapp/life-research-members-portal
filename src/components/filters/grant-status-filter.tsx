@@ -5,7 +5,7 @@
 // Exports the component as the default export
 
 import Select, { SelectProps } from "antd/lib/select";
-import { FC, useContext, useMemo } from "react";
+import { type FC, useContext, useMemo } from "react";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import { GrantStatusCtx } from "../../services/context/grant-statuses-ctx";
 import GetLanguage from "../../utils/front-end/get-language";

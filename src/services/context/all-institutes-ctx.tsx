@@ -10,7 +10,7 @@ import ApiRoutes from "../../routing/api-routes";
 import getAuthHeader from "../headers/auth-header";
 import Notification from "../notifications/notification";
 import { ActiveAccountCtx } from "./active-account-ctx";
-import { institute } from "@prisma/client";
+import type { institute } from "@prisma/client";
 
 export const AllInstitutesCtx = createContext<{
   allInstitutes: institute[];

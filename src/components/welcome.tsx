@@ -3,7 +3,7 @@
 // The component also  provides an overview of the portal information and displays a banner image, a tagline, and quick links to key sections of the portal
 // The information displayed is dynamic and changes based on the user's authentication status, language preference and profile information.
 
-import { Row, Col, Typography, Divider, Space } from "antd";
+import { Row, Col, Typography, Space } from "antd";
 import {
   TeamOutlined,
   AppstoreOutlined,
@@ -20,12 +20,11 @@ import { AllPartnersCtx } from "../services/context/all-partners-ctx";
 import {
   AuthenticatedTemplate,
   UnauthenticatedTemplate,
-  useMsal,
 } from "@azure/msal-react";
 import Spin from "antd/lib/spin";
-import { FC, useContext } from "react";
+import { type FC, useContext } from "react";
 import { ActiveAccountCtx } from "../services/context/active-account-ctx";
-import { blue, green } from "@ant-design/colors";
+import { green } from "@ant-design/colors";
 import { LanguageCtx } from "../services/context/language-ctx";
 import Image from "next/image";
 import life from "../../public/life-home2.png";
@@ -101,12 +100,21 @@ const Welcome: FC = () => {
       </h4>
     </>
   );
+
+  const grammerFr = () => {
+    var name = institute?.name.toLowerCase() || "";
+    const vowels = ['a', 'â', 'à', 'e', 'è', 'ê', 'é', 'i', 'î', 'y', 'o', 'ô', 'u', 'û', 'œ'];
+    if (vowels.includes(name[0]))
+      return `de l'${name.toUpperCase()}`;
+    else
+      return `du ${name.toUpperCase()}`;
+  }
   const unauthenticatedGreeting = (
     <>
       <h1>
         {en
-          ? `Welcome to the ${institute?.name} Member Portal!`
-          : `Bienvenue sur le portail des membres de l'${institute?.name}!`}
+          ? `Welcome to the ${institute?.name.toUpperCase()} Member Portal!`
+          : `Bienvenue sur le portail des membres ${grammerFr()}!`}
       </h1>
       <h4>
         {en
@@ -128,8 +136,8 @@ const Welcome: FC = () => {
         </h3>
         <h1>
           {en
-            ? `Welcome to the ${institute?.urlIdentifier.toUpperCase()} Member Portal`
-            : `Bienvenue sur le portail des membres de l'${institute?.urlIdentifier.toUpperCase()}`}
+            ? `Welcome to the ${institute?.name.toUpperCase()} Member Portal`
+            : `Bienvenue sur le portail des membres ${grammerFr()}`}
         </h1>
 
         {isAdmin
@@ -191,13 +199,13 @@ const Welcome: FC = () => {
           <Col xs={24} md={6}>
             <Title level={4}>
               {en
-                ? `${institute?.urlIdentifier.toUpperCase()} Portal at a glance`
-                : `Aperçu du portail de l'${institute?.urlIdentifier.toUpperCase()}`}
+                ? `${institute?.name.toUpperCase()} Portal at a glance`
+                : `Aperçu du portail ${grammerFr()}`}
             </Title>
             <p>
               {en
-                ? `The portal provides ${institute?.urlIdentifier.toUpperCase()} members with a comprehensive overview of our research, partnerships, and initiatives. Stay informed and engaged with our work by exploring the portal information today!`
-                : `Le portail fournit aux membres de l'${institute?.urlIdentifier.toUpperCase()} un aperçu de nos recherches, partenariats et initiatives. Restez informé(e) et impliqué(e) dans notre travail en explorant l'information de ce portail dès aujourd'hui.`}
+                ? `The portal provides ${institute?.name.toUpperCase()} members with a comprehensive overview of our research, partnerships, and initiatives. Stay informed and engaged with our work by exploring the portal information today!`
+                : `Le portail fournit aux membres ${grammerFr()} un aperçu de nos recherches, partenariats et initiatives. Restez informé(e) et impliqué(e) dans notre travail en explorant l'information de ce portail dès aujourd'hui.`}
             </p>
           </Col>
           <Col xs={24} md={6}>
