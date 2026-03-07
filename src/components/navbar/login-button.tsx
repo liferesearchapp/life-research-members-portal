@@ -12,7 +12,7 @@ const LoginButton: FC = () => {
     <Button type="primary" onClick={login} className="login-button">
       <div style={{ display: "flex", alignItems: "center" }}>
         <div style={{ flexShrink: 0, lineHeight: 0 }}>
-          <Image src={msIcon} alt="ms icon" width="25em" height="25em" />
+          <Image src={msIcon} alt="ms icon" width={25} height={25} />
         </div>
         <span style={{ width: 12 }}></span>
         <span>{en ? "Login" : "Connecter"}</span>
