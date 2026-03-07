@@ -1,4 +1,5 @@
 import { useMsal } from "@azure/msal-react";
+import { InteractionStatus } from "@azure/msal-browser";
 import {
   createContext,
   Dispatch,
@@ -8,26 +9,11 @@ import {
   useEffect,
   useState,
 } from "react";
-import { loginRequest, msalInstance } from "../../../auth-config";
+import { loginRequest } from "../../../auth-config";
 import ApiRoutes from "../../routing/api-routes";
 import getAuthHeader from "../headers/auth-header";
-import type { AuthenticationResult } from "@azure/msal-common/dist/response/AuthenticationResult";
 import type { AccountInfo } from "../_types";
 import Notification from "../notifications/notification";
-
-// See https://learn.microsoft.com/en-us/azure/active-directory/develop/scenario-spa-acquire-token?tabs=javascript2
-function handleResponse(response: AuthenticationResult | null) {
-  if (!response) return;
-  msalInstance.setActiveAccount(response.account);
-}
-
-/** Await this promise to make sure active account is loaded on redirecting from login screen*/
-async function onRedirect() {
-  return msalInstance
-    .handleRedirectPromise()
-    .then(handleResponse)
-    .catch((e: any) => console.error("Error after redirect:", e));
-}
 
 export const ActiveAccountCtx = createContext<{
   localAccount: AccountInfo | null;
@@ -40,7 +26,7 @@ export const ActiveAccountCtx = createContext<{
 }>(null as any);
 
 export const ActiveAccountCtxProvider: FC<PropsWithChildren> = ({ children }) => {
-  const { instance } = useMsal();
+  const { instance, inProgress, accounts } = useMsal();
 
   const [localAccount, setLocalAccount] = useState<AccountInfo | null>(null);
   const [loading, setLoading] = useState(true); // Start true so loading icons are served first
@@ -74,9 +60,18 @@ export const ActiveAccountCtxProvider: FC<PropsWithChildren> = ({ children }) =>
     }
   }
 
+  // Wait until MsalProvider has finished initializing (and processing any login redirect)
+  // before checking auth state. inProgress === None means MSAL is idle.
   useEffect(() => {
+    if (inProgress !== InteractionStatus.None) return;
+    // msal-browser v5 does not auto-set the active account after login/redirect.
+    // If accounts exist in the cache but no active account is selected yet, pick the first one.
+    // This covers both fresh logins (in case the LOGIN_SUCCESS event fires after this effect)
+    // and cached sessions on page refresh.
+    if (accounts.length > 0 && !instance.getActiveAccount()) {
+      instance.setActiveAccount(accounts[0]);
+    }
     async function firstLoad() {
-      await onRedirect();
       if (!instance.getActiveAccount()) return setLoading(false);
       const notification = new Notification("bottom-right");
       notification.loading("Loading your account...");
@@ -85,7 +80,7 @@ export const ActiveAccountCtxProvider: FC<PropsWithChildren> = ({ children }) =>
       notification.close();
     }
     firstLoad();
-  }, [instance]);
+  }, [instance, inProgress, accounts]);
 
   async function refresh() {
     if (loading || refreshing) return;
@@ -105,8 +100,8 @@ export const ActiveAccountCtxProvider: FC<PropsWithChildren> = ({ children }) =>
 
   function logout() {
     setLocalAccount(null);
-    // returning false stops redirect but still clears the cache and active user
-    instance.logoutRedirect({ onRedirectNavigate: () => false }).catch((e: any) => {
+    // clearCache clears MSAL state without triggering a browser redirect (v5 replacement for onRedirectNavigate: () => false)
+    instance.clearCache().catch((e: any) => {
       new Notification().error(e);
     });
   }

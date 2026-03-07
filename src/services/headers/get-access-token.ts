@@ -18,9 +18,9 @@ export default async function getAccessToken(): Promise<string | null> {
           ? "Your session has expired, please login again."
           : "Votre session a expiré, veuillez vous reconnecter."
       );
-      // Log them out to clear the cache and active user
+      // clearCache clears MSAL state without triggering a browser redirect (v5 replacement for onRedirectNavigate: () => false)
       msalInstance
-        .logoutRedirect({ onRedirectNavigate: () => false })
+        .clearCache()
         .catch((e: any) => new Notification().error(e));
       return null;
     });
