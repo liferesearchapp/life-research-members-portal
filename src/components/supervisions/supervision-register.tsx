@@ -2,12 +2,8 @@
 // When the form is submitted, it will call the `registerSupervision` service to register the new supervision
 // When the service returns successfully, the form will be reset
 
-import { Button, Col, DatePicker, Row } from "antd";
-import Select from "antd/lib/select";
-import Form from "antd/lib/form";
-import Input from "antd/lib/input";
+import { Button, Col, DatePicker, Row, Select, Form, Input } from "antd";
 import React, { FC, useContext } from "react";
-import { useForm } from "antd/lib/form/Form";
 import moment from "moment";
 import type { Moment } from "moment";
 import registerSupervision from "../../services/register-supervision";
@@ -15,6 +11,7 @@ import { LanguageCtx } from "../../services/context/language-ctx";
 import { FacultiesCtx } from "../../services/context/faculties-ctx";
 import { LevelsCtx } from "../../services/context/levels-ctx";
 import GetLanguage from "../../utils/front-end/get-language";
+const { useForm } = Form;
 
 const { Option } = Select;
 const { RangePicker } = DatePicker;

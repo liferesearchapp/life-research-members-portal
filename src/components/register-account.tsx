@@ -1,14 +1,11 @@
 // This component implements a form for creating new user accounts
 // with the ability to register as a Member or an Admin
 
-import { Button } from "antd";
-import Form from "antd/lib/form";
-import Input from "antd/lib/input";
+import { Button, Form, Input, Checkbox } from "antd";
 import { FC, useContext } from "react";
 import registerAccount from "../services/register-account";
-import Checkbox from "antd/lib/checkbox/Checkbox";
-import { useForm } from "antd/lib/form/Form";
 import { LanguageCtx } from "../services/context/language-ctx";
+const { useForm } = Form;
 type Data = {
   login_email: string;
   confirm_email: string;

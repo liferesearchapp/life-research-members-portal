@@ -4,12 +4,8 @@
 // The form uses the context API to access language, grant sources, grant statuses, and all topics data from the global state.
 // The component uses the useForm hook from the Ant Design library to handle form submissions and reset the form after a successful submission.
 
-import { Button, Col, DatePicker, Row, Switch } from "antd";
-import Select from "antd/lib/select";
-import Form from "antd/lib/form";
-import Input from "antd/lib/input";
+import { Button, Col, DatePicker, Row, Switch, Select, Form, Input } from "antd";
 import React, { FC, useContext, useState } from "react";
-import { useForm } from "antd/lib/form/Form";
 import moment from "moment";
 import type { Moment } from "moment";
 import registerGrant from "../../services/register-grant";
@@ -18,6 +14,7 @@ import { GrantSourcesCtx } from "../../services/context/grant-sources-ctx";
 import { GrantStatusCtx } from "../../services/context/grant-statuses-ctx";
 import { AllTopicsCtx } from "../../services/context/all-topics-ctx";
 import GetLanguage from "../../utils/front-end/get-language";
+const { useForm } = Form;
 
 const { Option } = Select;
 

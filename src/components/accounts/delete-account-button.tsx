@@ -1,18 +1,14 @@
-import useForm from "antd/lib/form/hooks/useForm";
-import Button from "antd/lib/button";
-import Form from "antd/lib/form";
-import Input from "antd/lib/input";
-import Modal from "antd/lib/modal";
 import { CSSProperties, Dispatch, FC, SetStateAction, useContext, useState } from "react";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import type { AccountInfo } from "../../services/_types";
-import Alert from "antd/lib/alert";
-import Text from "antd/lib/typography/Text";
 import deleteAccount from "../../services/delete-account";
 import { useRouter } from "next/router";
 import PageRoutes from "../../routing/page-routes";
 import { ActiveAccountCtx } from "../../services/context/active-account-ctx";
 import Notification from "../../services/notifications/notification";
+import { Form, Button, Input, Modal, Alert, Typography } from "antd";
+const useForm = Form.useForm;
+const Text = Typography.Text;
 
 type Data = { confirmation: string };
 type Props = {
@@ -62,7 +58,7 @@ const DeleteAccountButton: FC<Props> = ({ account, setAccount, style }) => {
         cancelButtonProps={{ danger: true }}
         cancelText={en ? "Cancel" : "Annuler"}
         destroyOnClose
-        bodyStyle={{ paddingBottom: 0 }}
+        styles={{ body: { paddingBottom: 0 } }}
       >
         <Alert
           showIcon

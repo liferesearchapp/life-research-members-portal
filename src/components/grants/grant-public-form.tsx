@@ -6,16 +6,8 @@ Additionally, it also allows users to associate investigators and members involv
 
 import React, { FC, useContext, useState, useCallback, useEffect } from "react";
 import { LanguageCtx } from "../../services/context/language-ctx";
-import { useForm } from "antd/lib/form/Form";
-import Form from "antd/lib/form";
-import Input from "antd/lib/input";
-import TextArea from "antd/lib/input/TextArea";
-import Button from "antd/lib/button";
-import Select from "antd/lib/select";
-import DatePicker from "antd/lib/date-picker";
 import type { Moment } from "moment";
 
-import Divider from "antd/lib/divider";
 import Notification from "../../services/notifications/notification";
 import {
   SaveChangesCtx,
@@ -33,8 +25,10 @@ import type { UpdateGrantPublicParams } from "../../pages/api/update-grant/[id]/
 import updateGrantPublic from "../../services/update-grant-public";
 import moment from "moment";
 import GetLanguage from "../../utils/front-end/get-language";
-import { Switch } from "antd";
+import { Switch, Form, Input, Button, Select, DatePicker, Divider } from "antd";
 import MemberSelector from "../members/member-selector";
+const { useForm } = Form;
+const TextArea = Input.TextArea;
 
 const { Option } = Select;
 

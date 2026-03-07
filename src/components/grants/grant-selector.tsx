@@ -9,10 +9,9 @@ import React, { FC, useContext, useEffect, useState } from "react";
 import type { grant } from "@prisma/client";
 import { GrantsCtx } from "../../services/context/grants-ctx";
 import { LanguageCtx } from "../../services/context/language-ctx";
-import AutoComplete from "antd/lib/auto-complete";
 import { GrantPublicInfo } from "../../services/_types";
 import GrantTag from "./grant-tag";
-import { Card } from "antd";
+import { Card, AutoComplete } from "antd";
 
 type Props = {
   id?: string;

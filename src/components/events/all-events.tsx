@@ -2,9 +2,6 @@
 // The component also has buttons to create new events, refresh the events and clear the filters.
 // The component also updates the URL query parameters based on the filter values and the query parameters are used to update the filters on component mount.
 
-import Button from "antd/lib/button";
-import Table, { ColumnType } from "antd/lib/table";
-import Title from "antd/lib/typography/Title";
 import {
   FC,
   Fragment,
@@ -16,13 +13,10 @@ import {
 } from "react";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import PageRoutes from "../../routing/page-routes";
-import Descriptions from "antd/lib/descriptions";
-import Item from "antd/lib/descriptions/Item";
 import SafeLink from "../link/safe-link";
 import Router, { useRouter } from "next/router";
-import Form from "antd/lib/form";
 import blurActiveElement from "../../utils/front-end/blur-active-element";
-import { Checkbox } from "antd";
+import { Checkbox, Button, Table, Typography, Descriptions, Form } from "antd";
 import type { ParsedUrlQueryInput } from "querystring";
 import { ActiveAccountCtx } from "../../services/context/active-account-ctx";
 import { AllEventsCtx } from "../../services/context/all-events-ctx";
@@ -31,7 +25,11 @@ import EventTypeFilter from "../filters/event-type-filter";
 import EventDateFilter from "../filters/event-date-filter";
 import type { EventPublicInfo } from "../../services/_types";
 import moment, { Moment } from "moment";
-import type { RangeValue } from "rc-picker/lib/interface";
+import type { TableColumnType as ColumnType } from "antd";
+
+type RangeValue<T> = [T | null, T | null] | null;
+const Title = Typography.Title;
+const Item = Descriptions.Item;
 
 function nameSorter(en: boolean) {
   return (

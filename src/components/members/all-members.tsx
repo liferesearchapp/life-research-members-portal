@@ -1,6 +1,3 @@
-import Button from "antd/lib/button";
-import Table, { ColumnType } from "antd/lib/table";
-import Title from "antd/lib/typography/Title";
 import {
   FC,
   Fragment,
@@ -15,21 +12,21 @@ import PageRoutes from "../../routing/page-routes";
 import KeywordTag from "../keywords/keyword-tag";
 import { AllMembersCtx } from "../../services/context/all-members-ctx";
 import GetLanguage from "../../utils/front-end/get-language";
-import Descriptions from "antd/lib/descriptions";
-import Item from "antd/lib/descriptions/Item";
 import SafeLink from "../link/safe-link";
 import Router, { useRouter } from "next/router";
-import Form from "antd/lib/form";
 import type { keyword } from "@prisma/client";
 import KeywordFilter from "../filters/keyword-filter";
 import blurActiveElement from "../../utils/front-end/blur-active-element";
-import { Checkbox } from "antd";
+import { Checkbox, Button, Table, Typography, Descriptions, Form } from "antd";
 import type { MemberPublicInfo } from "../../services/_types";
 import MemberTypeFilter from "../filters/member-type-filter";
 import FacultyFilter from "../filters/faculty-filter";
 import MemberNameFilter from "../filters/member-name-filter";
 import { AllKeywordsCtx } from "../../services/context/all-keywords-ctx";
 import type { ParsedUrlQueryInput } from "querystring";
+import type { TableColumnType as ColumnType } from "antd";
+const Title = Typography.Title;
+const Item = Descriptions.Item;
 
 function nameSorter(a: { name: string }, b: { name: string }) {
   return a.name.localeCompare(b.name);

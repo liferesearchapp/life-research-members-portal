@@ -1,6 +1,3 @@
-import Button from "antd/lib/button";
-import Card from "antd/lib/card/Card";
-import Title from "antd/lib/typography/Title";
 import React, {
   FC,
   ReactNode,
@@ -16,13 +13,14 @@ import PublicMemberForm from "./member-public-form";
 import MyProfileRegister from "./my-profile-register";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import type { MemberPrivateInfo } from "../../services/_types";
-import Tabs from "antd/lib/tabs";
 import PrivateMemberDescription from "./member-private-description";
 import MemberInsightDescription from "./member-insight-description";
 import PrivateMemberForm from "./member-private-form";
 import MemberInsightForm from "./member-insight-form";
 import { SaveChangesCtx } from "../../services/context/save-changes-ctx";
 import router from "next/router";
+import { Button, Card, Typography, Tabs } from "antd";
+const Title = Typography.Title;
 
 type Tab = { label: string; key: string; children: ReactNode };
 
@@ -192,7 +190,7 @@ const MyProfile: FC = () => {
   ];
 
   return (
-    <Card title={header} bodyStyle={{ paddingTop: 0 }}>
+    <Card title={header} styles={{ body: { paddingTop: 0 } }}>
       <Tabs
         items={editMode ? forms : descriptions}
         activeKey={activeTabKey}

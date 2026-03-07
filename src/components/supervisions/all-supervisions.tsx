@@ -2,9 +2,6 @@
 // The component also has buttons ta add a new supervision and clear the filters.
 // The component also updates the URL query parameters based on the filter values and the query parameters are used to update the filters on component mount.
 
-import Button from "antd/lib/button";
-import Table, { ColumnType } from "antd/lib/table";
-import Title from "antd/lib/typography/Title";
 import {
   FC,
   Fragment,
@@ -17,13 +14,10 @@ import {
 import { LanguageCtx } from "../../services/context/language-ctx";
 import PageRoutes from "../../routing/page-routes";
 import GetLanguage from "../../utils/front-end/get-language";
-import Descriptions from "antd/lib/descriptions";
-import Item from "antd/lib/descriptions/Item";
 import SafeLink from "../link/safe-link";
 import Router, { useRouter } from "next/router";
-import Form from "antd/lib/form";
 import blurActiveElement from "../../utils/front-end/blur-active-element";
-import { Checkbox } from "antd";
+import { Checkbox, Button, Table, Typography, Descriptions, Form } from "antd";
 import type { SupervisionPublicInfo } from "../../services/_types";
 import { AllSupervisionsCtx } from "../../services/context/all-supervisions-ctx";
 import LevelFilter from "../filters/level-filter";
@@ -31,6 +25,9 @@ import FacultyFilter from "../filters/faculty-filter";
 import SupervisionNameFilter from "../filters/supervision-name-filter";
 import type { ParsedUrlQueryInput } from "querystring";
 import { ActiveAccountCtx } from "../../services/context/active-account-ctx";
+import type { TableColumnType as ColumnType } from "antd";
+const Title = Typography.Title;
+const Item = Descriptions.Item;
 
 function nameSorter(a: { name: string }, b: { name: string }) {
   return a.name.localeCompare(b.name);

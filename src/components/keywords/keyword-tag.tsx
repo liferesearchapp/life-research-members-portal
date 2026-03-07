@@ -1,7 +1,4 @@
-import CloseOutlined from "@ant-design/icons/lib/icons/CloseOutlined";
-import EditOutlined from "@ant-design/icons/lib/icons/EditOutlined";
 import type { keyword } from "@prisma/client";
-import Tag from "antd/lib/tag";
 import { CSSProperties, FC, useState } from "react";
 import PageRoutes from "../../routing/page-routes";
 import colorFromString from "../../utils/front-end/color-from-string";
@@ -10,6 +7,8 @@ import GetOppositeLanguage from "../../utils/front-end/get-opposite-language";
 import SafeLink from "../link/safe-link";
 import { queryKeys } from "../members/all-members";
 import EditKeywordModal from "./edit-keyword-modal";
+import { Tag } from "antd";
+import { CloseOutlined, EditOutlined } from "@ant-design/icons";
 
 type Props = {
   keyword: keyword;

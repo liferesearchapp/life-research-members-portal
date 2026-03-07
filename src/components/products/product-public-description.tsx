@@ -2,19 +2,17 @@
 //The information displayed includes the product's abstract, product type, published date, DOI, product partnerships, product target, authors, and member authors.
 //The component uses the LanguageCtx to toggle between English and French content.
 
-import Grid from "antd/lib/grid";
-import Descriptions from "antd/lib/descriptions";
-import Item from "antd/lib/descriptions/Item";
 import { FC, useContext } from "react";
 import type { ProductPublicInfo } from "../../services/_types";
 import React from "react";
 import { LanguageCtx } from "../../services/context/language-ctx";
-import Tag from "antd/lib/tag";
 import SafeLink from "../link/safe-link";
 import ProductTypeLink from "../link/product-type-link";
 import type { PublicMemberRes } from "../../pages/api/member/[id]/public";
 import { useState, useEffect } from "react";
 import getMemberAuthor from "../getters/product-member-author-getter";
+import { Grid, Descriptions, Tag } from "antd";
+const Item = Descriptions.Item;
 
 const { useBreakpoint } = Grid;
 

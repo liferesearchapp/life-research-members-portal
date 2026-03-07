@@ -1,11 +1,10 @@
-import Empty from "antd/lib/empty";
-import Card from "antd/lib/card/Card";
-import Title from "antd/lib/typography/Title";
 import { FC, useContext } from "react";
 import usePublicMemberInfo from "../../services/use-public-member-info";
 import CardSkeleton from "../loading/card-skeleton";
 import PublicMemberDescription from "./member-public-description";
 import { LanguageCtx } from "../../services/context/language-ctx";
+import { Empty, Card, Typography } from "antd";
+const Title = Typography.Title;
 
 type Props = {
   id: number;

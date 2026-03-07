@@ -5,20 +5,18 @@ The component uses Ant Design's Descriptions component to render the grant's inf
 It takes the grant's information from the grant object passed as a prop.
 */
 
-import Grid from "antd/lib/grid";
-import Descriptions from "antd/lib/descriptions";
-import Item from "antd/lib/descriptions/Item";
 import { FC, useContext } from "react";
 import type { GrantPublicInfo } from "../../services/_types";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import React from "react";
-import Tag from "antd/lib/tag";
 import SafeLink from "../link/safe-link";
 //import GrantSatusLink from "../link/grant-status-link";
 //import GrantSourceLink from "../link/grant-source-link";
 import PageRoutes from "../../routing/page-routes";
 import colorFromString from "../../utils/front-end/color-from-string";
 import { useState, useEffect } from "react";
+import { Grid, Descriptions, Tag } from "antd";
+const Item = Descriptions.Item;
 
 const { useBreakpoint } = Grid;
 

@@ -1,5 +1,3 @@
-import Button from "antd/lib/button";
-import Modal from "antd/lib/modal";
 import Router from "next/router";
 import {
   createContext,
@@ -13,6 +11,7 @@ import {
   useState,
 } from "react";
 import { LanguageCtx } from "./language-ctx";
+import { Button, Modal } from "antd";
 
 type HistoryState = { url: string; as: string };
 declare global {

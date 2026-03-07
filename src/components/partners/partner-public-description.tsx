@@ -3,20 +3,18 @@ This component displays the public information of a partner, including organizat
 If the partner has partner members and the user is an admin, these members are also displayed.
 */
 
-import Grid from "antd/lib/grid";
-import Descriptions from "antd/lib/descriptions";
-import Item from "antd/lib/descriptions/Item";
 import { FC, useContext } from "react";
 import type { PartnerPublicInfo } from "../../services/_types";
 import GetLanguage from "../../utils/front-end/get-language";
 import React from "react";
 import { LanguageCtx } from "../../services/context/language-ctx";
-import Tag from "antd/lib/tag";
 import SafeLink from "../link/safe-link";
 import PartnerScopeLink from "../link/partner-scope-link";
 import PartnerTypeLink from "../link/partner-type-link";
 import PageRoutes from "../../routing/page-routes";
 import { ActiveAccountCtx } from "../../services/context/active-account-ctx";
+import { Grid, Descriptions, Tag } from "antd";
+const Item = Descriptions.Item;
 
 const { useBreakpoint } = Grid;
 

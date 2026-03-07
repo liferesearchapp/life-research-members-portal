@@ -11,7 +11,8 @@ import type { EventPublicInfo } from "../../services/_types";
 import moment, { Moment } from "moment";
 import { DatePicker } from "antd";
 import type { RangePickerProps } from "antd/lib/date-picker";
-import type { RangeValue } from "rc-picker/lib/interface";
+
+type RangeValue<T> = [T | null, T | null] | null;
 
 type Props = {
   id?: string;
@@ -59,8 +60,8 @@ const EventDateFilter: FC<Props> = ({
     <DatePicker.RangePicker
       id={id}
       className="event-date-filter"
-      value={dateRange}
-      onChange={onDateChange}
+      value={dateRange as any}
+      onChange={onDateChange as any}
       getPopupContainer={getPopupContainer}
     />
   );

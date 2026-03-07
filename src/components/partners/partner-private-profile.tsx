@@ -7,9 +7,6 @@
  * The component also includes a `DeletePartnerButton` component to delete the partner.
  */
 
-import Empty from "antd/lib/empty";
-import Card from "antd/lib/card/Card";
-import Title from "antd/lib/typography/Title";
 import { FC, ReactNode, useContext, useState, useCallback } from "react";
 import usePrivatePartnerInfo from "../../services/use-private-partner-info";
 import CardSkeleton from "../loading/card-skeleton";
@@ -17,9 +14,10 @@ import PublicPartnerDescription from "./partner-public-description";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import { SaveChangesCtx } from "../../services/context/save-changes-ctx";
 import type { PartnerPrivateInfo } from "../../services/_types";
-import { Button, Tabs } from "antd";
+import { Button, Tabs, Empty, Card, Typography } from "antd";
 import PublicPartnerForm from "./partner-public-form";
 import DeletePartnerButton from "./delete-partner-button";
+const Title = Typography.Title;
 
 type Tab = { label: string; key: string; children: ReactNode };
 
@@ -112,7 +110,7 @@ const PrivatePartnerProfile: FC<Props> = ({ id }) => {
   ];
 
   return (
-    <Card title={header} bodyStyle={{ paddingTop: 0 }}>
+    <Card title={header} styles={{ body: { paddingTop: 0 } }}>
       <Tabs
         items={editMode ? forms : descriptions}
         // items={descriptions}

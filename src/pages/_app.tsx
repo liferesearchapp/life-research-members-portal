@@ -1,3 +1,4 @@
+import "@ant-design/v5-patch-for-react-19";
 import "../styles/_globals.scss";
 import type { AppProps } from "next/app";
 import { MsalProvider } from "@azure/msal-react";
@@ -7,6 +8,7 @@ import Navbar from "../components/navbar/_navbar";
 import { useRouter } from "next/router";
 import PageRoutes from "../routing/page-routes";
 import AllContextProviders from "../services/context/_ctx-bundler";
+import { App } from "antd";
 
 function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter();
@@ -29,12 +31,14 @@ function MyApp({ Component, pageProps }: AppProps) {
         <title>{title}</title>
       </Head>
       <MsalProvider instance={msalInstance}>
-        <AllContextProviders>
-          <Navbar />
-          <div className="next-page-container">
-            <Component {...pageProps} />
-          </div>
-        </AllContextProviders>
+        <App>
+          <AllContextProviders>
+            <Navbar />
+            <div className="next-page-container">
+              <Component {...pageProps} />
+            </div>
+          </AllContextProviders>
+        </App>
       </MsalProvider>
     </>
   );

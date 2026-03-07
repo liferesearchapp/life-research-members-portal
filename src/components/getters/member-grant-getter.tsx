@@ -1,7 +1,7 @@
 import React from "react";
 import PageRoutes from "../../routing/page-routes";
 import SafeLink from "../link/safe-link";
-import List from "antd/lib/list";
+import { List } from "antd";
 import colorFromString from "../../utils/front-end/color-from-string";
 
 const getMemberGrant = (

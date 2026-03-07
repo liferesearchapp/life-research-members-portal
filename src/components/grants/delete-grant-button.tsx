@@ -1,11 +1,6 @@
 // This component is a button that opens a modal to delete a grant.
 // The modal contains a form that requires the user to confirm the grant name before deletion.
 
-import Button from "antd/lib/button";
-import Form from "antd/lib/form";
-import useForm from "antd/lib/form/hooks/useForm";
-import Input from "antd/lib/input";
-import Modal from "antd/lib/modal";
 import {
   CSSProperties,
   Dispatch,
@@ -16,12 +11,13 @@ import {
 } from "react";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import type { GrantPrivateInfo } from "../../services/_types";
-import Alert from "antd/lib/alert";
-import Text from "antd/lib/typography/Text";
 import deleteGrant from "../../services/delete-grant";
 import { useRouter } from "next/router";
 import PageRoutes from "../../routing/page-routes";
 import Notification from "../../services/notifications/notification";
+import { Button, Form, Input, Modal, Alert, Typography } from "antd";
+const useForm = Form.useForm;
+const Text = Typography.Text;
 
 type Data = { confirmation: string };
 type Props = {
@@ -76,7 +72,7 @@ const DeleteGrantButton: FC<Props> = ({ grant, setGrant, style }) => {
         cancelButtonProps={{ danger: true }}
         cancelText={en ? "Cancel" : "Annuler"}
         destroyOnClose
-        bodyStyle={{ paddingBottom: 0 }}
+        styles={{ body: { paddingBottom: 0 } }}
       >
         <Alert
           showIcon

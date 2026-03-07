@@ -3,24 +3,20 @@
 // The form is built using the antd form library, and the onFinish event is used to submit the data to an API
 // for updating the private information. The component also implements the SaveChangesCtx context for handling save changes notifications.
 
-import Button from "antd/lib/button";
-import Form from "antd/lib/form";
-import { useForm } from "antd/lib/form/Form";
-import Input from "antd/lib/input";
 import React, { FC, useCallback, useContext, useEffect, useState } from "react";
 import type { ProductPrivateInfo } from "../../services/_types";
 import { LanguageCtx } from "../../services/context/language-ctx";
-import Divider from "antd/lib/divider";
-import Text from "antd/lib/typography/Text";
 import type { UpdateProductPrivateParams } from "../../pages/api/update-product/[id]/private";
 import updateProductPrivate from "../../services/update-product-private";
 import { red } from "@ant-design/colors";
-import Switch from "antd/lib/switch";
 import Notification from "../../services/notifications/notification";
 import {
   SaveChangesCtx,
   useResetDirtyOnUnmount,
 } from "../../services/context/save-changes-ctx";
+import { Button, Form, Input, Divider, Typography, Switch } from "antd";
+const { useForm } = Form;
+const Text = Typography.Text;
 
 type Props = {
   product: ProductPrivateInfo;

@@ -1,14 +1,8 @@
 //This component is a form that allows to update the admin information of a product.
 
-import Button from "antd/lib/button";
-import Form from "antd/lib/form";
-import { useForm } from "antd/lib/form/Form";
 import React, { FC, useCallback, useContext, useEffect, useState } from "react";
 import type { ProductPrivateInfo } from "../../services/_types";
 import { LanguageCtx } from "../../services/context/language-ctx";
-import TextArea from "antd/lib/input/TextArea";
-import Divider from "antd/lib/divider";
-import Text from "antd/lib/typography/Text";
 import type { UpdateProductAdminParams } from "../../pages/api/update-product/[id]/admin";
 import updateProductAdmin from "../../services/update-product-admin";
 
@@ -20,6 +14,10 @@ import {
   SaveChangesCtx,
   useResetDirtyOnUnmount,
 } from "../../services/context/save-changes-ctx";
+import { Button, Form, Input, Divider, Typography } from "antd";
+const { useForm } = Form;
+const TextArea = Input.TextArea;
+const Text = Typography.Text;
 
 type Props = {
   product: ProductPrivateInfo;

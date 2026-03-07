@@ -1,13 +1,11 @@
-import Dropdown from "antd/lib/dropdown";
 import { FC, useContext } from "react";
-import Typography from "antd/lib/typography";
-import Card from "antd/lib/card";
 import LogoutButton from "./logout-button";
 import { ActiveAccountCtx } from "../../services/context/active-account-ctx";
 import { LanguageCtx } from "../../services/context/language-ctx";
-import CheckCircleTwoTone from "@ant-design/icons/lib/icons/CheckCircleTwoTone";
 import LoginButton from "./login-button";
 import { useMsal } from "@azure/msal-react";
+import { Dropdown, Typography, Card } from "antd";
+import { CheckCircleTwoTone } from "@ant-design/icons";
 
 const AvatarMenu: FC = () => {
   const { en } = useContext(LanguageCtx);
@@ -47,7 +45,7 @@ const AvatarMenu: FC = () => {
   ) : null;
 
   const dropdown = (
-    <Card bodyStyle={{ padding: 0 }}>
+    <Card styles={{ body: { padding: 0 } }}>
       <div className="avatar-dropdown">
         <Typography>{name}</Typography>
         <Typography>{email}</Typography>
@@ -62,7 +60,7 @@ const AvatarMenu: FC = () => {
 
   return (
     <Dropdown
-      overlay={dropdown}
+      dropdownRender={() => dropdown}
       getPopupContainer={() => document.querySelector(".navbar") || document.body}
     >
       <div className="avatar">{avatarLabel}</div>

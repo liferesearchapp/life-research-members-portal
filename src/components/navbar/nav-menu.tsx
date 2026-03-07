@@ -1,7 +1,4 @@
-import MenuOutlined from "@ant-design/icons/lib/icons/MenuOutlined";
-import Menu from "antd/lib/menu";
-import type { MenuItemType } from "antd/lib/menu/hooks/useItems";
-import Spin from "antd/lib/spin";
+import type { MenuItemType } from "antd/lib/menu/interface";
 import { useRouter } from "next/router";
 import {
   FC,
@@ -16,6 +13,8 @@ import { LanguageCtx } from "../../services/context/language-ctx";
 import PageRoutes from "../../routing/page-routes";
 import SafeLink from "../link/safe-link";
 import type { UrlObject } from "url";
+import { Menu, Spin } from "antd";
+import { MenuOutlined } from "@ant-design/icons";
 
 const NavMenu: FC = () => {
   const { localAccount, loading } = useContext(ActiveAccountCtx);
@@ -128,7 +127,6 @@ const NavMenu: FC = () => {
         overflowedIndicator={<MenuOutlined className="collapsed-icon" />}
         style={{ fontSize: "inherit" }}
         selectedKeys={activeItem ? [activeItem.label] : []}
-        activeKey={activeItem?.label}
         getPopupContainer={() =>
           document.querySelector(".navbar") || document.body
         }

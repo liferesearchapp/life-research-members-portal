@@ -5,12 +5,13 @@
 // Renders each option as the name of the organization, in either English or French based on the language context
 // Allows clearing the selection, and calls the onChange prop with an empty Set when it is cleared
 
-import Select, { SelectProps } from "antd/lib/select";
 import { FC, useContext, useMemo } from "react";
 import { AllPartnersCtx } from "../../services/context/all-partners-ctx";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import type { PartnerPublicInfo } from "../../services/_types";
 import fuzzyIncludes from "../../utils/front-end/fuzzy-includes";
+import { Select } from "antd";
+import type { SelectProps } from "antd";
 
 function getName(organization: PartnerPublicInfo, en: boolean) {
   return en ? organization.name_en : organization.name_fr;

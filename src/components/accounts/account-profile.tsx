@@ -1,18 +1,10 @@
-import Empty from "antd/lib/empty";
-import Card from "antd/lib/card/Card";
-import Title from "antd/lib/typography/Title";
 import { FC, useContext, useEffect } from "react";
 import CardSkeleton from "../loading/card-skeleton";
 import useAccount from "../../services/use-account";
 import { LanguageCtx } from "../../services/context/language-ctx";
-import Descriptions from "antd/lib/descriptions";
-import CheckCircleTwoTone from "@ant-design/icons/lib/icons/CheckCircleTwoTone";
-import CloseCircleTwoTone from "@ant-design/icons/lib/icons/CloseCircleTwoTone";
-import Button from "antd/lib/button";
 import { red } from "@ant-design/colors";
 import SafeLink from "../link/safe-link";
 import PageRoutes from "../../routing/page-routes";
-import Text from "antd/lib/typography/Text";
 import UpdateNameButton from "./update-name-button";
 import UpdateEmailButton from "./update-email-button";
 import RemoveAdminButton from "./remove-admin-button";
@@ -20,6 +12,10 @@ import GrantAdminButton from "./grant-admin-button";
 import DeleteMemberButton from "./delete-member-button";
 import RegisterMemberButton from "./register-member-button";
 import DeleteAccountButton from "./delete-account-button";
+import { Empty, Card, Typography, Descriptions, Button } from "antd";
+import { CheckCircleTwoTone, CloseCircleTwoTone } from "@ant-design/icons";
+const Title = Typography.Title;
+const Text = Typography.Text;
 
 const { Item } = Descriptions;
 

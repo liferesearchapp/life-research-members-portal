@@ -1,9 +1,6 @@
 // this component is a presentational component that displays a product in a tag format.
 
-import CloseOutlined from "@ant-design/icons/lib/icons/CloseOutlined";
-import EditOutlined from "@ant-design/icons/lib/icons/EditOutlined";
 import type { product } from "@prisma/client";
-import Tag from "antd/lib/tag";
 import { CSSProperties, FC, useState } from "react";
 import PageRoutes from "../../routing/page-routes";
 import colorFromString from "../../utils/front-end/color-from-string";
@@ -11,6 +8,8 @@ import GetLanguage from "../../utils/front-end/get-product-language";
 import GetProductLanguage from "../../utils/front-end/get-product-language";
 import SafeLink from "../link/safe-link";
 import { queryKeys } from "../products/all-products";
+import { Tag } from "antd";
+import { CloseOutlined, EditOutlined } from "@ant-design/icons";
 
 type Props = {
   product: product;

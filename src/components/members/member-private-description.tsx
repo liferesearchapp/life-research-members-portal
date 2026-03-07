@@ -1,10 +1,9 @@
-import Grid from "antd/lib/grid";
-import Descriptions from "antd/lib/descriptions";
-import Item from "antd/lib/descriptions/Item";
 import { FC, useContext } from "react";
 import type { MemberPrivateInfo } from "../../services/_types";
 import React from "react";
 import { LanguageCtx } from "../../services/context/language-ctx";
+import { Grid, Descriptions } from "antd";
+const Item = Descriptions.Item;
 
 const { useBreakpoint } = Grid;
 

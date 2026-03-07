@@ -6,7 +6,7 @@ import AvatarMenu from "./avatar-menu";
 import HomeLogo from "./home-logo";
 import LanguageButton from "./language-button";
 import { ActiveAccountCtx } from "../../services/context/active-account-ctx";
-import Spin from "antd/lib/spin";
+import { Spin } from "antd";
 
 const Navbar: FC = () => {
   const { loading } = useContext(ActiveAccountCtx);

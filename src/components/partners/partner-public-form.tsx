@@ -2,13 +2,8 @@
 // It makes use of the Ant Design form components, and updates the information by calling the updatePartnerPublic function.
 // It also displays a notification on success or failure of the update.
 
-import Button from "antd/lib/button";
-import Form from "antd/lib/form";
-import { useForm } from "antd/lib/form/Form";
-import Input from "antd/lib/input";
 import React, { FC, useCallback, useContext, useEffect, useState } from "react";
 import { red } from "@ant-design/colors";
-import Switch from "antd/lib/switch";
 import Notification from "../../services/notifications/notification";
 import {
   SaveChangesCtx,
@@ -21,12 +16,12 @@ import type {
 import type { UpdatePartnerPublicParams } from "../../pages/api/update-partner/[id]/public";
 import updatePartnerPublic from "../../services/update-partner-public";
 import { LanguageCtx } from "../../services/context/language-ctx";
-import Divider from "antd/lib/divider";
-import Text from "antd/lib/typography/Text";
 import { OrgTypesCtx } from "../../services/context/org-types-ctx";
 import { OrgScopeCtx } from "../../services/context/org-scopes-ctx";
-import { Select } from "antd";
+import { Select, Button, Form, Input, Switch, Divider, Typography } from "antd";
 import GetLanguage from "../../utils/front-end/get-language";
+const { useForm } = Form;
+const Text = Typography.Text;
 
 type Props = {
   partner: PartnerPublicInfo;

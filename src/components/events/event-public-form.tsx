@@ -3,9 +3,7 @@
 
 import React, { FC, useContext, useState, useCallback, useEffect } from "react";
 import { Form, Input, Select, Button, DatePicker, Divider } from "antd";
-import TextArea from "antd/lib/input/TextArea";
 
-import { useForm } from "antd/lib/form/Form";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import {
   SaveChangesCtx,
@@ -34,6 +32,8 @@ import GetLanguage from "../../utils/front-end/get-language";
 import type { UpdateEventPublicParams } from "../../pages/api/update-event/[id]/public";
 import updateEventPublic from "../../services/update-event-public";
 import EventSelector from "./event-selector";
+const TextArea = Input.TextArea;
+const { useForm } = Form;
 
 const { Option } = Select;
 
