@@ -1,7 +1,7 @@
 // This component displays the public profile of a supervision.
 // It shows the first and last name of the supervision, and the description.
 
-import { FC, useContext } from "react";
+import { type FC, useContext } from "react";
 import usePublicSupervisionInfo from "../../services/use-public-supervision-info";
 import CardSkeleton from "../loading/card-skeleton";
 import PublicSupervisionDescription from "./supervision-public-description";

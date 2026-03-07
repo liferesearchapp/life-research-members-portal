@@ -7,7 +7,7 @@
  * The component also includes a `DeletePartnerButton` component to delete the partner.
  */
 
-import { FC, ReactNode, useContext, useState, useCallback } from "react";
+import { type FC, type ReactNode, useContext, useState, useCallback } from "react";
 import usePrivatePartnerInfo from "../../services/use-private-partner-info";
 import CardSkeleton from "../loading/card-skeleton";
 import PublicPartnerDescription from "./partner-public-description";

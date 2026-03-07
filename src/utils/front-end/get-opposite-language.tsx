@@ -1,5 +1,5 @@
 import type { problem, faculty, member_type, keyword } from "@prisma/client";
-import { FC, useContext } from "react";
+import { type FC, useContext } from "react";
 import { LanguageCtx } from "../../services/context/language-ctx";
 
 const GetOppositeLanguage: FC<{

@@ -1,4 +1,4 @@
-import { FC, ReactNode, useCallback, useContext, useState } from "react";
+import { type FC, type ReactNode, useCallback, useContext, useState } from "react";
 import CardSkeleton from "../loading/card-skeleton";
 import PublicMemberDescription from "./member-public-description";
 import PublicMemberForm from "./member-public-form";

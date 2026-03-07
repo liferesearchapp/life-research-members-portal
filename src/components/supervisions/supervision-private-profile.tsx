@@ -1,7 +1,7 @@
 // A component that displays a private supervision profile.
 // It can either show supervision information or allow the user to edit the supervision's information.
 
-import { FC, ReactNode, useCallback, useContext, useState } from "react";
+import { type FC, type ReactNode, useCallback, useContext, useState } from "react";
 import CardSkeleton from "../loading/card-skeleton";
 import PublicSupervisionDescription from "./supervision-public-description";
 import usePrivateSupervisionInfo from "../../services/use-private-supervision-info";

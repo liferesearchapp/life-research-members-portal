@@ -5,10 +5,10 @@ The deletion is performed using the deletePartner service, and the user is redir
 */
 
 import {
-  CSSProperties,
-  Dispatch,
-  FC,
-  SetStateAction,
+  type CSSProperties,
+  type Dispatch,
+  type FC,
+  type SetStateAction,
   useContext,
   useState,
 } from "react";

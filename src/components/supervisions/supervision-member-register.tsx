@@ -4,7 +4,7 @@
 // Upon submission, the data from the form is passed to the `registerSupervision` function from the `register-supervision-member` service to register the supervision trainee.
 
 import { Button, Col, DatePicker, Row, Select, Form, Input } from "antd";
-import React, { FC, useContext } from "react";
+import React, { type FC, useContext } from "react";
 import moment from "moment";
 import type { Moment } from "moment";
 import registerSupervision from "../../services/register-supervision-member";

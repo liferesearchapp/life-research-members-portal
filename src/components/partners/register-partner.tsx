@@ -4,7 +4,7 @@
 // The component also uses context from the LanguageCtx, OrgTypesCtx, and OrgScopeCtx contexts to determine the language of the form and the available options for organization scope and type.
 
 import { Button, Select, Form, Input } from "antd";
-import React, { FC, useContext } from "react";
+import React, { type FC, useContext } from "react";
 import registerPartner from "../../services/register-partner";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import { OrgTypesCtx } from "../../services/context/org-types-ctx";

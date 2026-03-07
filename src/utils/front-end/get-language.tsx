@@ -8,7 +8,7 @@ import type {
   organization,
   product_type,
 } from "@prisma/client";
-import { FC, useContext } from "react";
+import { type FC, useContext } from "react";
 import { LanguageCtx } from "../../services/context/language-ctx";
 
 const GetLanguage: FC<{

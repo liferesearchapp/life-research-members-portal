@@ -6,7 +6,7 @@ The component also provides an onChange callback that returns the selected partn
 */
 
 import type { organization } from "@prisma/client";
-import { FC, useContext, useEffect, useState } from "react";
+import { type FC, useContext, useEffect, useState } from "react";
 import { AllOrganizationsCtx } from "../../services/context/all-organizations-ctx";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import type { OrganizationInfo } from "../../services/_types";

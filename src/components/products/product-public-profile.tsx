@@ -2,7 +2,7 @@
 // The component uses the "PublicProductDescription" component to display the description of the product
 // The component uses the LanguageCtx to display the title of the product in either English or French based on the language context value
 
-import { FC, useContext } from "react";
+import { type FC, useContext } from "react";
 import usePublicProductInfo from "../../services/use-public-product-info";
 import CardSkeleton from "../loading/card-skeleton";
 import PublicProductDescription from "./product-public-description";

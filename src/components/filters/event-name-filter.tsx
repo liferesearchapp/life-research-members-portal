@@ -2,7 +2,7 @@
 // It uses fuzzy search to match the input with event names.
 // The component is connected to AllEventsCtx and LanguageCtx to fetch all events and language preference respectively.
 
-import { FC, useContext, useMemo } from "react";
+import { type FC, useContext, useMemo } from "react";
 import { AllEventsCtx } from "../../services/context/all-events-ctx";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import type { EventPublicInfo } from "../../services/_types";

@@ -2,7 +2,7 @@
 //It uses the context of event types and language to show the right label for each type.
 //It allows for multiple selections and updating the filtered event types with the onChange prop.
 
-import { FC, useContext, useMemo } from "react";
+import { type FC, useContext, useMemo } from "react";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import { EventTypesCtx } from "../../services/context/event-types-ctx";
 import GetLanguage from "../../utils/front-end/get-language";

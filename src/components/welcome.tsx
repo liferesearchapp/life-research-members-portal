@@ -22,7 +22,7 @@ import {
   UnauthenticatedTemplate,
   useMsal,
 } from "@azure/msal-react";
-import { FC, useContext } from "react";
+import { type FC, useContext } from "react";
 import { ActiveAccountCtx } from "../services/context/active-account-ctx";
 import { blue, green } from "@ant-design/colors";
 import { LanguageCtx } from "../services/context/language-ctx";

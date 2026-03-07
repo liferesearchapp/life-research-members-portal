@@ -1,9 +1,9 @@
-import React, { FC, useCallback, useContext, useEffect, useState } from "react";
+import React, { type FC, useCallback, useContext, useEffect, useState } from "react";
 import type { MemberPrivateInfo } from "../../services/_types";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import type { UpdateMemberPrivateParams } from "../../pages/api/update-member/[id]/private";
 import updateMemberPrivate from "../../services/update-member-private";
-import moment, { Moment } from "moment";
+import moment, { type Moment } from "moment";
 import { red } from "@ant-design/colors";
 import Notification from "../../services/notifications/notification";
 import { SaveChangesCtx, useResetDirtyOnUnmount } from "../../services/context/save-changes-ctx";

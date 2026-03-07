@@ -1,5 +1,5 @@
 import type { keyword } from "@prisma/client";
-import { createContext, FC, PropsWithChildren, useContext, useEffect, useState } from "react";
+import { createContext, type FC, type PropsWithChildren, useContext, useEffect, useState } from "react";
 import ApiRoutes from "../../routing/api-routes";
 import Notification from "../notifications/notification";
 import { LanguageCtx } from "./language-ctx";

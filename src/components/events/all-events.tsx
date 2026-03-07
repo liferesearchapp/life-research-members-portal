@@ -3,7 +3,7 @@
 // The component also updates the URL query parameters based on the filter values and the query parameters are used to update the filters on component mount.
 
 import {
-  FC,
+  type FC,
   Fragment,
   useCallback,
   useContext,
@@ -24,7 +24,7 @@ import EventNameFilter from "../filters/event-name-filter";
 import EventTypeFilter from "../filters/event-type-filter";
 import EventDateFilter from "../filters/event-date-filter";
 import type { EventPublicInfo } from "../../services/_types";
-import moment, { Moment } from "moment";
+import moment, { type Moment } from "moment";
 import type { TableColumnType as ColumnType } from "antd";
 
 type RangeValue<T> = [T | null, T | null] | null;

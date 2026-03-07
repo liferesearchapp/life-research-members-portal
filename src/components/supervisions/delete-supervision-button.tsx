@@ -2,10 +2,10 @@
 // The modal contains a form that requires the user to confirm the supervision trainee name before deletion.
 
 import {
-  CSSProperties,
-  Dispatch,
-  FC,
-  SetStateAction,
+  type CSSProperties,
+  type Dispatch,
+  type FC,
+  type SetStateAction,
   useContext,
   useState,
 } from "react";

@@ -1,6 +1,6 @@
 import React, {
-  FC,
-  ReactNode,
+  type FC,
+  type ReactNode,
   useCallback,
   useContext,
   useEffect,

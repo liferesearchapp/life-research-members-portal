@@ -5,11 +5,11 @@ The selected grants are displayed as tags, and the user can delete or edit the t
 The component also provides an onChange callback that returns the selected grants as a Map.
 */
 
-import React, { FC, useContext, useEffect, useState } from "react";
+import React, { type FC, useContext, useEffect, useState } from "react";
 import type { grant } from "@prisma/client";
 import { GrantsCtx } from "../../services/context/grants-ctx";
 import { LanguageCtx } from "../../services/context/language-ctx";
-import { GrantPublicInfo } from "../../services/_types";
+import { type GrantPublicInfo } from "../../services/_types";
 import GrantTag from "./grant-tag";
 import { Card, AutoComplete } from "antd";
 

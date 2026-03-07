@@ -2,7 +2,7 @@
 // with the ability to register as a Member or an Admin
 
 import { Button, Form, Input, Checkbox } from "antd";
-import { FC, useContext } from "react";
+import { type FC, useContext } from "react";
 import registerAccount from "../services/register-account";
 import { LanguageCtx } from "../services/context/language-ctx";
 const { useForm } = Form;

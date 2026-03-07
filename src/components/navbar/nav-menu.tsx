@@ -1,10 +1,10 @@
 import { useRouter } from "next/router";
 import {
-  FC,
-  JSXElementConstructor,
-  ReactElement,
-  ReactNode,
-  ReactPortal,
+  type FC,
+  type JSXElementConstructor,
+  type ReactElement,
+  type ReactNode,
+  type ReactPortal,
   useContext,
 } from "react";
 import { ActiveAccountCtx } from "../../services/context/active-account-ctx";

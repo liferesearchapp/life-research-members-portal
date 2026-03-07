@@ -1,6 +1,6 @@
 // Displays information about a public event
 
-import { FC, useContext } from "react";
+import { type FC, useContext } from "react";
 import type { EventPublicInfo } from "../../services/_types";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import React from "react";

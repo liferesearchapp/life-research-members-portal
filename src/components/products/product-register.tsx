@@ -4,7 +4,7 @@
 // Upon submission, the handleRegister function is called to send the product data to the server for storage.
 
 import { Button, Col, DatePicker, Row, Switch, Select, Form, Input } from "antd";
-import React, { FC, useContext, useState } from "react";
+import React, { type FC, useContext, useState } from "react";
 import moment from "moment";
 import type { Moment } from "moment";
 import registerProduct from "../../services/register-product";

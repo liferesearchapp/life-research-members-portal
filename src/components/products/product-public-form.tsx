@@ -3,7 +3,7 @@
 //The component also has a `validateAndSubmit` function that can be called from the SaveChangesCtx context to validate and submit the form.
 
 import React, {
-  FC,
+  type FC,
   Fragment,
   useCallback,
   useContext,
@@ -24,7 +24,7 @@ import {
   useResetDirtyOnUnmount,
 } from "../../services/context/save-changes-ctx";
 import { ProductTypesCtx } from "../../services/context/products-types-ctx";
-import moment, { Moment } from "moment";
+import moment, { type Moment } from "moment";
 import type { MemberPublicInfo } from "../../services/_types";
 import type { target } from "@prisma/client";
 import type { organization } from "@prisma/client";

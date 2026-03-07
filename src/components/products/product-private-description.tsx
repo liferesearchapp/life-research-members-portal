@@ -5,7 +5,7 @@
 */
 
 
-import { FC, useContext } from "react";
+import { type FC, useContext } from "react";
 import type { ProductPrivateInfo } from "../../services/_types";
 import React from "react";
 import { LanguageCtx } from "../../services/context/language-ctx";

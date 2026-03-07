@@ -2,7 +2,7 @@
 // It uses the fuzzyIncludes utility to filter options and getPopupContainer prop to control the container
 // of the select dropdown. It retrieves the allProducts from the AllProductsCtx and the language from LanguageCtx.
 
-import { FC, useContext, useMemo } from "react";
+import { type FC, useContext, useMemo } from "react";
 import { AllProductsCtx } from "../../services/context/all-products-ctx";
 import type { ProductPublicInfo } from "../../services/_types";
 import fuzzyIncludes from "../../utils/front-end/fuzzy-includes";

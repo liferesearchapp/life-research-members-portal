@@ -1,4 +1,4 @@
-import { Dispatch, FC, SetStateAction, useContext, useState } from "react";
+import { type Dispatch, type FC, type SetStateAction, useContext, useState } from "react";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import type { AccountInfo } from "../../services/_types";
 import updateAccountRemoveAdmin from "../../services/update-account-remove-admin";

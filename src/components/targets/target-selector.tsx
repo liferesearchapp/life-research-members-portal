@@ -1,7 +1,7 @@
 // See https://ant.design/components/form/#components-form-demo-customized-form-controls
 
 import type { target } from "@prisma/client";
-import { FC, useContext, useEffect, useState } from "react";
+import { type FC, useContext, useEffect, useState } from "react";
 import { AllTargetsCtx } from "../../services/context/all-targets-ctx";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import type { TargetInfo } from "../../services/_types";

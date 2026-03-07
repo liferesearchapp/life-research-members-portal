@@ -2,7 +2,7 @@
 // It makes use of the Ant Design form components, and updates the information by calling the updatePartnerPublic function.
 // It also displays a notification on success or failure of the update.
 
-import React, { FC, useCallback, useContext, useEffect, useState } from "react";
+import React, { type FC, useCallback, useContext, useEffect, useState } from "react";
 import { red } from "@ant-design/colors";
 import Notification from "../../services/notifications/notification";
 import {

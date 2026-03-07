@@ -1,4 +1,4 @@
-import { FC, useContext, useEffect } from "react";
+import { type FC, useContext, useEffect } from "react";
 import CardSkeleton from "../loading/card-skeleton";
 import useAccount from "../../services/use-account";
 import { LanguageCtx } from "../../services/context/language-ctx";

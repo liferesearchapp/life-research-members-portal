@@ -1,6 +1,6 @@
 //This component is a form that allows to update the admin information of a product.
 
-import React, { FC, useCallback, useContext, useEffect, useState } from "react";
+import React, { type FC, useCallback, useContext, useEffect, useState } from "react";
 import type { ProductPrivateInfo } from "../../services/_types";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import type { UpdateProductAdminParams } from "../../pages/api/update-product/[id]/admin";

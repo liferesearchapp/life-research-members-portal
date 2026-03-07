@@ -1,4 +1,4 @@
-import { FC, useContext } from "react";
+import { type FC, useContext } from "react";
 import type { MemberPublicInfo } from "../../services/_types";
 import GetLanguage from "../../utils/front-end/get-language";
 import KeywordTag from "../keywords/keyword-tag";

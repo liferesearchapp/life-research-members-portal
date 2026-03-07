@@ -1,7 +1,7 @@
 // this component allows the user to update the public information of an event and manage the related topics, members, partners, products, grants, and events
 // It also uses the updateEventPublic API function from the services to update the event data on the backend
 
-import React, { FC, useContext, useState, useCallback, useEffect } from "react";
+import React, { type FC, useContext, useState, useCallback, useEffect } from "react";
 import { Form, Input, Select, Button, DatePicker, Divider } from "antd";
 
 import { LanguageCtx } from "../../services/context/language-ctx";
@@ -9,7 +9,7 @@ import {
   SaveChangesCtx,
   useResetDirtyOnUnmount,
 } from "../../services/context/save-changes-ctx";
-import moment, { Moment } from "moment";
+import moment, { type Moment } from "moment";
 import Notification from "../../services/notifications/notification";
 import type { event, organization } from "@prisma/client";
 import type { grant } from "@prisma/client";

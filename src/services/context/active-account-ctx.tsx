@@ -2,10 +2,10 @@ import { useMsal } from "@azure/msal-react";
 import { InteractionStatus } from "@azure/msal-browser";
 import {
   createContext,
-  Dispatch,
-  FC,
-  PropsWithChildren,
-  SetStateAction,
+  type Dispatch,
+  type FC,
+  type PropsWithChildren,
+  type SetStateAction,
   useEffect,
   useState,
 } from "react";

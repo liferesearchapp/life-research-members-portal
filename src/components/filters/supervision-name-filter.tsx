@@ -1,7 +1,7 @@
 // SupervisionNameFilter is a React functional component that provides a multiselect dropdown for filtering a list of supervisions based on their names.
 // The component uses the Ant Design Select component and the `allSupervisions` context from `AllSupervisionsCtx`.
 
-import { FC, useContext, useMemo } from "react";
+import { type FC, useContext, useMemo } from "react";
 import { AllSupervisionsCtx } from "../../services/context/all-supervisions-ctx";
 import type { SupervisionPublicInfo } from "../../services/_types";
 import fuzzyIncludes from "../../utils/front-end/fuzzy-includes";

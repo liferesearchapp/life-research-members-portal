@@ -1,7 +1,7 @@
 import {
   PublicClientApplication,
-  RedirectRequest,
-  Configuration,
+  type RedirectRequest,
+  type Configuration,
   BrowserCacheLocation,
   EventType,
   type AuthenticationResult,

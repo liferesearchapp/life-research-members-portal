@@ -5,7 +5,7 @@ The component uses Ant Design's Descriptions component to render the grant's inf
 It takes the grant's information from the grant object passed as a prop.
 */
 
-import { FC, useContext } from "react";
+import { type FC, useContext } from "react";
 import type { GrantPublicInfo } from "../../services/_types";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import React from "react";

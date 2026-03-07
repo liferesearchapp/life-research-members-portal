@@ -1,4 +1,4 @@
-import { FC, useContext, useEffect } from "react";
+import { type FC, useContext, useEffect } from "react";
 import type { AccountRes } from "../../pages/api/account/[id]";
 import PageRoutes from "../../routing/page-routes";
 import { useRouter } from "next/router";

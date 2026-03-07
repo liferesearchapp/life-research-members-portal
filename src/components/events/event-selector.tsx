@@ -1,7 +1,7 @@
 //This component is a form element that allows a user to search for existing events and select one or more of them.
 
 import type { event } from "@prisma/client";
-import { FC, useContext, useEffect, useState } from "react";
+import { type FC, useContext, useEffect, useState } from "react";
 import { EventsCtx } from "../../services/context/events-ctx";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import type { EventPublicInfo } from "../../services/_types";

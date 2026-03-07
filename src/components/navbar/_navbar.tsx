@@ -1,5 +1,5 @@
 import { AuthenticatedTemplate, UnauthenticatedTemplate } from "@azure/msal-react";
-import { FC, useContext } from "react";
+import { type FC, useContext } from "react";
 import LoginButton from "./login-button";
 import NavMenu from "./nav-menu";
 import AvatarMenu from "./avatar-menu";

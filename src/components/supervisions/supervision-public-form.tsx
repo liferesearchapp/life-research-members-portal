@@ -1,6 +1,6 @@
 //This is a form component that allows the user to edit public information of a supervision.
 
-import React, { FC, useContext, useState, useCallback, useEffect } from "react";
+import React, { type FC, useContext, useState, useCallback, useEffect } from "react";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import type { Moment } from "moment";
 import { FacultiesCtx } from "../../services/context/faculties-ctx";

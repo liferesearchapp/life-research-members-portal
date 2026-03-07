@@ -2,10 +2,10 @@
 // The modal includes a form with an input field to confirm the deletion by typing the name of the event.
 
 import {
-  CSSProperties,
-  Dispatch,
-  FC,
-  SetStateAction,
+  type CSSProperties,
+  type Dispatch,
+  type FC,
+  type SetStateAction,
   useContext,
   useState,
 } from "react";

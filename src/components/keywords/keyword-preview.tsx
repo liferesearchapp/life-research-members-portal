@@ -1,4 +1,4 @@
-import { FC, useContext } from "react";
+import { type FC, useContext } from "react";
 import KeywordTag from "./keyword-tag";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import type { keyword } from "@prisma/client";

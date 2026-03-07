@@ -5,7 +5,7 @@
 // The component uses the useForm hook from the Ant Design library to handle form submissions and reset the form after a successful submission.
 
 import { Button, Col, DatePicker, Row, Switch, Select, Form, Input } from "antd";
-import React, { FC, useContext, useState } from "react";
+import React, { type FC, useContext, useState } from "react";
 import moment from "moment";
 import type { Moment } from "moment";
 import registerGrant from "../../services/register-grant";

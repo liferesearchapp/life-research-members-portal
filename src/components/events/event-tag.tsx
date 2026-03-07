@@ -1,7 +1,7 @@
 // This component is a presentational component that displays an event in a tag format.
 
 import type { event } from "@prisma/client";
-import { CSSProperties, FC, useState } from "react";
+import { type CSSProperties, type FC, useState } from "react";
 import PageRoutes from "../../routing/page-routes";
 import colorFromString from "../../utils/front-end/color-from-string";
 import GetLanguage from "../../utils/front-end/get-language";

@@ -3,7 +3,7 @@
 // The component also updates the URL query parameters based on the filter values and the query parameters are used to update the filters on component mount.
 
 import {
-  FC,
+  type FC,
   Fragment,
   useCallback,
   useContext,

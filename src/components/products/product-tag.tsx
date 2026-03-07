@@ -1,7 +1,7 @@
 // this component is a presentational component that displays a product in a tag format.
 
 import type { product } from "@prisma/client";
-import { CSSProperties, FC, useState } from "react";
+import { type CSSProperties, type FC, useState } from "react";
 import PageRoutes from "../../routing/page-routes";
 import colorFromString from "../../utils/front-end/color-from-string";
 import GetLanguage from "../../utils/front-end/get-product-language";

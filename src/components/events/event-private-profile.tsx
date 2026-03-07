@@ -1,6 +1,6 @@
 // This component displays the profile of an event, with the possibility to view or edit it
 
-import { FC, ReactNode, useCallback, useContext, useState } from "react";
+import { type FC, type ReactNode, useCallback, useContext, useState } from "react";
 import CardSkeleton from "../loading/card-skeleton";
 import PublicEventDescription from "./event-public-description";
 import usePrivateEventInfo from "../../services/use-private-event-info";

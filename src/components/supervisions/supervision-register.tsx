@@ -3,7 +3,7 @@
 // When the service returns successfully, the form will be reset
 
 import { Button, Col, DatePicker, Row, Select, Form, Input } from "antd";
-import React, { FC, useContext } from "react";
+import React, { type FC, useContext } from "react";
 import moment from "moment";
 import type { Moment } from "moment";
 import registerSupervision from "../../services/register-supervision";

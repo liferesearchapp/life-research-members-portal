@@ -5,7 +5,7 @@
 // Renders each option as the name of the organization, in either English or French based on the language context
 // Allows clearing the selection, and calls the onChange prop with an empty Set when it is cleared
 
-import { FC, useContext, useMemo } from "react";
+import { type FC, useContext, useMemo } from "react";
 import { AllPartnersCtx } from "../../services/context/all-partners-ctx";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import type { PartnerPublicInfo } from "../../services/_types";

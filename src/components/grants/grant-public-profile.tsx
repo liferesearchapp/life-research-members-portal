@@ -3,7 +3,7 @@
 // The grant information is displayed within a Card component with a header containing the grant title.
 // The grant description is displayed using the PublicGrantDescription component.
 
-import { FC, useContext } from "react";
+import { type FC, useContext } from "react";
 import usePublicGrantInfo from "../../services/use-public-grant-info";
 import CardSkeleton from "../loading/card-skeleton";
 import PublicGrantDescription from "./grant-public-description";

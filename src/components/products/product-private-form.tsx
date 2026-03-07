@@ -3,7 +3,7 @@
 // The form is built using the antd form library, and the onFinish event is used to submit the data to an API
 // for updating the private information. The component also implements the SaveChangesCtx context for handling save changes notifications.
 
-import React, { FC, useCallback, useContext, useEffect, useState } from "react";
+import React, { type FC, useCallback, useContext, useEffect, useState } from "react";
 import type { ProductPrivateInfo } from "../../services/_types";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import type { UpdateProductPrivateParams } from "../../pages/api/update-product/[id]/private";

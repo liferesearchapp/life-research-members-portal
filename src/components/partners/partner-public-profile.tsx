@@ -2,7 +2,7 @@
 //It takes the ID of the organization as a prop and uses the usePublicOrganizationInfo hook to retrieve the information of the organization.
 //The component also makes use of the LanguageCtx context to toggle the language of the component between English and French.
 
-import { FC, useContext } from "react";
+import { type FC, useContext } from "react";
 import usePublicOrganizationInfo from "../../services/use-public-partner-info";
 import CardSkeleton from "../loading/card-skeleton";
 import PublicPartnerDescription from "./partner-public-description";

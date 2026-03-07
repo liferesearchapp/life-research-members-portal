@@ -4,7 +4,7 @@ The form allows users to update the title, amount, status, source, topic, and no
 Additionally, it also allows users to associate investigators and members involved with the grant.
 */
 
-import React, { FC, useContext, useState, useCallback, useEffect } from "react";
+import React, { type FC, useContext, useState, useCallback, useEffect } from "react";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import type { Moment } from "moment";
 

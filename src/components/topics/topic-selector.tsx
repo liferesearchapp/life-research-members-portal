@@ -1,7 +1,7 @@
 // See https://ant.design/components/form/#components-form-demo-customized-form-controls
 
 import type { topic } from "@prisma/client";
-import { FC, useContext, useEffect, useState } from "react";
+import { type FC, useContext, useEffect, useState } from "react";
 import { AllTopicsCtx } from "../../services/context/all-topics-ctx";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import type { TopicInfo } from "../../services/_types";

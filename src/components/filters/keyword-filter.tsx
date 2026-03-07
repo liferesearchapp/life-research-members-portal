@@ -3,7 +3,7 @@
 
 import type { keyword } from "@prisma/client";
 import {
-  FC,
+  type FC,
   useCallback,
   useContext,
   useEffect,

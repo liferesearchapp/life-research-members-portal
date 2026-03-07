@@ -3,7 +3,7 @@ This component displays the public information of a partner, including organizat
 If the partner has partner members and the user is an admin, these members are also displayed.
 */
 
-import { FC, useContext } from "react";
+import { type FC, useContext } from "react";
 import type { PartnerPublicInfo } from "../../services/_types";
 import GetLanguage from "../../utils/front-end/get-language";
 import React from "react";

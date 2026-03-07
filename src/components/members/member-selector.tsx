@@ -1,5 +1,5 @@
 import type { MemberPublicInfo } from "../../services/_types";
-import { FC, useContext, useEffect, useState } from "react";
+import { type FC, useContext, useEffect, useState } from "react";
 import { AllMembersSelectorCtx } from "../../services/context/all-members-selector-ctx";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import MemberTag from "./member-tag";

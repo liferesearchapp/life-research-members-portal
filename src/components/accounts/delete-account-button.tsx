@@ -1,4 +1,4 @@
-import { CSSProperties, Dispatch, FC, SetStateAction, useContext, useState } from "react";
+import { type CSSProperties, type Dispatch, type FC, type SetStateAction, useContext, useState } from "react";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import type { AccountInfo } from "../../services/_types";
 import deleteAccount from "../../services/delete-account";

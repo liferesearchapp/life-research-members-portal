@@ -2,7 +2,7 @@
 //The information displayed includes the product's abstract, product type, published date, DOI, product partnerships, product target, authors, and member authors.
 //The component uses the LanguageCtx to toggle between English and French content.
 
-import { FC, useContext } from "react";
+import { type FC, useContext } from "react";
 import type { ProductPublicInfo } from "../../services/_types";
 import React from "react";
 import { LanguageCtx } from "../../services/context/language-ctx";

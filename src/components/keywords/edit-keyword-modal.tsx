@@ -1,5 +1,5 @@
 import { Divider, Button, Form, Input, Modal, Typography } from "antd";
-import { FC, useState, useContext } from "react";
+import { type FC, useState, useContext } from "react";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import type { KeywordInfo } from "../../services/_types";
 import type { keyword } from "@prisma/client";

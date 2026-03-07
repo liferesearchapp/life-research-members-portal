@@ -2,7 +2,7 @@
 // Uses the context `AllProductsCtx` to retrieve a list of all products
 // Uses the context `LanguageCtx` to determine the language for the title
 
-import { FC, useContext, useMemo } from "react";
+import { type FC, useContext, useMemo } from "react";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import { AllProductsCtx } from "../../services/context/all-products-ctx";
 import type { ProductPublicInfo } from "../../services/_types";

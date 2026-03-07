@@ -3,7 +3,7 @@
 // The component has two modes, view mode and edit mode.
 // The component uses the save-changes context to prompt the user to save unsaved changes before navigating away.
 
-import { FC, ReactNode, useCallback, useContext, useState } from "react";
+import { type FC, type ReactNode, useCallback, useContext, useState } from "react";
 import CardSkeleton from "../loading/card-skeleton";
 
 import usePrivateGrantInfo from "../../services/use-private-grant-info";

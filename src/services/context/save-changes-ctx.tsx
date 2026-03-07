@@ -1,10 +1,10 @@
 import Router from "next/router";
 import {
   createContext,
-  Dispatch,
-  FC,
-  PropsWithChildren,
-  SetStateAction,
+  type Dispatch,
+  type FC,
+  type PropsWithChildren,
+  type SetStateAction,
   useCallback,
   useContext,
   useEffect,

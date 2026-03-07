@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useContext, useEffect, useState } from "react";
+import React, { type FC, useCallback, useContext, useEffect, useState } from "react";
 import type { MemberPrivateInfo } from "../../services/_types";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import type { Moment } from "moment";

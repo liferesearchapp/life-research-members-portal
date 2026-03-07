@@ -1,7 +1,7 @@
 // this is a  component that displays a private product profile.
 // The component also uses several other components such as ProductPrivateDescription, ProductPrivateForm, ProductAdminForm and DeleteProductButton.
 
-import { FC, ReactNode, useCallback, useContext, useState } from "react";
+import { type FC, type ReactNode, useCallback, useContext, useState } from "react";
 import CardSkeleton from "../loading/card-skeleton";
 import PublicProductDescription from "./product-public-description";
 import PublicProductForm from "./product-public-form";

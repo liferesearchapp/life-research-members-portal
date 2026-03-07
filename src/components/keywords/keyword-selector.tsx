@@ -1,7 +1,7 @@
 // See https://ant.design/components/form/#components-form-demo-customized-form-controls
 
 import type { keyword } from "@prisma/client";
-import { FC, useContext, useEffect, useState } from "react";
+import { type FC, useContext, useEffect, useState } from "react";
 import { AllKeywordsCtx } from "../../services/context/all-keywords-ctx";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import type { KeywordInfo } from "../../services/_types";

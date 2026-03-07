@@ -1,7 +1,7 @@
 // This is a functional component that displays the private information of a product.
 // The component uses the LanguageCtx context to determine the language to display.
 
-import { FC, useContext } from "react";
+import { type FC, useContext } from "react";
 import type { ProductPrivateInfo } from "../../services/_types";
 import React from "react";
 import { LanguageCtx } from "../../services/context/language-ctx";

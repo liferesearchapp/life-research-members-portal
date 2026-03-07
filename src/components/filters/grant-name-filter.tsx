@@ -4,7 +4,7 @@ Uses the AllGrantsCtx for all grants data, and receives filter value, change eve
 Renders antd Select component with multiple select mode, filter option, clear button, select/deselect events, and getPopupContainer prop.
 */
 
-import { FC, useContext, useMemo } from "react";
+import { type FC, useContext, useMemo } from "react";
 import { AllGrantsCtx } from "../../services/context/all-grants-ctx";
 import type { GrantPublicInfo } from "../../services/_types";
 import fuzzyIncludes from "../../utils/front-end/fuzzy-includes";

@@ -1,5 +1,5 @@
 import React, {
-  FC,
+  type FC,
   Fragment,
   useCallback,
   useContext,

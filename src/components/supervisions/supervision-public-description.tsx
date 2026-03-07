@@ -3,7 +3,7 @@
 // The component uses the `LanguageCtx` context to determine the language to display the text.
 // SafeLink is used to make the links to the member profiles safe.
 
-import { FC, useContext } from "react";
+import { type FC, useContext } from "react";
 import type { SupervisionPublicInfo } from "../../services/_types";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import React from "react";
