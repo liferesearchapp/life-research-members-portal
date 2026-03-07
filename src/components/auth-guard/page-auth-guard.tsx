@@ -7,7 +7,7 @@ import Authorizations from "./authorizations";
 type Props = {
   auths: Authorizations[];
   id?: number;
-  loadingIcon?: ReactElement;
+  loadingIcon?: ReactElement<any>;
 };
 
 const PageAuthGuard: FC<PropsWithChildren<Props>> = ({ auths, id, loadingIcon, children }) => {

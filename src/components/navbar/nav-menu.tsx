@@ -7,7 +7,7 @@ import {
   FC,
   JSXElementConstructor,
   ReactElement,
-  ReactFragment,
+  ReactNode,
   ReactPortal,
   useContext,
 } from "react";
@@ -100,7 +100,7 @@ const NavMenu: FC = () => {
               | number
               | boolean
               | ReactElement<any, string | JSXElementConstructor<any>>
-              | ReactFragment
+              | Iterable<ReactNode>
               | ReactPortal
               | null
               | undefined;
