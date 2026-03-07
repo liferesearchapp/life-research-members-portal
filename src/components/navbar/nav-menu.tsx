@@ -1,4 +1,3 @@
-import type { MenuItemType } from "antd/lib/menu/interface";
 import { useRouter } from "next/router";
 import {
   FC,
@@ -14,7 +13,10 @@ import PageRoutes from "../../routing/page-routes";
 import SafeLink from "../link/safe-link";
 import type { UrlObject } from "url";
 import { Menu, Spin } from "antd";
+import type { MenuProps } from "antd";
 import { MenuOutlined } from "@ant-design/icons";
+
+type MenuItemType = NonNullable<MenuProps["items"]>[number];
 
 const NavMenu: FC = () => {
   const { localAccount, loading } = useContext(ActiveAccountCtx);

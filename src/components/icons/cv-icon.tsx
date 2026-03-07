@@ -1,5 +1,5 @@
-import type { CustomIconComponentProps } from "@ant-design/icons/lib/components/Icon";
-import Icon from "@ant-design/icons/lib/components/Icon";
+import type { CustomIconComponentProps } from "@ant-design/icons/es/components/Icon";
+import Icon from "@ant-design/icons";
 import type { FC } from "react";
 
 // From https://freeicons.io/education-16/papertexture-background-cardboard-pattern-page-blank-white-letter-canvas-icon-124317

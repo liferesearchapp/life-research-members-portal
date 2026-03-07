@@ -10,7 +10,6 @@ import { AllEventsCtx } from "../../services/context/all-events-ctx";
 import type { EventPublicInfo } from "../../services/_types";
 import moment, { Moment } from "moment";
 import { DatePicker } from "antd";
-import type { RangePickerProps } from "antd/lib/date-picker";
 
 type RangeValue<T> = [T | null, T | null] | null;
 
@@ -20,7 +19,7 @@ type Props = {
     value: RangeValue<Moment>,
     filteredEvents: EventPublicInfo[]
   ) => void;
-  getPopupContainer?: RangePickerProps["getPopupContainer"];
+  getPopupContainer?: (triggerNode: HTMLElement) => HTMLElement;
 };
 
 const EventDateFilter: FC<Props> = ({

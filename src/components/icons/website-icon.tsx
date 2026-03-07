@@ -1,5 +1,5 @@
-import type { CustomIconComponentProps } from "@ant-design/icons/lib/components/Icon";
-import Icon from "@ant-design/icons/lib/components/Icon";
+import type { CustomIconComponentProps } from "@ant-design/icons/es/components/Icon";
+import Icon from "@ant-design/icons";
 import type { FC } from "react";
 
 // From https://www.svgrepo.com/svg/379736/web

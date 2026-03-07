@@ -60,7 +60,7 @@ const AvatarMenu: FC = () => {
 
   return (
     <Dropdown
-      dropdownRender={() => dropdown}
+      popupRender={() => dropdown}
       getPopupContainer={() => document.querySelector(".navbar") || document.body}
     >
       <div className="avatar">{avatarLabel}</div>
