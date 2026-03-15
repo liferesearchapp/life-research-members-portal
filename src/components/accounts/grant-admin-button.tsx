@@ -1,23 +1,30 @@
+import Button from "antd/lib/button";
 import { type Dispatch, type FC, type SetStateAction, useContext } from "react";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import type { AccountInfo } from "../../services/_types";
-
+import Popconfirm from "antd/lib/popconfirm";
 import updateAccountGrantAdmin from "../../services/update-account-grant-admin";
-import { Button, Popconfirm } from "antd";
+import { useSelectedInstitute } from "../../services/context/selected-institute-ctx";
 
-type Props = { account: AccountInfo; setAccount: Dispatch<SetStateAction<AccountInfo | null>> };
+type Props = {
+  account: AccountInfo;
+  setAccount: Dispatch<SetStateAction<AccountInfo | null>>;
+};
 
 const GrantAdminButton: FC<Props> = ({ account, setAccount }) => {
   const { en } = useContext(LanguageCtx);
+  const { institute } = useSelectedInstitute();
 
   async function submit() {
-    const res = await updateAccountGrantAdmin(account.id);
+    const res =
+      institute &&
+      (await updateAccountGrantAdmin(account.id, institute.urlIdentifier));
     if (res) setAccount(res);
   }
 
   const confirmMessage = en
-    ? "Are you sure you want to grant this account admin privileges?"
-    : "Voulez-vous vraiment accorder des privilèges d'administrateur à ce compte ?";
+    ? "Are you sure you want to grant this account admin privileges? This will grant admin access for current selected institute!"
+    : "Voulez-vous vraiment accorder des privilèges d'administrateur à ce compte ? Cela accordera l'accès administrateur pour l'institut actuellement sélectionné !";
 
   return (
     <>

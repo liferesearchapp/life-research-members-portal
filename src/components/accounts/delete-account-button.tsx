@@ -1,14 +1,19 @@
-import { type CSSProperties, type Dispatch, type FC, type SetStateAction, useContext, useState } from "react";
+import useForm from "antd/lib/form/hooks/useForm";
+import Button from "antd/lib/button";
+import Form from "antd/lib/form";
+import Input from "antd/lib/input";
+import Modal from "antd/lib/modal";
+import { CSSProperties, type Dispatch, type FC, type SetStateAction, useContext, useState } from "react";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import type { AccountInfo } from "../../services/_types";
+import Alert from "antd/lib/alert";
+import Text from "antd/lib/typography/Text";
 import deleteAccount from "../../services/delete-account";
 import { useRouter } from "next/router";
 import PageRoutes from "../../routing/page-routes";
 import { ActiveAccountCtx } from "../../services/context/active-account-ctx";
 import Notification from "../../services/notifications/notification";
-import { Form, Button, Input, Modal, Alert, Typography } from "antd";
-const useForm = Form.useForm;
-const Text = Typography.Text;
+import { useSelectedInstitute } from "../../services/context/selected-institute-ctx";
 
 type Data = { confirmation: string };
 type Props = {
@@ -23,14 +28,16 @@ const DeleteAccountButton: FC<Props> = ({ account, setAccount, style }) => {
   const router = useRouter();
   const [modalOpen, setModalOpen] = useState(false);
   const [form] = useForm<Data>();
+  const { institute } = useSelectedInstitute();
+  const urlIdentifier = institute?.urlIdentifier;
 
   const memberName = account.first_name + " " + account.last_name;
 
   async function submit() {
     const res = await deleteAccount(account.id);
-    if (res) {
+    if (res && urlIdentifier) {
       setModalOpen(false);
-      router.push(PageRoutes.allAccounts);
+      router.push(PageRoutes.allAccounts(urlIdentifier));
     }
   }
 
@@ -58,7 +65,7 @@ const DeleteAccountButton: FC<Props> = ({ account, setAccount, style }) => {
         cancelButtonProps={{ danger: true }}
         cancelText={en ? "Cancel" : "Annuler"}
         destroyOnClose
-        styles={{ body: { paddingBottom: 0 } }}
+        bodyStyle={{ paddingBottom: 0 }}
       >
         <Alert
           showIcon

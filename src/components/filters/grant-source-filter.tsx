@@ -3,12 +3,11 @@ Renders a list of options for grant sources with a value of 0 for "empty"
 Receives onChange, value, id and getPopupContainer props
 */
 
+import Select, { SelectProps } from "antd/lib/select";
 import { type FC, useContext, useMemo } from "react";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import { GrantSourcesCtx } from "../../services/context/grant-sources-ctx";
 import GetLanguage from "../../utils/front-end/get-language";
-import { Select } from "antd";
-import type { SelectProps } from "antd";
 
 type Props = {
   id?: string;
@@ -61,6 +60,7 @@ const GrantSourceFilter: FC<Props> = ({
       options={options}
       allowClear
       showSearch={false}
+      showArrow
       onSelect={onSelect}
       onDeselect={onDelete}
       getPopupContainer={getPopupContainer}

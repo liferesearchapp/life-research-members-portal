@@ -1,5 +1,8 @@
+import CloseOutlined from "@ant-design/icons/lib/icons/CloseOutlined";
+import EditOutlined from "@ant-design/icons/lib/icons/EditOutlined";
 import type { keyword } from "@prisma/client";
-import { type CSSProperties, type FC, useState } from "react";
+import Tag from "antd/lib/tag";
+import { CSSProperties, FC, useState } from "react";
 import PageRoutes from "../../routing/page-routes";
 import colorFromString from "../../utils/front-end/color-from-string";
 import GetLanguage from "../../utils/front-end/get-language";
@@ -7,8 +10,7 @@ import GetOppositeLanguage from "../../utils/front-end/get-opposite-language";
 import SafeLink from "../link/safe-link";
 import { queryKeys } from "../members/all-members";
 import EditKeywordModal from "./edit-keyword-modal";
-import { Tag } from "antd";
-import { CloseOutlined, EditOutlined } from "@ant-design/icons";
+import { useSelectedInstitute } from "../../services/context/selected-institute-ctx";
 
 type Props = {
   keyword: keyword;
@@ -34,6 +36,7 @@ const KeywordTag: FC<Props> = ({
   style,
 }) => {
   const [modalOpen, setModalOpen] = useState(false);
+  const { institute } = useSelectedInstitute();
 
   const classList = ["keyword-tag"];
   if (linked || editable || onClick) classList.push("cursor-pointer");
@@ -51,7 +54,7 @@ const KeywordTag: FC<Props> = ({
   const content = linked ? (
     <SafeLink
       href={{
-        pathname: PageRoutes.allMembers,
+        pathname: PageRoutes.allMembers(institute?.urlIdentifier || ""),
         query: { [queryKeys.keywords]: k.id },
       }}
     >

@@ -1,23 +1,28 @@
 // This component is a button that opens a modal to delete a product.
 // The modal contains a form that requires the user to confirm the product name before deletion.
 
+import Button from "antd/lib/button";
+import Form from "antd/lib/form";
+import useForm from "antd/lib/form/hooks/useForm";
+import Input from "antd/lib/input";
+import Modal from "antd/lib/modal";
 import {
-  type CSSProperties,
-  type Dispatch,
-  type FC,
-  type SetStateAction,
+  CSSProperties,
+  Dispatch,
+  FC,
+  SetStateAction,
   useContext,
   useState,
 } from "react";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import type { ProductPrivateInfo } from "../../services/_types";
+import Alert from "antd/lib/alert";
+import Text from "antd/lib/typography/Text";
 import deleteProduct from "../../services/delete-product";
 import { useRouter } from "next/router";
 import PageRoutes from "../../routing/page-routes";
 import Notification from "../../services/notifications/notification";
-import { Button, Form, Input, Modal, Alert, Typography } from "antd";
-const useForm = Form.useForm;
-const Text = Typography.Text;
+import { useSelectedInstitute } from "../../services/context/selected-institute-ctx";
 
 type Data = { confirmation: string };
 type Props = {
@@ -31,14 +36,15 @@ const DeleteProductButton: FC<Props> = ({ product, setProduct, style }) => {
   const router = useRouter();
   const [modalOpen, setModalOpen] = useState(false);
   const [form] = useForm<Data>();
+  const { institute } = useSelectedInstitute();
 
   const productName = en ? product.title_en : product.title_fr;
 
   async function submit() {
     const res = await deleteProduct(product.id);
-    if (res) {
+    if (res && institute) {
       setModalOpen(false);
-      router.push(PageRoutes.products);
+      router.push(PageRoutes.allProducts(institute?.urlIdentifier));
     }
   }
 
@@ -72,7 +78,7 @@ const DeleteProductButton: FC<Props> = ({ product, setProduct, style }) => {
         cancelButtonProps={{ danger: true }}
         cancelText={en ? "Cancel" : "Annuler"}
         destroyOnClose
-        styles={{ body: { paddingBottom: 0 } }}
+        bodyStyle={{ paddingBottom: 0 }}
       >
         <Alert
           showIcon

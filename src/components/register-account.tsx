@@ -1,24 +1,42 @@
 // This component implements a form for creating new user accounts
 // with the ability to register as a Member or an Admin
 
-import { Button, Form, Input, Checkbox } from "antd";
+import { Button, Select } from "antd";
+import Form from "antd/lib/form";
+import Input from "antd/lib/input";
 import { type FC, useContext } from "react";
 import registerAccount from "../services/register-account";
+import Checkbox from "antd/lib/checkbox/Checkbox";
+import { useForm } from "antd/lib/form/Form";
 import { LanguageCtx } from "../services/context/language-ctx";
-const { useForm } = Form;
+import { MemberInstituteCtx } from "../services/context/member-institutes-ctx";
+import {
+  useAdminDetails,
+  useSelectedInstitute,
+} from "../services/context/selected-institute-ctx";
+import { ActiveAccountCtx } from "../services/context/active-account-ctx";
+
 type Data = {
   login_email: string;
   confirm_email: string;
   first_name: string;
   last_name: string;
   is_admin: boolean;
+  is_super_admin: boolean;
   is_member: boolean;
+  institute_id: number[];
 };
+
+const { Option } = Select;
 
 const RegisterAccount: FC = () => {
   // This hook is important for type checking the form
   const [form] = useForm<Data>();
+  const { localAccount } = useContext(ActiveAccountCtx);
   const { en } = useContext(LanguageCtx);
+  const { institute } = useSelectedInstitute();
+  const { institutes } = useContext(MemberInstituteCtx);
+  const isAdmin = useAdminDetails();
 
   async function handleRegister({
     first_name,
@@ -26,6 +44,8 @@ const RegisterAccount: FC = () => {
     login_email,
     is_admin,
     is_member,
+    is_super_admin,
+    institute_id,
   }: Data) {
     const res = await registerAccount({
       first_name,
@@ -33,6 +53,8 @@ const RegisterAccount: FC = () => {
       login_email,
       is_admin,
       is_member,
+      is_super_admin,
+      institute_id,
     });
     if (res) form.resetFields();
   }
@@ -108,6 +130,24 @@ const RegisterAccount: FC = () => {
           <Input />
         </Form.Item>
 
+        {institute && (
+          <Form.Item
+            label={en ? "Select Institute" : "Sélectionnez l'institut"}
+            name="institute_id"
+            initialValue={[institute.id]}
+            rules={[{ required: true, message: en ? "Required" : "Requis" }]}
+          >
+            <Select mode="multiple" defaultValue={institute?.id}>
+              <Option value="">{""}</Option>
+              {localAccount?.instituteAdmin.map((f) => (
+                <Option key={f.institute.id} value={f.institute.id}>
+                  {`${f.institute.name} - ${f.institute.urlIdentifier}`}
+                </Option>
+              ))}
+            </Select>
+          </Form.Item>
+        )}
+
         <div className="row">
           <Form.Item
             name="is_member"
@@ -118,13 +158,30 @@ const RegisterAccount: FC = () => {
               {en ? "Register as Member" : "Inscrivez-vous en tant que membre"}
             </Checkbox>
           </Form.Item>
-          <Form.Item name="is_admin" valuePropName="checked">
-            <Checkbox>
-              {en
-                ? "Grant Admin Privileges"
-                : "Accorder des privilèges d'administrateur"}
-            </Checkbox>
-          </Form.Item>
+          {
+            // Only super admins can grant admin privileges
+            isAdmin && (
+              <Form.Item name="is_admin" valuePropName="checked">
+                <Checkbox>
+                  {en
+                    ? "Grant Admin Privileges"
+                    : "Accorder des privilèges d'administrateur"}
+                </Checkbox>
+              </Form.Item>
+            )
+          }
+          {
+            // Only super admins can grant admin privileges
+            localAccount?.is_super_admin && (
+              <Form.Item name="is_super_admin" valuePropName="checked">
+                <Checkbox>
+                  {en
+                    ? "Grant Super Admin Privileges"
+                    : "Accorder des privilèges d'administrateur"}
+                </Checkbox>
+              </Form.Item>
+            )
+          }
         </div>
 
         <Form.Item>

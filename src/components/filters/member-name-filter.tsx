@@ -3,12 +3,11 @@
 // Includes fuzzy search functionality to match the input string with member names.
 
 
+import Select, { SelectProps } from "antd/lib/select";
 import { type FC, useContext, useMemo } from "react";
 import { AllMembersCtx } from "../../services/context/all-members-ctx";
 import type { MemberPublicInfo } from "../../services/_types";
 import fuzzyIncludes from "../../utils/front-end/fuzzy-includes";
-import { Select } from "antd";
-import type { SelectProps } from "antd";
 
 function getName(member: MemberPublicInfo) {
   return member.account.first_name + " " + member.account.last_name;

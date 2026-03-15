@@ -2,13 +2,12 @@
 // Uses the context `AllProductsCtx` to retrieve a list of all products
 // Uses the context `LanguageCtx` to determine the language for the title
 
+import Select, { SelectProps } from "antd/lib/select";
 import { type FC, useContext, useMemo } from "react";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import { AllProductsCtx } from "../../services/context/all-products-ctx";
 import type { ProductPublicInfo } from "../../services/_types";
 import fuzzyIncludes from "../../utils/front-end/fuzzy-includes";
-import { Select } from "antd";
-import type { SelectProps } from "antd";
 
 function getTitle(product: ProductPublicInfo, en: boolean) {
   return en ? product.title_en : product.title_fr;

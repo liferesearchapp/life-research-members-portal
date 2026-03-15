@@ -42,10 +42,8 @@ const SafeLink: FC<PropsWithChildren<Props>> = ({
       {children}
     </a>
   ) : (
-    <Link href={href} legacyBehavior>
-      <a target={target} rel={rel} onClick={handleNav}>
-        {children}
-      </a>
+    <Link href={href} target={target} rel={rel} onClick={handleNav}>
+      {children}
     </Link>
   );
 };

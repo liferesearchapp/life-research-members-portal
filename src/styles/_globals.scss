@@ -1,4 +1,4 @@
-// antd v5 uses CSS-in-JS; no global CSS import needed
+@import "antd/dist/reset.css";
 @import "./antd-colors.scss";
 @import "./navbar.scss";
 @import "./all-members.scss";
@@ -137,6 +137,12 @@ body {
   margin-bottom: 20px;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
   color: white;
+}
+
+.rounded-box-link {
+  display: block;
+  color: inherit;
+  text-decoration: none;
 }
 
 .rounded-box:hover {

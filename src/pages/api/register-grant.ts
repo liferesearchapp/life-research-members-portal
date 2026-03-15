@@ -1,6 +1,10 @@
 import { Prisma } from "@prisma/client";
 import type { NextApiRequest, NextApiResponse } from "next";
 import db from "../../../prisma/prisma-client";
+import {
+  assertAuthorized,
+  hasAnyInstituteAccess,
+} from "../../utils/api/authorization";
 import getAccountFromRequest from "../../utils/api/get-account-from-request";
 import isAuthorMatch from "../../components/products/author-match"; // Import isAuthorMatch
 import removeDiacritics from "../../utils/front-end/remove-diacritics"; // Import removeDiacritics
@@ -17,6 +21,7 @@ export type RegisterGrantParams = {
   all_investigator: string;
   topic_id: number;
   note: string;
+  institute_id: number;
 };
 
 export type RegisterGrantRes = Awaited<ReturnType<typeof registerGrant>>;
@@ -35,6 +40,7 @@ function registerGrant(params: RegisterGrantParams) {
       all_investigator: params.all_investigator,
       topic_id: params.topic_id,
       note: params.note,
+      instituteId: params.institute_id,
     },
     select: {
       id: true,
@@ -75,9 +81,14 @@ export default async function handler(
   try {
     const currentUser = await getAccountFromRequest(req, res);
     if (!currentUser) return;
-
-    if (!currentUser.is_admin)
-      return res.status(401).send("You are not authorized to register a grant");
+    if (
+      !assertAuthorized(
+        res,
+        hasAnyInstituteAccess(currentUser, [params.institute_id]),
+        "You are not authorized to register a grant."
+      )
+    )
+      return;
 
     const newGrant = await registerGrant(params);
 

@@ -3,12 +3,11 @@ MemberTypeFilter - A React component that allows selecting multiple member types
 Uses MemberTypesCtx and LanguageCtx from context for data and translation.
 */
 
+import Select, { SelectProps } from "antd/lib/select";
 import { type FC, useContext, useMemo } from "react";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import { MemberTypesCtx } from "../../services/context/member-types-ctx";
 import GetLanguage from "../../utils/front-end/get-language";
-import { Select } from "antd";
-import type { SelectProps } from "antd";
 
 type Props = {
   id?: string;
@@ -58,6 +57,7 @@ const MemberTypeFilter: FC<Props> = ({
       options={options}
       allowClear
       showSearch={false}
+      showArrow
       onSelect={onSelect}
       onDeselect={onDelete}
       getPopupContainer={getPopupContainer}

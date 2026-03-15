@@ -2,8 +2,11 @@
 // The component also has buttons to create new partner when login in as an administrator and clear the filters.
 // The component also updates the URL query parameters based on the filter values and the query parameters are used to update the filters on component mount.
 
+import Button from "antd/lib/button";
+import Table, { ColumnType } from "antd/lib/table";
+import Title from "antd/lib/typography/Title";
 import {
-  type FC,
+  FC,
   Fragment,
   useCallback,
   useContext,
@@ -13,10 +16,13 @@ import {
 } from "react";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import PageRoutes from "../../routing/page-routes";
+import Descriptions from "antd/lib/descriptions";
+import Item from "antd/lib/descriptions/Item";
 import SafeLink from "../link/safe-link";
 import Router, { useRouter } from "next/router";
+import Form from "antd/lib/form";
 import blurActiveElement from "../../utils/front-end/blur-active-element";
-import { Checkbox, Button, Table, Typography, Descriptions, Form } from "antd";
+import { Checkbox } from "antd";
 import type { ParsedUrlQueryInput } from "querystring";
 import { ActiveAccountCtx } from "../../services/context/active-account-ctx";
 import type { PartnerPublicInfo } from "../../services/_types";
@@ -24,9 +30,10 @@ import { AllPartnersCtx } from "../../services/context/all-partners-ctx";
 import OrgTypeFilter from "../filters/org-type-filter";
 import OrgScopeFilter from "../filters/org-scope-filter";
 import OrgNameFilter from "../filters/org-name-filter";
-import type { TableColumnType as ColumnType } from "antd";
-const Title = Typography.Title;
-const Item = Descriptions.Item;
+import {
+  useAdminDetails,
+  useSelectedInstitute,
+} from "../../services/context/selected-institute-ctx";
 
 function nameSorter(en: boolean) {
   return (
@@ -138,8 +145,15 @@ function handleShowTypeChange(value: boolean) {
   Router.push({ query }, undefined, { scroll: false });
 }
 
-function clearQueries() {
-  Router.push({ query: null }, undefined, { scroll: false });
+function clearQueries(institute: { urlIdentifier: string | null }) {
+  if (institute?.urlIdentifier) {
+    const url = PageRoutes.allMembers(institute.urlIdentifier);
+    console.log("Redirecting to:", url); 
+    Router.push(url); 
+  } else {
+    console.error("Unable to reset filters: Institute ID is missing.");
+    alert("Unable to reset filters: Institute ID is missing.");
+  }
 }
 
 function getIdsFromQueryParams(key: string): Set<number> {
@@ -166,6 +180,7 @@ function getPopupContainer(): HTMLElement {
 
 const AllPartners: FC = () => {
   const { en } = useContext(LanguageCtx);
+  const { institute } = useSelectedInstitute();
 
   const {
     allPartners,
@@ -176,7 +191,12 @@ const AllPartners: FC = () => {
   const { localAccount } = useContext(ActiveAccountCtx);
 
   const handleRegisterPartner = () => {
-    router.push("partners/register");
+    if (institute) {
+      router.push({
+        pathname: "/[instituteId]/partners/register",
+        query: { instituteId: institute.urlIdentifier },
+      });
+    }
   };
 
   useEffect(() => {
@@ -223,8 +243,13 @@ const AllPartners: FC = () => {
   }, [scopeQuery]);
 
   function refreshAndClearFilters() {
-    clearQueries();
-    refreshOrganizations();
+    const instituteUrlIdentifier = institute?.urlIdentifier; // Retrieve urlIdentifier instead of id
+    if (instituteUrlIdentifier) {
+      clearQueries({ urlIdentifier: instituteUrlIdentifier }); // Pass as an object
+      refreshOrganizations();
+    } else {
+      console.error("Cannot reset filters: Institute ID is missing.");
+    }
   }
 
   const filteredOrganisation = useMemo(
@@ -363,6 +388,8 @@ const AllPartners: FC = () => {
     </Form>
   );
 
+  const isAdmin = useAdminDetails();
+
   const Header = () => (
     <>
       <div className="header-title-row">
@@ -370,7 +397,7 @@ const AllPartners: FC = () => {
         <Button type="primary" onClick={refreshAndClearFilters} size="large">
           {en ? "Reset the filter" : "Réinitialiser le filtre"}
         </Button>{" "}
-        {localAccount && localAccount.is_admin && (
+        {localAccount && isAdmin && (
           <Button
             type="primary"
             size="large"

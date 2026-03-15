@@ -4,10 +4,12 @@ import { useContext, useEffect } from "react";
 import { ActiveAccountCtx } from "../../../services/context/active-account-ctx";
 import CardSkeleton from "../../../components/loading/card-skeleton";
 import PageRoutes from "../../../routing/page-routes";
+import { useAdminDetails } from "../../../services/context/selected-institute-ctx";
 
 const PrivateSupervisionPage: NextPage = () => {
   const router = useRouter();
   const { localAccount, loading } = useContext(ActiveAccountCtx);
+  const isAdmin = useAdminDetails();
   const { id: idString } = router.query;
 
   useEffect(() => {
@@ -18,7 +20,7 @@ const PrivateSupervisionPage: NextPage = () => {
 
     const id = parseInt(idString);
 
-    if (localAccount?.is_admin) {
+    if (isAdmin) {
       router.replace(PageRoutes.privateSupervisionProfile(id));
       return;
     }
@@ -28,7 +30,7 @@ const PrivateSupervisionPage: NextPage = () => {
 
       return;
     }
-  }, [localAccount, loading, idString, router]);
+  }, [localAccount, loading, idString, router, isAdmin]);
 
   return <CardSkeleton />;
 };

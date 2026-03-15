@@ -40,7 +40,7 @@ const PublicGrantDescription: FC<Props> = ({ grant }) => {
 
       <Item label={en ? "Amount" : "Montant"}>{grant.amount}</Item>
 
-      <Item label={en ? "Throught LRI" : "Throught LRI"}>
+      <Item label={en ? "Through Institute" : "Through Institut"}>
         {grant.throught_lri ? (en ? "Yes" : "Oui") : en ? "No" : "Non"}
       </Item>
 
@@ -98,6 +98,12 @@ const PublicGrantDescription: FC<Props> = ({ grant }) => {
 
       <Item label={en ? "Topic" : "Sujet"}>
         {grant.topic ? (en ? grant.topic.name_en : grant.topic.name_fr) : ""}
+      </Item>
+
+      <Item label={en ? "Institute" : "L'institut"}>
+        <Tag
+          key={grant.institute.id}
+        >{`${grant.institute.name} - ${grant.institute.urlIdentifier}`}</Tag>
       </Item>
 
       <Item label={en ? "Note" : "Note"} style={{ whiteSpace: "break-spaces" }}>

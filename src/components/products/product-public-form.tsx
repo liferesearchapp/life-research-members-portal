@@ -2,8 +2,12 @@
 //The component has various functions to compare the initial data of the product with the data entered in the form (`diffMembers`, `diffTargets`, and `diffPartners`).
 //The component also has a `validateAndSubmit` function that can be called from the SaveChangesCtx context to validate and submit the form.
 
+import Button from "antd/lib/button";
+import Form from "antd/lib/form";
+import { useForm } from "antd/lib/form/Form";
+import Input from "antd/lib/input";
 import React, {
-  type FC,
+  FC,
   Fragment,
   useCallback,
   useContext,
@@ -16,25 +20,29 @@ import type {
 } from "../../services/_types";
 import updateProductPublic from "../../services/update-product-public";
 import { LanguageCtx } from "../../services/context/language-ctx";
+import Select from "antd/lib/select";
+import TextArea from "antd/lib/input/TextArea";
 import GetLanguage from "../../utils/front-end/get-language";
+import Divider from "antd/lib/divider";
 import type { UpdateProductPublicParams } from "../../pages/api/update-product/[id]/public";
+import Text from "antd/lib/typography/Text";
 import Notification from "../../services/notifications/notification";
 import {
   SaveChangesCtx,
   useResetDirtyOnUnmount,
 } from "../../services/context/save-changes-ctx";
 import { ProductTypesCtx } from "../../services/context/products-types-ctx";
-import moment, { type Moment } from "moment";
+import type { Dayjs } from "dayjs";
 import type { MemberPublicInfo } from "../../services/_types";
+import DatePicker from "antd/lib/date-picker";
 import type { target } from "@prisma/client";
 import type { organization } from "@prisma/client";
 import TargetSelector from "../targets/target-selector";
 import PartnerSelector from "../partners/partner-selector";
 import MemberSelector from "../members/member-selector";
-import { Button, Form, Input, Select, Divider, Typography, DatePicker } from "antd";
-const { useForm } = Form;
-const TextArea = Input.TextArea;
-const Text = Typography.Text;
+import { MemberInstituteCtx } from "../../services/context/member-institutes-ctx";
+import { useSelectedInstitute } from "../../services/context/selected-institute-ctx";
+import toDayjsDate from "../../utils/front-end/to-dayjs-date";
 
 const { Option } = Select;
 
@@ -56,7 +64,7 @@ type ProductMemberAuthor = {
 type Data = {
   title_en: string;
   title_fr: string;
-  publish_date: Moment | null;
+  publish_date: Dayjs | null;
   all_author?: string;
   doi?: string;
   targets: Map<number, target>;
@@ -64,6 +72,7 @@ type Data = {
   product_type_id?: number;
   note?: string;
   members: Map<number, MemberPublicInfo>;
+  institutes: number[];
 };
 
 const PublicProductForm: FC<Props> = ({ product, onSuccess }) => {
@@ -72,6 +81,8 @@ const PublicProductForm: FC<Props> = ({ product, onSuccess }) => {
   const { productTypes } = useContext(ProductTypesCtx);
   const [loading, setLoading] = useState(false);
   const { dirty, setDirty, setSubmit } = useContext(SaveChangesCtx);
+  const { institutes } = useContext(MemberInstituteCtx);
+  const { institute: selectedInstitute } = useSelectedInstitute();
   useResetDirtyOnUnmount();
 
   const diffMembers = useCallback(
@@ -169,9 +180,13 @@ const PublicProductForm: FC<Props> = ({ product, onSuccess }) => {
         addPartners,
         deleteMembers,
         addMembers,
+        institutes: data.institutes,
       };
 
-      const newInfo = await updateProductPublic(product.id, params);
+      const newInfo =
+        selectedInstitute &&
+        (await updateProductPublic(product.id, params, selectedInstitute?.id));
+
       setLoading(false);
       if (newInfo) {
         setDirty(false);
@@ -188,6 +203,7 @@ const PublicProductForm: FC<Props> = ({ product, onSuccess }) => {
       dirty,
       en,
       setDirty,
+      selectedInstitute,
     ]
   );
 
@@ -240,13 +256,7 @@ const PublicProductForm: FC<Props> = ({ product, onSuccess }) => {
   const initialValues: Data = {
     title_en: product.title_en,
     title_fr: product.title_fr,
-    publish_date: product.publish_date
-      ? moment(
-          product.publish_date instanceof Date
-            ? product.publish_date.toISOString().split("T")[0]
-            : (product.publish_date as string).split("T")[0]
-        )
-      : null,
+    publish_date: toDayjsDate(product.publish_date),
     all_author: product.all_author || "",
     doi: product.doi || "",
     product_type_id: product.product_type?.id,
@@ -255,6 +265,9 @@ const PublicProductForm: FC<Props> = ({ product, onSuccess }) => {
     organizations: getInitialPartners(),
     // @ts-ignore
     members: getInitialMembers(product.product_member_author),
+    institutes: product.institutes
+      ? product.institutes.map((i) => i.institute.id)
+      : [],
   };
 
   return (
@@ -337,6 +350,20 @@ const PublicProductForm: FC<Props> = ({ product, onSuccess }) => {
           <MemberSelector
             setErrors={(e) => form.setFields([{ name: "members", errors: e }])}
           />
+        </Form.Item>
+
+        <Form.Item
+          label={en ? "Select Institute" : "Sélectionnez l'institut"}
+          name="institutes"
+        >
+          <Select mode="multiple">
+            <Option value="">{""}</Option>
+            {institutes.map((f) => (
+              <Option key={f.id} value={f.id}>
+                {`${f.name} - ${f.urlIdentifier}`}
+              </Option>
+            ))}
+          </Select>
         </Form.Item>
 
         <Form.Item label={en ? "DOI" : "DOI"} name="doi">

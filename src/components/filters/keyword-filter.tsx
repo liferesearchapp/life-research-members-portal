@@ -6,9 +6,7 @@ import {
   type FC,
   useCallback,
   useContext,
-  useEffect,
   useMemo,
-  useState,
 } from "react";
 import { AllKeywordsCtx } from "../../services/context/all-keywords-ctx";
 import { LanguageCtx } from "../../services/context/language-ctx";

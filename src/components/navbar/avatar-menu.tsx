@@ -1,15 +1,19 @@
-import { type FC, useContext } from "react";
+import Dropdown from "antd/lib/dropdown";
+import { FC, useContext } from "react";
+import Typography from "antd/lib/typography";
+import Card from "antd/lib/card";
 import LogoutButton from "./logout-button";
 import { ActiveAccountCtx } from "../../services/context/active-account-ctx";
 import { LanguageCtx } from "../../services/context/language-ctx";
+import CheckCircleTwoTone from "@ant-design/icons/lib/icons/CheckCircleTwoTone";
 import LoginButton from "./login-button";
 import { useMsal } from "@azure/msal-react";
-import { Dropdown, Typography, Card } from "antd";
-import { CheckCircleTwoTone } from "@ant-design/icons";
+import { useAdminDetails } from "../../services/context/selected-institute-ctx";
 
 const AvatarMenu: FC = () => {
   const { en } = useContext(LanguageCtx);
   const { localAccount } = useContext(ActiveAccountCtx);
+  const isAdmin = useAdminDetails();
   const { instance } = useMsal();
   const msalAccount = instance.getActiveAccount();
 
@@ -32,7 +36,7 @@ const AvatarMenu: FC = () => {
     </Typography>
   );
 
-  const administrator = localAccount?.is_admin ? (
+  const administrator = isAdmin ? (
     <Typography>
       {en ? "Administrator" : "Administrateur"} &nbsp; <CheckCircleTwoTone />
     </Typography>
@@ -44,12 +48,19 @@ const AvatarMenu: FC = () => {
     </Typography>
   ) : null;
 
+  const superAdmin = localAccount?.is_super_admin ? (
+    <Typography>
+      {en ? "Super Admin" : "Super Administrateur"} &nbsp; <CheckCircleTwoTone />
+    </Typography>
+  ) : null;
+
   const dropdown = (
-    <Card styles={{ body: { padding: 0 } }}>
+    <Card bodyStyle={{ padding: 0 }}>
       <div className="avatar-dropdown">
         <Typography>{name}</Typography>
         <Typography>{email}</Typography>
         {registered}
+        {superAdmin}
         {administrator}
         {member}
         <div style={{ height: 16 }}></div>
@@ -60,8 +71,10 @@ const AvatarMenu: FC = () => {
 
   return (
     <Dropdown
-      popupRender={() => dropdown}
-      getPopupContainer={() => document.querySelector(".navbar") || document.body}
+      overlay={dropdown}
+      getPopupContainer={() =>
+        document.querySelector(".navbar") || document.body
+      }
     >
       <div className="avatar">{avatarLabel}</div>
     </Dropdown>

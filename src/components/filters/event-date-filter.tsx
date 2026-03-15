@@ -8,18 +8,20 @@
 import { type FC, useContext, useState } from "react";
 import { AllEventsCtx } from "../../services/context/all-events-ctx";
 import type { EventPublicInfo } from "../../services/_types";
-import moment, { type Moment } from "moment";
 import { DatePicker } from "antd";
+import type { RangePickerProps } from "antd/lib/date-picker";
+import type { RangeValueType } from "rc-picker/lib/PickerInput/RangePicker";
+import dayjs, { type Dayjs } from "dayjs";
 
-type RangeValue<T> = [T | null, T | null] | null;
+type EventDateRange = RangeValueType<Dayjs> | null;
 
 type Props = {
   id?: string;
   onChange?: (
-    value: RangeValue<Moment>,
+    value: EventDateRange,
     filteredEvents: EventPublicInfo[]
   ) => void;
-  getPopupContainer?: (triggerNode: HTMLElement) => HTMLElement;
+  getPopupContainer?: RangePickerProps["getPopupContainer"];
 };
 
 const EventDateFilter: FC<Props> = ({
@@ -28,9 +30,9 @@ const EventDateFilter: FC<Props> = ({
   getPopupContainer,
 }) => {
   const { allEvents } = useContext(AllEventsCtx);
-  const [dateRange, setDateRange] = useState<RangeValue<Moment>>([null, null]);
+  const [dateRange, setDateRange] = useState<EventDateRange>([null, null]);
 
-  function onDateChange(values: RangeValue<Moment>, _: [string, string]) {
+  function onDateChange(values: EventDateRange, _: [string, string]) {
     if (!values || values[0] === null || values[1] === null) {
       onChange(null, allEvents);
       setDateRange([null, null]);
@@ -39,15 +41,15 @@ const EventDateFilter: FC<Props> = ({
 
     const filteredEvents = allEvents.filter((event) => {
       if (!event.start_date) return false;
-      const startDate = moment(event.start_date);
-      const endDate = event.end_date ? moment(event.end_date) : startDate;
+      const startDate = dayjs(event.start_date);
+      const endDate = event.end_date ? dayjs(event.end_date) : startDate;
 
       const selectedStartDate = values[0]?.startOf("day");
       const selectedEndDate = values[1]?.endOf("day");
 
       return (
-        (!selectedStartDate || endDate.isSameOrAfter(selectedStartDate)) &&
-        (!selectedEndDate || startDate.isSameOrBefore(selectedEndDate))
+        (!selectedStartDate || !endDate.isBefore(selectedStartDate)) &&
+        (!selectedEndDate || !startDate.isAfter(selectedEndDate))
       );
     });
 
@@ -59,8 +61,8 @@ const EventDateFilter: FC<Props> = ({
     <DatePicker.RangePicker
       id={id}
       className="event-date-filter"
-      value={dateRange as any}
-      onChange={onDateChange as any}
+      value={dateRange}
+      onChange={onDateChange}
       getPopupContainer={getPopupContainer}
     />
   );

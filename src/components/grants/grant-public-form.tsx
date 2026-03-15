@@ -4,10 +4,18 @@ The form allows users to update the title, amount, status, source, topic, and no
 Additionally, it also allows users to associate investigators and members involved with the grant.
 */
 
-import React, { type FC, useContext, useState, useCallback, useEffect } from "react";
+import React, { FC, useContext, useState, useCallback, useEffect } from "react";
 import { LanguageCtx } from "../../services/context/language-ctx";
-import type { Moment } from "moment";
+import { useForm } from "antd/lib/form/Form";
+import Form from "antd/lib/form";
+import Input from "antd/lib/input";
+import TextArea from "antd/lib/input/TextArea";
+import Button from "antd/lib/button";
+import Select from "antd/lib/select";
+import DatePicker from "antd/lib/date-picker";
+import type { Dayjs } from "dayjs";
 
+import Divider from "antd/lib/divider";
 import Notification from "../../services/notifications/notification";
 import {
   SaveChangesCtx,
@@ -23,12 +31,10 @@ import { GrantStatusCtx } from "../../services/context/grant-statuses-ctx";
 import { AllTopicsCtx } from "../../services/context/all-topics-ctx";
 import type { UpdateGrantPublicParams } from "../../pages/api/update-grant/[id]/public";
 import updateGrantPublic from "../../services/update-grant-public";
-import moment from "moment";
 import GetLanguage from "../../utils/front-end/get-language";
-import { Switch, Form, Input, Button, Select, DatePicker, Divider } from "antd";
+import { Switch } from "antd";
 import MemberSelector from "../members/member-selector";
-const { useForm } = Form;
-const TextArea = Input.TextArea;
+import toDayjsDate from "../../utils/front-end/to-dayjs-date";
 
 const { Option } = Select;
 
@@ -62,9 +68,9 @@ type GrantData = {
   amount: string;
   status_id: number;
   throught_lri: boolean;
-  submission_date: Moment | null;
-  obtained_date: Moment | null;
-  completed_date: Moment | null;
+  submission_date: Dayjs | null;
+  obtained_date: Dayjs | null;
+  completed_date: Dayjs | null;
   source_id: number;
   all_investigator: string;
   topic_id: number;
@@ -241,27 +247,9 @@ const PublicGrantForm: FC<Props> = ({ grant, onSuccess }) => {
     amount: grant.amount.toString(),
     status_id: grant.status?.id || 0,
     throught_lri: grant.throught_lri,
-    submission_date: grant.submission_date
-      ? moment(
-          grant.submission_date instanceof Date
-            ? grant.submission_date.toISOString().split("T")[0]
-            : (grant.submission_date as string).split("T")[0]
-        )
-      : null,
-    obtained_date: grant.obtained_date
-      ? moment(
-          grant.obtained_date instanceof Date
-            ? grant.obtained_date.toISOString().split("T")[0]
-            : (grant.obtained_date as string).split("T")[0]
-        )
-      : null,
-    completed_date: grant.completed_date
-      ? moment(
-          grant.completed_date instanceof Date
-            ? grant.completed_date.toISOString().split("T")[0]
-            : (grant.completed_date as string).split("T")[0]
-        )
-      : null,
+    submission_date: toDayjsDate(grant.submission_date),
+    obtained_date: toDayjsDate(grant.obtained_date),
+    completed_date: toDayjsDate(grant.completed_date),
     source_id: grant.source?.id || 0,
     all_investigator: grant.all_investigator || "",
     topic_id: grant.topic?.id || 0,

@@ -1,21 +1,28 @@
+import Button from "antd/lib/button";
 import { type Dispatch, type FC, type SetStateAction, useContext, useState } from "react";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import type { AccountInfo } from "../../services/_types";
 import updateAccountRemoveAdmin from "../../services/update-account-remove-admin";
-
+import Popconfirm from "antd/lib/popconfirm";
 import { ActiveAccountCtx } from "../../services/context/active-account-ctx";
 import Notification from "../../services/notifications/notification";
-import { Button, Popconfirm } from "antd";
+import { useSelectedInstitute } from "../../services/context/selected-institute-ctx";
 
-type Props = { account: AccountInfo; setAccount: Dispatch<SetStateAction<AccountInfo | null>> };
+type Props = {
+  account: AccountInfo;
+  setAccount: Dispatch<SetStateAction<AccountInfo | null>>;
+};
 
 const RemoveAdminButton: FC<Props> = ({ account, setAccount }) => {
   const { en } = useContext(LanguageCtx);
   const { localAccount } = useContext(ActiveAccountCtx);
   const [popconfirmOpen, setPopconfirmOpen] = useState(false);
+  const { institute } = useSelectedInstitute();
 
   async function submit() {
-    const res = await updateAccountRemoveAdmin(account.id);
+    const res =
+      institute &&
+      (await updateAccountRemoveAdmin(account.id, institute?.urlIdentifier));
     if (res) setAccount(res);
   }
 

@@ -1,12 +1,13 @@
 //This component is a form element that allows a user to search for existing products and select one or more of them.
 
-import React, { type FC, useContext, useEffect, useState } from "react";
+import React, { FC, useContext, useEffect, useState } from "react";
 import type { product } from "@prisma/client";
 import { ProductsCtx } from "../../services/context/products-ctx";
 import { LanguageCtx } from "../../services/context/language-ctx";
-import { type ProductPublicInfo } from "../../services/_types";
+import AutoComplete from "antd/lib/auto-complete";
+import type { ProductPublicInfo } from "../../services/_types";
 import ProductTag from "./product-tag";
-import { Card, AutoComplete } from "antd";
+import { Card } from "antd";
 
 type Props = {
   id?: string;

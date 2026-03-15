@@ -2,8 +2,11 @@
 // The component also has buttons ta add a new product and clear the filters.
 // The component also updates the URL query parameters based on the filter values and the query parameters are used to update the filters on component mount.
 
+import Button from "antd/lib/button";
+import Table, { ColumnType } from "antd/lib/table";
+import Title from "antd/lib/typography/Title";
 import {
-  type FC,
+  FC,
   Fragment,
   useCallback,
   useContext,
@@ -15,10 +18,13 @@ import { LanguageCtx } from "../../services/context/language-ctx";
 import type { ProductPublicInfo } from "../../services/_types";
 import type { MemberPublicInfo } from "../../services/_types";
 import PageRoutes from "../../routing/page-routes";
+import Descriptions from "antd/lib/descriptions";
+import Item from "antd/lib/descriptions/Item";
 import SafeLink from "../link/safe-link";
 import Router, { useRouter } from "next/router";
+import Form from "antd/lib/form";
 import blurActiveElement from "../../utils/front-end/blur-active-element";
-import { Checkbox, Tag, Button, Table, Typography, Descriptions, Form } from "antd";
+import { Checkbox, Tag } from "antd";
 import ProductTitleFilter from "../filters/product-title-filter";
 import ProductTypeFilter from "../filters/product-type-filter";
 import type { ParsedUrlQueryInput } from "querystring";
@@ -28,9 +34,7 @@ import type { PublicMemberRes } from "../../pages/api/member/[id]/public";
 import colorFromString from "../../utils/front-end/color-from-string";
 import ProductAllAuthorFilter from "../filters/product-all-author-filter";
 import getMemberAuthor from "../getters/product-member-author-getter";
-import type { TableColumnType as ColumnType } from "antd";
-const Title = Typography.Title;
-const Item = Descriptions.Item;
+import { useSelectedInstitute } from "../../services/context/selected-institute-ctx";
 
 function getTitle(product: ProductPublicInfo, en: boolean) {
   return en ? product.title_en : product.title_fr;
@@ -167,8 +171,15 @@ function handleProductAllAuthorFilterChange(next: Set<string>) {
   );
 }
 
-function clearQueries() {
-  Router.push({ query: null }, undefined, { scroll: false });
+function clearQueries(institute: { urlIdentifier: string | null }) {
+  if (institute?.urlIdentifier) {
+    const url = PageRoutes.allProducts(institute.urlIdentifier);
+    console.log("Redirecting to:", url); 
+    Router.push(url); 
+  } else {
+    console.error("Unable to reset filters: Institute ID is missing.");
+    alert("Unable to reset filters: Institute ID is missing.");
+  }
 }
 
 function getIdsFromQueryParams(key: string): Set<number> {
@@ -209,6 +220,7 @@ function getPopupContainer(): HTMLElement {
 
 const AllProducts: FC = () => {
   const { en } = useContext(LanguageCtx);
+  const { institute } = useSelectedInstitute();
   const {
     allProducts,
     loading,
@@ -216,7 +228,12 @@ const AllProducts: FC = () => {
   } = useContext(AllProductsCtx);
 
   const handleRegisterProduct = () => {
-    router.push("products/register");
+    if (institute) {
+      router.push({
+         pathname: "/[instituteId]/products/register",
+         query: { instituteId: institute.urlIdentifier },
+      });
+    }
   };
 
   useEffect(() => {
@@ -298,23 +315,14 @@ const AllProducts: FC = () => {
   }, [productTypesQuery]);
 
   function refreshAndClearFilters() {
-    clearQueries();
+    const instituteUrlIdentifier = institute?.urlIdentifier; // Retrieve urlIdentifier instead of id
+    if (instituteUrlIdentifier) {
+    clearQueries({ urlIdentifier: instituteUrlIdentifier }); // Pass as an object
     refreshProducts();
+  } else {
+    console.error("Cannot reset filters: Institute ID is missing.");
   }
-
-  const [members, setAccounts] = useState<PublicMemberRes[]>([]);
-
-  useEffect(() => {
-    const fetchAccounts = async () => {
-      const res = await fetch("api/all-members");
-      const data = await res.json();
-      setAccounts(data);
-
-      //console.log(data);
-    };
-
-    fetchAccounts();
-  }, []);
+  }
 
   const filteredProducts = useMemo(
     () =>

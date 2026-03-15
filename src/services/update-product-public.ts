@@ -8,7 +8,8 @@ import type { ProductPrivateInfo } from "./_types";
 
 export default async function updateProductPublic(
   id: number,
-  params: UpdateProductPublicParams
+  params: UpdateProductPublicParams,
+  instituteId: number
 ): Promise<ProductPrivateInfo | null> {
   const authHeader = await getAuthHeader();
   if (!authHeader) return null;
@@ -16,7 +17,9 @@ export default async function updateProductPublic(
   const notification = new Notification();
   try {
     notification.loading(
-      en ? "Updating Product Info..." : "Mise à jour des informations sur le produit..."
+      en
+        ? "Updating Product Info..."
+        : "Mise à jour des informations sur le produit..."
     );
     const res = await fetch(ApiRoutes.updateProductPublic(id), {
       method: "PATCH",

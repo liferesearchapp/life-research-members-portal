@@ -1,14 +1,15 @@
 import type { NextPage } from "next/types";
-import PageAuthGuard from "../../components/auth-guard/page-auth-guard";
 import Authorizations from "../../components/auth-guard/authorizations";
-import RegisterSupervision from "../../components/supervisions/supervision-register";
+import PageAuthGuard from "../../components/auth-guard/page-auth-guard";
 import Layout from "../../components/layout/layout";
+import RegisterInstitute from "../../components/institutes/register-institute";
 
 const Register: NextPage = () => {
+  console.log("Registe Page Institue");
   return (
-    <PageAuthGuard auths={[Authorizations.admin]}>
+    <PageAuthGuard auths={[Authorizations.superAdmin]}>
       <Layout>
-        <RegisterSupervision />
+        <RegisterInstitute />
       </Layout>
     </PageAuthGuard>
   );
