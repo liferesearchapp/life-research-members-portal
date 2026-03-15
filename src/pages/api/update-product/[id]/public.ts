@@ -2,6 +2,12 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { selectAllProductInfo } from "../../../../../prisma/helpers";
 import db from "../../../../../prisma/prisma-client";
 import getAccountFromRequest from "../../../../utils/api/get-account-from-request";
+import {
+  assertAuthorized,
+  hasAllInstituteAccess,
+  hasAnyInstituteAccess,
+  isProductAuthor,
+} from "../../../../utils/api/authorization";
 import type { PrivateProductDBRes } from "../../product/[id]/private";
 
 export type UpdateProductPublicParams = {
@@ -84,6 +90,29 @@ async function updateProduct(
   });
 }
 
+function getNormalizedInstituteIds(instituteIds: Iterable<number | null | undefined>) {
+  return Array.from(
+    new Set(
+      Array.from(instituteIds).filter(
+        (instituteId): instituteId is number =>
+          typeof instituteId === "number" && Number.isFinite(instituteId)
+      )
+    )
+  ).sort((a, b) => a - b);
+}
+
+function haveSameInstituteIds(
+  currentInstituteIds: Iterable<number | null | undefined>,
+  nextInstituteIds: Iterable<number | null | undefined>
+) {
+  const current = getNormalizedInstituteIds(currentInstituteIds);
+  const next = getNormalizedInstituteIds(nextInstituteIds);
+
+  if (current.length !== next.length) return false;
+
+  return current.every((instituteId, index) => instituteId === next[index]);
+}
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<PrivateProductDBRes | string>
@@ -104,26 +133,35 @@ export default async function handler(
         instituteId: true,
       },
     });
+    const currentInstituteIds = productInstitutes.map(
+      (institute) => institute.instituteId
+    );
 
-    //check if user is admin of any product institutes:
-    const isUserAdmin = currentUser.instituteAdmin.some((admin) =>
-      productInstitutes.some(
-        (institute) => institute.instituteId === admin.instituteId
+    if (
+      !assertAuthorized(
+        res,
+        hasAnyInstituteAccess(currentUser, currentInstituteIds, {
+          allowAdmin: true,
+          allowMember: true,
+          allowSuperAdmin: true,
+        }) || isProductAuthor(currentUser, id),
+        "You are not authorized to edit this product information."
       )
-    );
-
-    const isUsersProduct = currentUser.member?.product_member_author.some(
-      (product) => product.product_id === id
-    );
-
-    const authorized =
-      currentUser.is_super_admin || isUserAdmin || isUsersProduct;
-
-    if (!authorized)
-      return res
-        .status(401)
-        .send("You are not authorized to edit this product information.");
-
+    )
+      return;
+    if (
+      !haveSameInstituteIds(currentInstituteIds, params.institutes ?? []) &&
+      !assertAuthorized(
+        res,
+        hasAllInstituteAccess(currentUser, params.institutes ?? [], {
+          allowAdmin: true,
+          allowMember: true,
+          allowSuperAdmin: true,
+        }),
+        "You are not authorized to assign this product to the selected institutes."
+      )
+    )
+      return;
 
     const updated = await updateProduct(id, params);
 

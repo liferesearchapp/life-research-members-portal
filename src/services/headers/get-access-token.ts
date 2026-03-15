@@ -20,7 +20,7 @@ export default async function getAccessToken(): Promise<string | null> {
       );
       // Log them out to clear the cache and active user
       msalInstance
-        .logoutRedirect({ onRedirectNavigate: () => false })
+        .logoutRedirect()
         .catch((e: any) => new Notification().error(e));
       return null;
     });

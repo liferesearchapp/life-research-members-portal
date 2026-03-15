@@ -6,7 +6,7 @@ import Form from "antd/lib/form";
 import Input from "antd/lib/input";
 import React, { type FC, useContext } from "react";
 import { useForm } from "antd/lib/form/Form";
-import type { Moment } from "moment";
+import type { Dayjs } from "dayjs";
 import registerEvent from "../../services/register-event";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import { EventTypesCtx } from "../../services/context/event-types-ctx";
@@ -19,7 +19,7 @@ const { RangePicker } = DatePicker; // Add RangePicker import
 type EventData = {
   name_en: string;
   name_fr: string;
-  date_range: [Moment | null, Moment | null];
+  date_range: [Dayjs | null, Dayjs | null] | null;
   event_type_id: number;
   note: string;
   institute_id: number;
@@ -42,8 +42,8 @@ const RegisterEvent: FC = () => {
     const res = await registerEvent({
       name_en,
       name_fr,
-      start_date: date_range[0] ? date_range[0].toDate() : null, // Access start_date from date_range
-      end_date: date_range[1] ? date_range[1].toDate() : null, // Access end_date from date_range
+      start_date: date_range?.[0] ? date_range[0].toDate() : null,
+      end_date: date_range?.[1] ? date_range[1].toDate() : null,
       event_type_id,
       note,
       institute_id: institute.id,

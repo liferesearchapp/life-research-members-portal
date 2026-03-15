@@ -2,6 +2,11 @@ import type { grant } from "@prisma/client";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { selectAllGrantInfo } from "../../../../../prisma/helpers";
 import db from "../../../../../prisma/prisma-client";
+import {
+  assertAuthorized,
+  hasAnyInstituteAccess,
+  isGrantParticipant,
+} from "../../../../utils/api/authorization";
 import getAccountFromRequest from "../../../../utils/api/get-account-from-request";
 
 export type PrivateGrantDBRes = Awaited<ReturnType<typeof getPrivateGrantInfo>>;
@@ -37,6 +42,21 @@ export default async function handler(
 
     const grant = await getPrivateGrantInfo(id);
     if (!grant) return res.status(400).send("Grant not found. ID: " + id);
+
+    const authorized =
+      hasAnyInstituteAccess(currentAccount, [grant.institute.id]) ||
+      isGrantParticipant(currentAccount, [
+        ...grant.grant_member_involved.map((entry) => entry.member.id),
+        ...grant.grant_investigator_member.map((entry) => entry.member.id),
+      ]);
+    if (
+      !assertAuthorized(
+        res,
+        authorized,
+        "You are not authorized to view this grant's private information."
+      )
+    )
+      return;
 
     return res.status(200).send(grant);
   } catch (e: any) {

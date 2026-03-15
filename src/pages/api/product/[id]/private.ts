@@ -2,6 +2,11 @@ import type { product } from "@prisma/client";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { selectAllProductInfo } from "../../../../../prisma/helpers";
 import db from "../../../../../prisma/prisma-client";
+import {
+  assertAuthorized,
+  hasAnyInstituteAccess,
+  isProductAuthor,
+} from "../../../../utils/api/authorization";
 import getAccountFromRequest from "../../../../utils/api/get-account-from-request";
 
 export type PrivateProductDBRes = Awaited<ReturnType<typeof getPrivateProductInfo>>;
@@ -34,6 +39,24 @@ export default async function handler(
 
     const product = await getPrivateProductInfo(id);
     if (!product) return res.status(400).send("Product not found. ID: " + id);
+    const authorized =
+      hasAnyInstituteAccess(
+        currentAccount,
+        product.institutes.map((entry) => entry.instituteId),
+        {
+          allowAdmin: true,
+          allowMember: true,
+          allowSuperAdmin: true,
+        }
+      ) || isProductAuthor(currentAccount, id);
+    if (
+      !assertAuthorized(
+        res,
+        authorized,
+        "You are not authorized to view this product's private information."
+      )
+    )
+      return;
 
     return res.status(200).send(product);
   } catch (e: any) {

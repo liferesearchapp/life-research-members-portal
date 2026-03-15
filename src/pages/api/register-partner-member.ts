@@ -2,6 +2,10 @@ import { Prisma } from "@prisma/client";
 import type { organization } from "@prisma/client";
 import type { NextApiRequest, NextApiResponse } from "next";
 import db from "../../../prisma/prisma-client";
+import {
+  assertAuthorized,
+  hasAllInstituteAccess,
+} from "../../utils/api/authorization";
 import getAccountFromRequest from "../../utils/api/get-account-from-request";
 
 export type RegisterPartnerParams = {
@@ -59,6 +63,18 @@ export default async function handler(
     if (params.institute_id === undefined) {
       return res.status(400).send("Please provide at least one institute");
     }
+    if (
+      !assertAuthorized(
+        res,
+        hasAllInstituteAccess(currentUser, params.institute_id, {
+          allowAdmin: true,
+          allowMember: true,
+          allowSuperAdmin: true,
+        }),
+        "You are not authorized to register a partner."
+      )
+    )
+      return;
     
     const currentMember = await db.member.findUnique({
       where: { account_id: currentUser.id },

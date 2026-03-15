@@ -2,6 +2,10 @@ import type { keyword } from "@prisma/client";
 import type { NextApiRequest, NextApiResponse } from "next";
 import db from "../../../../prisma/prisma-client";
 import type { KeywordInfo } from "../../../services/_types";
+import {
+  assertAuthorized,
+  hasAdministrativeRole,
+} from "../../../utils/api/authorization";
 import getAccountFromRequest from "../../../utils/api/get-account-from-request";
 
 function updateKeyword(id: number, { name_en, name_fr }: KeywordInfo): Promise<keyword> {
@@ -18,6 +22,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
 
     const currentUser = await getAccountFromRequest(req, res);
     if (!currentUser) return;
+    if (
+      !assertAuthorized(
+        res,
+        hasAdministrativeRole(currentUser) || !!currentUser.member,
+        "You are not authorized to edit keywords."
+      )
+    )
+      return;
 
     const updated = await updateKeyword(id, params);
 

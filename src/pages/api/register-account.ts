@@ -1,6 +1,11 @@
 import { Prisma } from "@prisma/client";
 import type { NextApiRequest, NextApiResponse } from "next";
 import db from "../../../prisma/prisma-client";
+import {
+  assertAuthorized,
+  hasAdministrativeRole,
+  hasAllInstituteAccess,
+} from "../../utils/api/authorization";
 import getAccountFromRequest from "../../utils/api/get-account-from-request";
 
 
@@ -88,6 +93,24 @@ export default async function handler(
   try {
     const currentUser = await getAccountFromRequest(req, res);
     if (!currentUser) return;
+    if (
+      !assertAuthorized(
+        res,
+        hasAdministrativeRole(currentUser) &&
+          hasAllInstituteAccess(currentUser, params.institute_id),
+        "You are not authorized to register accounts."
+      )
+    )
+      return;
+    if (
+      params.is_super_admin &&
+      !assertAuthorized(
+        res,
+        currentUser.is_super_admin,
+        "Only super admins may grant super admin access."
+      )
+    )
+      return;
 
     const newUser = await registerAccount(params);
 

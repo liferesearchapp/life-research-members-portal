@@ -1,6 +1,10 @@
 import { Prisma } from "@prisma/client";
 import type { NextApiRequest, NextApiResponse } from "next";
 import db from "../../../prisma/prisma-client";
+import {
+  assertAuthorized,
+  hasAnyInstituteAccess,
+} from "../../utils/api/authorization";
 import getAccountFromRequest from "../../utils/api/get-account-from-request";
 
 export type RegisterEventParams = {
@@ -52,6 +56,14 @@ export default async function handler(
   try {
     const currentUser = await getAccountFromRequest(req, res);
     if (!currentUser) return;
+    if (
+      !assertAuthorized(
+        res,
+        hasAnyInstituteAccess(currentUser, [params.institute_id]),
+        "You are not authorized to register an event."
+      )
+    )
+      return;
 
     const newEvent = await registerEvent(params);
 

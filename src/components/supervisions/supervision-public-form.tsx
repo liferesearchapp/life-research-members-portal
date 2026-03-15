@@ -9,7 +9,7 @@ import TextArea from "antd/lib/input/TextArea";
 import Button from "antd/lib/button";
 import Select from "antd/lib/select";
 import DatePicker from "antd/lib/date-picker";
-import type { Moment } from "moment";
+import type { Dayjs } from "dayjs";
 import { FacultiesCtx } from "../../services/context/faculties-ctx";
 import { LevelsCtx } from "../../services/context/levels-ctx";
 import Divider from "antd/lib/divider";
@@ -18,7 +18,6 @@ import {
   SaveChangesCtx,
   useResetDirtyOnUnmount,
 } from "../../services/context/save-changes-ctx";
-import moment from "moment";
 import type {
   MemberPublicInfo,
   SupervisionPrivateInfo,
@@ -28,6 +27,7 @@ import GetLanguage from "../../utils/front-end/get-language";
 import updateSupervisionPublic from "../../services/update-supervision-public";
 import type { UpdateSupervisionPublicParams } from "../../pages/api/update-supervision/[id]/public";
 import MemberSelector from "../members/member-selector";
+import toDayjsDate from "../../utils/front-end/to-dayjs-date";
 
 const { Option } = Select;
 
@@ -79,8 +79,8 @@ type SupervisionCommittee = {
 type SupervisionData = {
   last_name: string;
   first_name: string;
-  start_date: Moment | null;
-  end_date: Moment | null;
+  start_date: Dayjs | null;
+  end_date: Dayjs | null;
   faculty_id: number;
   level_id: number;
   note: string;
@@ -346,20 +346,8 @@ const PublicSupervisionForm: FC<Props> = ({ supervision, onSuccess }) => {
   const initialValues: SupervisionData = {
     last_name: supervision.last_name,
     first_name: supervision.first_name,
-    start_date: supervision.start_date
-      ? moment(
-          supervision.start_date instanceof Date
-            ? supervision.start_date.toISOString().split("T")[0]
-            : (supervision.start_date as string).split("T")[0]
-        )
-      : null,
-    end_date: supervision.end_date
-      ? moment(
-          supervision.end_date instanceof Date
-            ? supervision.end_date.toISOString().split("T")[0]
-            : (supervision.end_date as string).split("T")[0]
-        )
-      : null,
+    start_date: toDayjsDate(supervision.start_date),
+    end_date: toDayjsDate(supervision.end_date),
     faculty_id: supervision.faculty_id || 0,
     level_id: supervision.level_id || 0,
     note: supervision.note || "",

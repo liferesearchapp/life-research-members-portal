@@ -1,6 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { includeAllAccountInfo } from "../../../../../prisma/helpers";
 import db from "../../../../../prisma/prisma-client";
+import {
+  assertAuthorized,
+  canAccessAccount,
+} from "../../../../utils/api/authorization";
 import getAccountFromRequest from "../../../../utils/api/get-account-from-request";
 import type { AccountDBRes } from "../../account/[id]";
 
@@ -30,6 +34,19 @@ export default async function handler(
 
     const currentAccount = await getAccountFromRequest(req, res);
     if (!currentAccount) return;
+    const account = await db.account.findUnique({
+      where: { id },
+      include: { member: { include: { institutes: true } } },
+    });
+    if (!account) return res.status(404).send("Account not found.");
+    if (
+      !assertAuthorized(
+        res,
+        canAccessAccount(currentAccount, account),
+        "You are not authorized to edit account information."
+      )
+    )
+      return;
 
     const updated = await updateAccountName(id, params);
 

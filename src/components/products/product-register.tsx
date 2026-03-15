@@ -9,8 +9,7 @@ import Form from "antd/lib/form";
 import Input from "antd/lib/input";
 import React, { FC, useContext, useState } from "react";
 import { useForm } from "antd/lib/form/Form";
-import moment from "moment";
-import type { Moment } from "moment";
+import type { Dayjs } from "dayjs";
 import registerProduct from "../../services/register-product";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import { ProductTypesCtx } from "../../services/context/products-types-ctx";
@@ -23,7 +22,7 @@ const { Option } = Select;
 type Data = {
   title_en: string;
   title_fr: string;
-  publish_date: Moment | null;
+  publish_date: Dayjs | null;
   doi: string;
   all_author: string;
   on_going: boolean;

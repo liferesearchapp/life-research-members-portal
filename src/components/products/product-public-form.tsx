@@ -32,7 +32,7 @@ import {
   useResetDirtyOnUnmount,
 } from "../../services/context/save-changes-ctx";
 import { ProductTypesCtx } from "../../services/context/products-types-ctx";
-import moment, { Moment } from "moment";
+import type { Dayjs } from "dayjs";
 import type { MemberPublicInfo } from "../../services/_types";
 import DatePicker from "antd/lib/date-picker";
 import type { target } from "@prisma/client";
@@ -42,6 +42,7 @@ import PartnerSelector from "../partners/partner-selector";
 import MemberSelector from "../members/member-selector";
 import { MemberInstituteCtx } from "../../services/context/member-institutes-ctx";
 import { useSelectedInstitute } from "../../services/context/selected-institute-ctx";
+import toDayjsDate from "../../utils/front-end/to-dayjs-date";
 
 const { Option } = Select;
 
@@ -63,7 +64,7 @@ type ProductMemberAuthor = {
 type Data = {
   title_en: string;
   title_fr: string;
-  publish_date: Moment | null;
+  publish_date: Dayjs | null;
   all_author?: string;
   doi?: string;
   targets: Map<number, target>;
@@ -255,13 +256,7 @@ const PublicProductForm: FC<Props> = ({ product, onSuccess }) => {
   const initialValues: Data = {
     title_en: product.title_en,
     title_fr: product.title_fr,
-    publish_date: product.publish_date
-      ? moment(
-          product.publish_date instanceof Date
-            ? product.publish_date.toISOString().split("T")[0]
-            : (product.publish_date as string).split("T")[0]
-        )
-      : null,
+    publish_date: toDayjsDate(product.publish_date),
     all_author: product.all_author || "",
     doi: product.doi || "",
     product_type_id: product.product_type?.id,

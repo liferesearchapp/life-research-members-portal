@@ -34,7 +34,15 @@ const AllAccounts: FC = () => {
     );
   };
 
-  const keyedAccounts = allAccounts.map((m) => ({ ...m, key: m.id }));
+  const keyedAccounts = allAccounts
+    .filter((account) => {
+      if (!institute?.id) return true;
+      return (
+        isAdminOfInstitute(account, institute.id) ||
+        isMemberOfInstitute(account, institute.id)
+      );
+    })
+    .map((m) => ({ ...m, key: m.id }));
 
   useEffect(() => {
     refresh();

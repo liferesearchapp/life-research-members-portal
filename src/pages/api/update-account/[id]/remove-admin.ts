@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { includeAllAccountInfo } from "../../../../../prisma/helpers";
 import db from "../../../../../prisma/prisma-client";
+import { assertAuthorized } from "../../../../utils/api/authorization";
 import getAccountFromRequest from "../../../../utils/api/get-account-from-request";
 import type { AccountDBRes } from "../../account/[id]";
 
@@ -29,6 +30,13 @@ async function updateAccountRemoveAdmin(id: number, urlIdentifier: string) {
   });
 }
 
+function getInstituteByUrlIdentifier(urlIdentifier: string) {
+  return db.institute.findUnique({
+    where: { urlIdentifier },
+    select: { id: true },
+  });
+}
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<AccountDBRes | string>
@@ -45,6 +53,20 @@ export default async function handler(
 
     const currentAccount = await getAccountFromRequest(req, res);
     if (!currentAccount) return;
+    const institute = await getInstituteByUrlIdentifier(urlIdentifier);
+    if (!institute)
+      return res.status(400).send("Institute URL Identifier is invalid.");
+    if (
+      !assertAuthorized(
+        res,
+        currentAccount.is_super_admin ||
+          currentAccount.instituteAdmin.some(
+            (admin) => admin.instituteId === institute.id
+          ),
+        "You are not authorized to remove admin permission."
+      )
+    )
+      return;
 
     if (currentAccount.id === id)
       return res

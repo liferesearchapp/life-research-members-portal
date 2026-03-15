@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { includeAllAccountInfo } from "../../../prisma/helpers";
 import db from "../../../prisma/prisma-client";
+import { assertAuthorized } from "../../utils/api/authorization";
 import getAccountFromRequest from "../../utils/api/get-account-from-request";
 import type { AccountDBRes } from "./account/[id]";
 import type { institute } from "@prisma/client";
@@ -16,6 +17,14 @@ export default async function handler(
   try {
     const currentUser = await getAccountFromRequest(req, res);
     if (!currentUser) return;
+    if (
+      !assertAuthorized(
+        res,
+        currentUser.is_super_admin,
+        "You are not authorized to view institute information."
+      )
+    )
+      return;
 
     const institutes = await getAllInstitutes();
     return res.status(200).send(institutes);

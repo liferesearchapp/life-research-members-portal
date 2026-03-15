@@ -1,6 +1,10 @@
 import type { organization, Prisma } from "@prisma/client";
 import type { NextApiRequest, NextApiResponse } from "next";
 import db from "../../../../prisma/prisma-client";
+import {
+  assertAuthorized,
+  hasAnyInstituteAccess,
+} from "../../../utils/api/authorization";
 import getAccountFromRequest from "../../../utils/api/get-account-from-request";
 import type { PrivatePartnerDBRes } from "../partner/[id]/private";
 
@@ -23,6 +27,20 @@ async function deletePartner(
   return transaction;
 }
 
+function getPartnerAccessInfo(id: number) {
+  return db.organization.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      organizationInstitute: {
+        select: {
+          instituteId: true,
+        },
+      },
+    },
+  });
+}
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Prisma.PromiseReturnType<typeof deletePartner> | string>
@@ -35,6 +53,19 @@ export default async function handler(
 
     const currentAccount = await getAccountFromRequest(req, res);
     if (!currentAccount) return;
+    const partnerInfo = await getPartnerAccessInfo(id);
+    if (!partnerInfo) return res.status(400).send("Partner not found. ID: " + id);
+    if (
+      !assertAuthorized(
+        res,
+        hasAnyInstituteAccess(
+          currentAccount,
+          partnerInfo.organizationInstitute.map((entry) => entry.instituteId)
+        ),
+        "You are not authorized to delete partners."
+      )
+    )
+      return;
 
     const partner = await deletePartner(id);
 

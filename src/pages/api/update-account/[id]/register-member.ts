@@ -2,6 +2,10 @@ import { Prisma } from "@prisma/client";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { includeAllAccountInfo } from "../../../../../prisma/helpers";
 import db from "../../../../../prisma/prisma-client";
+import {
+  assertAuthorized,
+  hasAdministrativeRole,
+} from "../../../../utils/api/authorization";
 import getAccountFromRequest from "../../../../utils/api/get-account-from-request";
 import type { AccountDBRes } from "../../account/[id]";
 
@@ -25,6 +29,14 @@ export default async function handler(
 
     const currentUser = await getAccountFromRequest(req, res);
     if (!currentUser) return;
+    if (
+      !assertAuthorized(
+        res,
+        hasAdministrativeRole(currentUser),
+        "You are not authorized to register this account as a member."
+      )
+    )
+      return;
 
     const updated = await registerMember(id);
 

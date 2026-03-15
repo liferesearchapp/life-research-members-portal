@@ -111,12 +111,9 @@ export const ActiveAccountCtxProvider: FC<PropsWithChildren> = ({
 
   function logout() {
     setLocalAccount(null);
-    // returning false stops redirect but still clears the cache and active user
-    instance
-      .logoutRedirect({ onRedirectNavigate: () => false })
-      .catch((e: any) => {
-        new Notification().error(e);
-      });
+    instance.logoutRedirect().catch((e: any) => {
+      new Notification().error(e);
+    });
   }
 
   return (

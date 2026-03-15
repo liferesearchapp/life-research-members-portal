@@ -2,6 +2,10 @@ import type { event } from "@prisma/client";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { selectAllEventInfo } from "../../../../../prisma/helpers";
 import db from "../../../../../prisma/prisma-client";
+import {
+  assertAuthorized,
+  hasAnyInstituteAccess,
+} from "../../../../utils/api/authorization";
 import getAccountFromRequest from "../../../../utils/api/get-account-from-request";
 
 export type PrivateEventDBRes = Awaited<ReturnType<typeof getPrivateEventInfo>>;
@@ -34,6 +38,14 @@ export default async function handler(
 
     const event = await getPrivateEventInfo(id);
     if (!event) return res.status(400).send("Event not found. ID: " + id);
+    if (
+      !assertAuthorized(
+        res,
+        hasAnyInstituteAccess(currentAccount, [event.institute.id]),
+        "You are not authorized to view this event's private information."
+      )
+    )
+      return;
 
     return res.status(200).send(event);
   } catch (e: any) {

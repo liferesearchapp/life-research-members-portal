@@ -58,6 +58,7 @@ export default async function handler(
 
     if (
       !(
+        currentAccount.is_super_admin ||
         isUserAdmin ||
         (await isProductMemberAuthor(currentAccount.member?.id, id))
       )

@@ -2,6 +2,10 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { includeAllAccountInfo } from "../../../../../prisma/helpers";
 import db from "../../../../../prisma/prisma-client";
 import type { AccountDBRes } from "../../account/[id]";
+import {
+  assertAuthorized,
+  canAccessAccount,
+} from "../../../../utils/api/authorization";
 import getAccountFromRequest from "../../../../utils/api/get-account-from-request";
 
 function deleteMember(id: number) {
@@ -23,10 +27,18 @@ export default async function handler(
 
     const account = await db.account.findUnique({
       where: { id },
-      include: { member: true },
+      include: { member: { include: { institutes: true } } },
     });
 
     if (!account?.member) return res.status(404).send("Member not found.");
+    if (
+      !assertAuthorized(
+        res,
+        canAccessAccount(currentUser, account),
+        "You are not authorized to delete member information."
+      )
+    )
+      return;
     await db.memberInstitute.deleteMany({
       where: { memberId: account?.member?.id },
     });

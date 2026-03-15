@@ -2,6 +2,10 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { selectAllSupervisionInfo } from "../../../../../prisma/helpers";
 import db from "../../../../../prisma/prisma-client";
 import getAccountFromRequest from "../../../../utils/api/get-account-from-request";
+import {
+  assertAuthorized,
+  hasAnyInstituteAccess,
+} from "../../../../utils/api/authorization";
 import type { PrivateSupervisionDBRes } from "../../supervision/[id]/private";
 
 export type UpdateSupervisionPublicParams = {
@@ -21,6 +25,13 @@ export type UpdateSupervisionPublicParams = {
   addCoSupervisorMembers: number[];
   deleteCoSupervisorMembers: number[];
 };
+
+function getSupervisionAccessInfo(id: number) {
+  return db.supervision.findUnique({
+    where: { id },
+    select: { id: true, instituteId: true },
+  });
+}
 
 function updateSupervision(
   id: number,
@@ -79,6 +90,21 @@ export default async function handler(
 
     const currentUser = await getAccountFromRequest(req, res);
     if (!currentUser) return;
+    const supervision = await getSupervisionAccessInfo(id);
+    if (!supervision)
+      return res.status(400).send("Supervision not found. ID: " + id);
+    if (
+      !assertAuthorized(
+        res,
+        hasAnyInstituteAccess(currentUser, [supervision.instituteId], {
+          allowAdmin: true,
+          allowMember: true,
+          allowSuperAdmin: true,
+        }),
+        "You are not authorized to edit this supervision information."
+      )
+    )
+      return;
 
     const updated = await updateSupervision(id, params);
 

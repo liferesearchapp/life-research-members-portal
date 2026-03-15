@@ -2,6 +2,11 @@ import type { supervision } from "@prisma/client";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { selectAllSupervisionInfo } from "../../../../../prisma/helpers";
 import db from "../../../../../prisma/prisma-client";
+import {
+  assertAuthorized,
+  hasAnyInstituteAccess,
+  isPrincipalSupervisor,
+} from "../../../../utils/api/authorization";
 import getAccountFromRequest from "../../../../utils/api/get-account-from-request";
 
 export type PrivateSupervisionDBRes = Awaited<ReturnType<typeof getPrivateSupervisionInfo>>;
@@ -20,19 +25,6 @@ function getPrivateSupervisionInfo(id: number) {
   });
 }
 
-async function isPrincipalSupervisor(memberId: number | undefined, supervisionId: number) {
-  if (!memberId) return false;
-  const principalSupervisor = await db.supervision_principal_supervisor.findUnique({
-    where: {
-      member_id_supervision_id: {
-        member_id: memberId,
-        supervision_id: supervisionId,
-      },
-    },
-  });
-  return !!principalSupervisor;
-}
-
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<PrivateSupervisionDBRes | string>
@@ -47,6 +39,18 @@ export default async function handler(
 
     const supervision = await getPrivateSupervisionInfo(id);
     if (!supervision) return res.status(400).send("Supervision not found. ID: " + id);
+    if (
+      !assertAuthorized(
+        res,
+        hasAnyInstituteAccess(currentAccount, [supervision.institute.id], {
+          allowAdmin: true,
+          allowMember: true,
+          allowSuperAdmin: true,
+        }) || isPrincipalSupervisor(currentAccount, id),
+        "You are not authorized to view this supervision's private information."
+      )
+    )
+      return;
 
     return res.status(200).send(supervision);
   } catch (e: any) {

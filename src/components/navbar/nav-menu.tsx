@@ -1,14 +1,11 @@
 import MenuOutlined from "@ant-design/icons/lib/icons/MenuOutlined";
 import Menu from "antd/lib/menu";
-import type { MenuItemType } from "antd/lib/menu/hooks/useItems";
 import Spin from "antd/lib/spin";
 import { useRouter } from "next/router";
 import {
+  type ComponentProps,
   FC,
-  JSXElementConstructor,
-  ReactElement,
-  ReactFragment,
-  ReactPortal,
+  type ReactNode,
   useContext,
 } from "react";
 import { ActiveAccountCtx } from "../../services/context/active-account-ctx";
@@ -18,6 +15,8 @@ import SafeLink from "../link/safe-link";
 import type { UrlObject } from "url";
 import { useAdminDetails, useMemberDetails } from "../../services/context/selected-institute-ctx";
 import { useSelectedInstitute } from "../../services/context/selected-institute-ctx";
+
+type MenuItemType = NonNullable<ComponentProps<typeof Menu>["items"]>[number];
 
 const NavMenu: FC<{ urlIdentifier: string | undefined }> = ({
   urlIdentifier,
@@ -133,15 +132,7 @@ const NavMenu: FC<{ urlIdentifier: string | undefined }> = ({
         children: it.children.map(
           (child: {
             href: string | UrlObject;
-            label:
-              | string
-              | number
-              | boolean
-              | ReactElement<any, string | JSXElementConstructor<any>>
-              | ReactFragment
-              | ReactPortal
-              | null
-              | undefined;
+            label: ReactNode;
           }) => ({
             label: <SafeLink href={child.href}>{child.label}</SafeLink>,
             key: child.label,
@@ -166,7 +157,6 @@ const NavMenu: FC<{ urlIdentifier: string | undefined }> = ({
         overflowedIndicator={<MenuOutlined className="collapsed-icon" />}
         style={{ fontSize: "inherit" }}
         selectedKeys={activeItem ? [activeItem.label] : []}
-        activeKey={activeItem?.label}
         getPopupContainer={() =>
           document.querySelector(".navbar") || document.body
         }

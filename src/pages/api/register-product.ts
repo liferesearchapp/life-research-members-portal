@@ -1,6 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import db from "../../../prisma/prisma-client";
 import isAuthorMatch from "../../components/products/author-match";
+import {
+  assertAuthorized,
+  hasAllInstituteAccess,
+} from "../../utils/api/authorization";
 import getAccountFromRequest from "../../utils/api/get-account-from-request";
 import removeDiacritics from "../../utils/front-end/remove-diacritics";
 
@@ -80,6 +84,18 @@ export default async function handler(
   try {
     const currentUser = await getAccountFromRequest(req, res);
     if (!currentUser) return;
+    if (
+      !assertAuthorized(
+        res,
+        hasAllInstituteAccess(currentUser, params.institute_id, {
+          allowAdmin: true,
+          allowMember: true,
+          allowSuperAdmin: true,
+        }),
+        "You are not authorized to register a product."
+      )
+    )
+      return;
 
     const newProduct = await registerProduct(params);
 

@@ -1,5 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import type { AccountDBRes } from "../../account/[id]";
+import {
+  assertAuthorized,
+  hasAllInstituteAccess,
+} from "../../../../utils/api/authorization";
 import getAccountFromRequest from "../../../../utils/api/get-account-from-request";
 import db from "../../../../../prisma/prisma-client";
 import { includeAllAccountInfo } from "../../../../../prisma/helpers";
@@ -46,6 +50,14 @@ export default async function handler(
 
     const currentAccount = await getAccountFromRequest(req, res);
     if (!currentAccount) return;
+    if (
+      !assertAuthorized(
+        res,
+        hasAllInstituteAccess(currentAccount, params.instituteId),
+        "You are not authorized to update institute memberships."
+      )
+    )
+      return;
 
     console.log({ id, params }, "id, params");
 

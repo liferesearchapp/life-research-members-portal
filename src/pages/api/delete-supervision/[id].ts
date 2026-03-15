@@ -1,12 +1,23 @@
 import type { supervision, Prisma } from "@prisma/client";
 import type { NextApiRequest, NextApiResponse } from "next";
 import db from "../../../../prisma/prisma-client";
+import {
+  assertAuthorized,
+  hasAnyInstituteAccess,
+} from "../../../utils/api/authorization";
 import getAccountFromRequest from "../../../utils/api/get-account-from-request";
 import type { PrivateSupervisionDBRes } from "../supervision/[id]/private";
 
 async function deleteSupervision(id: number): Promise<supervision | null> {
   return db.supervision.delete({
     where: { id },
+  });
+}
+
+function getSupervisionAccessInfo(id: number) {
+  return db.supervision.findUnique({
+    where: { id },
+    select: { id: true, instituteId: true },
   });
 }
 
@@ -24,6 +35,21 @@ export default async function handler(
 
     const currentAccount = await getAccountFromRequest(req, res);
     if (!currentAccount) return;
+    const supervisionInfo = await getSupervisionAccessInfo(id);
+    if (!supervisionInfo)
+      return res.status(400).send("Supervision not found. ID: " + id);
+    if (
+      !assertAuthorized(
+        res,
+        hasAnyInstituteAccess(currentAccount, [supervisionInfo.instituteId], {
+          allowAdmin: true,
+          allowMember: true,
+          allowSuperAdmin: true,
+        }),
+        "You are not authorized to delete supervisions."
+      )
+    )
+      return;
 
     const supervision = await deleteSupervision(id);
 

@@ -1,6 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { includeAllAccountInfo } from "../../../../prisma/helpers";
 import db from "../../../../prisma/prisma-client";
+import {
+  assertAuthorized,
+  canAccessAccount,
+} from "../../../utils/api/authorization";
 import getAccountFromRequest from "../../../utils/api/get-account-from-request";
 import type { PrivateMemberRes } from "../member/[id]/private";
 
@@ -32,9 +36,16 @@ export default async function handler(
     const currentAccount = await getAccountFromRequest(req, res);
     if (!currentAccount) return;
 
-
     const account = await getAccountById(id);
     if (!account) return res.status(400).send("Account not found. ID: " + id);
+    if (
+      !assertAuthorized(
+        res,
+        canAccessAccount(currentAccount, account, { allowSelf: true }),
+        "You are not authorized to view this account information."
+      )
+    )
+      return;
 
     return res.status(200).send(account);
   } catch (e: any) {

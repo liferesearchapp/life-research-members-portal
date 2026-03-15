@@ -1,12 +1,23 @@
 import type { event, Prisma } from "@prisma/client";
 import type { NextApiRequest, NextApiResponse } from "next";
 import db from "../../../../prisma/prisma-client";
+import {
+  assertAuthorized,
+  hasAnyInstituteAccess,
+} from "../../../utils/api/authorization";
 import getAccountFromRequest from "../../../utils/api/get-account-from-request";
 import type { PrivateEventDBRes } from "../event/[id]/private";
 
 async function deleteEvent(id: number): Promise<event | null> {
   return db.event.delete({
     where: { id },
+  });
+}
+
+function getEventAccessInfo(id: number) {
+  return db.event.findUnique({
+    where: { id },
+    select: { id: true, instituteId: true },
   });
 }
 
@@ -22,6 +33,16 @@ export default async function handler(
 
     const currentAccount = await getAccountFromRequest(req, res);
     if (!currentAccount) return;
+    const eventInfo = await getEventAccessInfo(id);
+    if (!eventInfo) return res.status(400).send("Event not found. ID: " + id);
+    if (
+      !assertAuthorized(
+        res,
+        hasAnyInstituteAccess(currentAccount, [eventInfo.instituteId]),
+        "You are not authorized to delete events."
+      )
+    )
+      return;
 
     const event = await deleteEvent(id);
 

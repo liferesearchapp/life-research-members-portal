@@ -28,8 +28,8 @@ import EventNameFilter from "../filters/event-name-filter";
 import EventTypeFilter from "../filters/event-type-filter";
 import EventDateFilter from "../filters/event-date-filter";
 import type { EventPublicInfo } from "../../services/_types";
-import moment, { Moment } from "moment";
-import type { RangeValue } from "rc-picker/lib/interface";
+import type { RangeValueType } from "rc-picker/lib/PickerInput/RangePicker";
+import dayjs, { type Dayjs } from "dayjs";
 import {
   useAdminDetails,
   useSelectedInstitute,
@@ -54,8 +54,8 @@ function filterFn(
   filters: {
     nameFilter: Set<number>;
     typeFilter: Set<number>;
-    startDateFilter: moment.Moment | null;
-    endDateFilter: moment.Moment | null;
+    startDateFilter: Dayjs | null;
+    endDateFilter: Dayjs | null;
   }
 ): boolean {
   const { nameFilter, typeFilter, startDateFilter, endDateFilter } = filters;
@@ -68,12 +68,12 @@ function filterFn(
   }
 
   if (startDateFilter && m.start_date) {
-    const eventStartDate = moment(m.start_date);
+    const eventStartDate = dayjs(m.start_date);
     if (eventStartDate.isBefore(startDateFilter, "day")) return false;
   }
 
   if (endDateFilter && m.end_date) {
-    const eventEndDate = moment(m.end_date);
+    const eventEndDate = dayjs(m.end_date);
     if (eventEndDate.isAfter(endDateFilter, "day")) return false;
   }
 
@@ -124,9 +124,9 @@ function handleEventTypeFilterChange(next: Set<number>) {
   );
 }
 
-function handleEventDateFilterChange(value: RangeValue<Moment> | null) {
+function handleEventDateFilterChange(value: RangeValueType<Dayjs> | null) {
   const adjustedStartDate =
-    value && value[0] ? value[0].clone().subtract(1, "day") : null;
+    value && value[0] ? value[0].subtract(1, "day") : null;
 
   Router.push(
     {
@@ -198,6 +198,11 @@ function getIdsFromQueryParams(key: string): Set<number> {
   return res;
 }
 
+function getDateFromQueryParam(query: string | string[] | undefined): string | null {
+  if (!query) return null;
+  return Array.isArray(query) ? query[0] || null : query;
+}
+
 function getPopupContainer(): HTMLElement {
   return (
     document.querySelector(".all-organizations-table .filters") || document.body
@@ -241,12 +246,8 @@ const AllEvents: FC = () => {
 
   const [nameFilter, setNameFilter] = useState(new Set<number>());
   const [typeFilter, setTypeFilter] = useState(new Set<number>());
-  const [startDateFilter, setStartDateFilter] = useState<moment.Moment | null>(
-    null
-  );
-  const [endDateFilter, setEndDateFilter] = useState<moment.Moment | null>(
-    null
-  );
+  const [startDateFilter, setStartDateFilter] = useState<Dayjs | null>(null);
+  const [endDateFilter, setEndDateFilter] = useState<Dayjs | null>(null);
 
   const router = useRouter();
   const showTypeQuery = router.query[queryKeys.showType];
@@ -271,12 +272,14 @@ const AllEvents: FC = () => {
   }, [showStartDateQuery]);
 
   useEffect(() => {
-    if (!startDateQuery) setStartDateFilter(null);
-    else setStartDateFilter(moment(startDateQuery));
+    const nextStartDate = getDateFromQueryParam(startDateQuery);
+    if (!nextStartDate) setStartDateFilter(null);
+    else setStartDateFilter(dayjs(nextStartDate));
   }, [startDateQuery]);
   useEffect(() => {
-    if (!endDateQuery) setEndDateFilter(null);
-    else setEndDateFilter(moment(endDateQuery));
+    const nextEndDate = getDateFromQueryParam(endDateQuery);
+    if (!nextEndDate) setEndDateFilter(null);
+    else setEndDateFilter(dayjs(nextEndDate));
   }, [endDateQuery]);
 
   useEffect(() => {

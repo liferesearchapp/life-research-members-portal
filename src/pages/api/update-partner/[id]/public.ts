@@ -3,6 +3,11 @@ import { selectAllPartnerInfo } from "../../../../../prisma/helpers";
 import db from "../../../../../prisma/prisma-client";
 import type { PartnerPrivateInfo } from "../../../../services/_types";
 import getAccountFromRequest from "../../../../utils/api/get-account-from-request";
+import {
+  assertAuthorized,
+  hasAllInstituteAccess,
+  hasAnyInstituteAccess,
+} from "../../../../utils/api/authorization";
 import type { PrivatePartnerRes } from "../../partner/[id]/private";
 
 export type UpdatePartnerPublicParams = {
@@ -13,6 +18,20 @@ export type UpdatePartnerPublicParams = {
   description: string | null;
   institute_id: number[];
 };
+
+function getPartnerAccessInfo(id: number) {
+  return db.organization.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      organizationInstitute: {
+        select: {
+          instituteId: true,
+        },
+      },
+    },
+  });
+}
 
 function updatePartner(
   id: number,
@@ -45,6 +64,29 @@ function updatePartner(
   });
 }
 
+function getNormalizedInstituteIds(instituteIds: Iterable<number | null | undefined>) {
+  return Array.from(
+    new Set(
+      Array.from(instituteIds).filter(
+        (instituteId): instituteId is number =>
+          typeof instituteId === "number" && Number.isFinite(instituteId)
+      )
+    )
+  ).sort((a, b) => a - b);
+}
+
+function haveSameInstituteIds(
+  currentInstituteIds: Iterable<number | null | undefined>,
+  nextInstituteIds: Iterable<number | null | undefined>
+) {
+  const current = getNormalizedInstituteIds(currentInstituteIds);
+  const next = getNormalizedInstituteIds(nextInstituteIds);
+
+  if (current.length !== next.length) return false;
+
+  return current.every((instituteId, index) => instituteId === next[index]);
+}
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<PrivatePartnerRes | string>
@@ -58,13 +100,28 @@ export default async function handler(
 
     const currentUser = await getAccountFromRequest(req, res);
     if (!currentUser) return;
-
-    //chnange this to check if user is admin of any partner institutes this is wrong!!
-    // const authorized = currentUser.is_admin || currentUser.member?.id === id;
-    // if (!authorized)
-    //   return res
-    //     .status(401)
-    //     .send("You are not authorized to edit this partner information.");
+    const partner = await getPartnerAccessInfo(id);
+    if (!partner) return res.status(400).send("Partner not found. ID: " + id);
+    const currentInstituteIds = partner.organizationInstitute.map(
+      (entry) => entry.instituteId
+    );
+    if (
+      !assertAuthorized(
+        res,
+        hasAnyInstituteAccess(currentUser, currentInstituteIds),
+        "You are not authorized to edit this partner information."
+      )
+    )
+      return;
+    if (
+      !haveSameInstituteIds(currentInstituteIds, params.institute_id) &&
+      !assertAuthorized(
+        res,
+        hasAllInstituteAccess(currentUser, params.institute_id),
+        "You are not authorized to assign this partner to the selected institutes."
+      )
+    )
+      return;
 
     const updated = await updatePartner(id, params);
 

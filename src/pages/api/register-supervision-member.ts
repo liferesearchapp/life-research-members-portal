@@ -1,6 +1,10 @@
 import { Prisma } from "@prisma/client";
 import type { NextApiRequest, NextApiResponse } from "next";
 import db from "../../../prisma/prisma-client";
+import {
+  assertAuthorized,
+  hasAnyInstituteAccess,
+} from "../../utils/api/authorization";
 import getAccountFromRequest from "../../utils/api/get-account-from-request";
 
 export type RegisterSupervisionParams = {
@@ -63,6 +67,18 @@ export default async function handler(
 
     if (!currentUser.member)
       return res.status(401).send("You are not authorized to register a supervision");
+    if (
+      !assertAuthorized(
+        res,
+        hasAnyInstituteAccess(currentUser, [params.institute_id], {
+          allowAdmin: true,
+          allowMember: true,
+          allowSuperAdmin: true,
+        }),
+        "You are not authorized to register a supervision."
+      )
+    )
+      return;
 
     const currentMember = await db.member.findUnique({
       where: { account_id: currentUser.id },

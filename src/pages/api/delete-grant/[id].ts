@@ -1,12 +1,23 @@
 import type { grant, Prisma } from "@prisma/client";
 import type { NextApiRequest, NextApiResponse } from "next";
 import db from "../../../../prisma/prisma-client";
+import {
+  assertAuthorized,
+  hasAnyInstituteAccess,
+} from "../../../utils/api/authorization";
 import getAccountFromRequest from "../../../utils/api/get-account-from-request";
 import type { PrivateGrantDBRes } from "../grant/[id]/private";
 
 async function deleteGrant(id: number): Promise<grant | null> {
   return db.grant.delete({
     where: { id },
+  });
+}
+
+function getGrantAccessInfo(id: number) {
+  return db.grant.findUnique({
+    where: { id },
+    select: { id: true, instituteId: true },
   });
 }
 
@@ -22,6 +33,17 @@ export default async function handler(
 
     const currentAccount = await getAccountFromRequest(req, res);
     if (!currentAccount) return;
+
+    const grantInfo = await getGrantAccessInfo(id);
+    if (!grantInfo) return res.status(400).send("Grant not found. ID: " + id);
+    if (
+      !assertAuthorized(
+        res,
+        hasAnyInstituteAccess(currentAccount, [grantInfo.instituteId]),
+        "You are not authorized to delete grants."
+      )
+    )
+      return;
 
     const grant = await deleteGrant(id);
 
