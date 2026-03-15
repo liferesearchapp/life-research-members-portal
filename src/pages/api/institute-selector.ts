@@ -37,6 +37,14 @@ export default async function handler(
       const instituteSelection = await getAllInstitutesForSelector();
       return res.status(200).send(instituteSelection);
     } catch (e: any) {
-      return res.status(500).send({ ...e, message: e.message });
+      if (e?.code === "P2021" && typeof e?.meta?.table === "string") {
+        return res
+          .status(500)
+          .send(
+            `Database schema mismatch: missing table ${e.meta.table}. This branch requires the generic portal institute schema to be applied to the database.`
+          );
+      }
+
+      return res.status(500).send(e?.message || "Failed to load institutes.");
     }
   }

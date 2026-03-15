@@ -9,7 +9,7 @@ import {
   useEffect,
   useState,
 } from "react";
-import { loginRequest } from "../../../auth-config";
+import { ensureMsalInitialized, loginRequest } from "../../../auth-config";
 import ApiRoutes from "../../routing/api-routes";
 import getAuthHeader from "../headers/auth-header";
 import type { AccountInfo } from "../_types";
@@ -91,14 +91,16 @@ export const ActiveAccountCtxProvider: FC<PropsWithChildren> = ({
     notification.close();
   }
 
-  function login() {
+  async function login() {
+    await ensureMsalInitialized();
     instance.loginRedirect(loginRequest).catch((e: any) => {
       new Notification().error(e);
     });
   }
 
-  function logout() {
+  async function logout() {
     setLocalAccount(null);
+    await ensureMsalInitialized();
     instance.clearCache().catch((e: any) => {
       new Notification().error(e);
     });

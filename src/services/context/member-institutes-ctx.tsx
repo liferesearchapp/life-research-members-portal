@@ -42,7 +42,7 @@ export const MemberInstituteCtxProvider: FC<
 
       setInstitutes(institutes.sort((a, b) => a.name.localeCompare(b.name)));
     } catch (e: any) {
-      new Notification().error(e.message);
+      new Notification().error(e instanceof Error ? e.message : String(e));
     } finally {
       setLoading(false);
     }

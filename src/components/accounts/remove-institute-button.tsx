@@ -13,6 +13,7 @@ import {
 import { LanguageCtx } from "../../services/context/language-ctx";
 import type { AccountInfo } from "../../services/_types";
 import { ActiveAccountCtx } from "../../services/context/active-account-ctx";
+import { AllInstitutesCtx } from "../../services/context/all-institutes-ctx";
 import removeInstitute from "../../services/remove-institute"; // Assume this service function exists
 
 const { Option } = Select;
@@ -26,7 +27,12 @@ const RemoveInstituteButton: FC<Props> = ({ account, setAccount }) => {
   const { en } = useContext(LanguageCtx);
   const [modalOpen, setModalOpen] = useState(false);
   const [form] = useForm<Data>();
-  const { localAccount, loading } = useContext(ActiveAccountCtx);
+  const { localAccount } = useContext(ActiveAccountCtx);
+  const { allInstitutes } = useContext(AllInstitutesCtx);
+
+  const manageableInstitutes = localAccount?.is_super_admin
+    ? allInstitutes
+    : (localAccount?.instituteAdmin.map((admin) => admin.institute) ?? []);
 
   async function submit(data: Data) {
     const res = await removeInstitute(account.id, data);
@@ -49,7 +55,7 @@ const RemoveInstituteButton: FC<Props> = ({ account, setAccount }) => {
         okText={en ? "Submit" : "Soumettre"}
         cancelButtonProps={{ danger: true }}
         cancelText={en ? "Cancel" : "Annuler"}
-        destroyOnClose
+        destroyOnHidden
       >
         <Form
           form={form}
@@ -67,9 +73,9 @@ const RemoveInstituteButton: FC<Props> = ({ account, setAccount }) => {
             name="instituteId"
           >
             <Select mode="multiple">
-              {localAccount?.instituteAdmin.map((f) => (
-                <Option key={f.institute.id} value={f.institute.id}>
-                  {`${f.institute.name} - ${f.institute.urlIdentifier}`}
+              {manageableInstitutes.map((institute) => (
+                <Option key={institute.id} value={institute.id}>
+                  {`${institute.name} - ${institute.urlIdentifier}`}
                 </Option>
               ))}
             </Select>

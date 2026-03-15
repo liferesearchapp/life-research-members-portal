@@ -47,7 +47,6 @@ export const AllMembersSelectorCtxProvider: FC<PropsWithChildren> = ({
 
   const fetchAllMembers = useCallback(async () => {
     if (!institute) {
-      console.log("Institute not found.");
       setLoading(false);
       return;
     }
@@ -62,8 +61,6 @@ export const AllMembersSelectorCtxProvider: FC<PropsWithChildren> = ({
       });
       if (!res.ok) throw await res.text();
       const fetchedMembers: MemberPublicInfo[] = await res.json();
-
-      console.log("Fetched members: ", fetchedMembers);
 
       setMembers(fetchedMembers.sort(en ? enSorter : frSorter));
       setMemberMap(new Map(fetchedMembers.map((m) => [m.id, m])));

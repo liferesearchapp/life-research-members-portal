@@ -1,4 +1,4 @@
-import "@ant-design/v5-patch-for-react-19";
+import "../antd-react19-patch";
 import "../styles/_globals.scss";
 import type { AppProps } from "next/app";
 import { App } from "antd";

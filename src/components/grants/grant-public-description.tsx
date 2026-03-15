@@ -33,7 +33,7 @@ const PublicGrantDescription: FC<Props> = ({ grant }) => {
       size="small"
       bordered
       column={1}
-      labelStyle={{ whiteSpace: "nowrap", width: 0 }}
+      styles={{ label: { whiteSpace: "nowrap", width: 0 } }}
       layout={screens.xs ? "vertical" : "horizontal"}
     >
       <Item label={en ? "Title" : "Titre"}>{grant.title}</Item>

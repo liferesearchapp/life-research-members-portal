@@ -6,7 +6,6 @@ import getAccountFromRequest from "../../../../utils/api/get-account-from-reques
 import type { AccountDBRes } from "../../account/[id]";
 
 async function updateAccountRemoveAdmin(id: number, urlIdentifier: string) {
-  console.log(id, urlIdentifier);
   const institute = await db.institute.findUnique({
     where: {
       urlIdentifier: urlIdentifier,
@@ -15,8 +14,6 @@ async function updateAccountRemoveAdmin(id: number, urlIdentifier: string) {
       id: true,
     },
   });
-
-  console.log(institute);
 
   if (!institute) return null;
 

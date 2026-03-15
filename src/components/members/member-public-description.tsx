@@ -43,7 +43,7 @@ const PublicMemberDescription: FC<Props> = ({ member }) => {
       size="small"
       bordered
       column={1}
-      labelStyle={{ whiteSpace: "nowrap", width: 0 }}
+      styles={{ label: { whiteSpace: "nowrap", width: 0 } }}
       layout={screens.xs ? "vertical" : "horizontal"}
     >
       <Item
@@ -62,7 +62,7 @@ const PublicMemberDescription: FC<Props> = ({ member }) => {
         label={
           en ? "Problems I Work On" : "Problèmes sur lesquels je travaille"
         }
-        labelStyle={{ whiteSpace: "break-spaces" }}
+        styles={{ label: { whiteSpace: "break-spaces" } }}
       >
         {member.problem.map((p, i) => (
           <React.Fragment key={i}>

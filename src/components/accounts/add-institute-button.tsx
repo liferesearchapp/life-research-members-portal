@@ -13,6 +13,7 @@ import {
 import { LanguageCtx } from "../../services/context/language-ctx";
 import type { AccountInfo } from "../../services/_types";
 import { ActiveAccountCtx } from "../../services/context/active-account-ctx";
+import { AllInstitutesCtx } from "../../services/context/all-institutes-ctx";
 import addInstitute from "../../services/add-institute";
 
 const { Option } = Select;
@@ -26,11 +27,15 @@ const AddInstituteButton: FC<Props> = ({ account, setAccount }) => {
   const { en } = useContext(LanguageCtx);
   const [modalOpen, setModalOpen] = useState(false);
   const [form] = useForm<Data>();
-  const { localAccount, loading } = useContext(ActiveAccountCtx);
+  const { localAccount } = useContext(ActiveAccountCtx);
+  const { allInstitutes } = useContext(AllInstitutesCtx);
+
+  const manageableInstitutes = localAccount?.is_super_admin
+    ? allInstitutes
+    : (localAccount?.instituteAdmin.map((admin) => admin.institute) ?? []);
 
   // Extract IDs of institutes where the localAccount is an admin
-  const adminInstituteIds =
-    localAccount?.instituteAdmin.map((admin) => admin.institute.id) || [];
+  const adminInstituteIds = manageableInstitutes.map((institute) => institute.id);
 
   // Filter the account.member.institutes to include only those that match the adminInstituteIds
   const initialInstitutes =
@@ -61,7 +66,7 @@ const AddInstituteButton: FC<Props> = ({ account, setAccount }) => {
         okText={en ? "Submit" : "Soumettre"}
         cancelButtonProps={{ danger: true }}
         cancelText={en ? "Cancel" : "Annuler"}
-        destroyOnClose
+        destroyOnHidden
       >
         <Form
           form={form}
@@ -77,9 +82,9 @@ const AddInstituteButton: FC<Props> = ({ account, setAccount }) => {
           >
             <Select mode="multiple">
               <Option value="">{""}</Option>
-              {localAccount?.instituteAdmin.map((f) => (
-                <Option key={f.institute.id} value={f.institute.id}>
-                  {`${f.institute.name} - ${f.institute.urlIdentifier}`}
+              {manageableInstitutes.map((institute) => (
+                <Option key={institute.id} value={institute.id}>
+                  {`${institute.name} - ${institute.urlIdentifier}`}
                 </Option>
               ))}
             </Select>

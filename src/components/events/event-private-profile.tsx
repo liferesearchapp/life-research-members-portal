@@ -108,12 +108,12 @@ const PrivateEventProfile: FC<Props> = ({ id }) => {
   ];
 
   return (
-    <Card title={header} bodyStyle={{ paddingTop: 0 }}>
+    <Card title={header} styles={{ body: { paddingTop: 0 } }}>
       <Tabs
         items={editMode ? forms : descriptions}
         activeKey={activeTabKey}
         onChange={onChange}
-        destroyInactiveTabPane
+        destroyOnHidden
       />
       <DeleteEventButton
         event={event}

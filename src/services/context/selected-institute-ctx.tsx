@@ -44,6 +44,7 @@ export const useSelectedInstitute = () => {
 export const useMemberDetails = () => {
   const { institute } = useContext(SelectedInstituteCtx);
   const { localAccount } = useContext(ActiveAccountCtx);
+  if (localAccount?.is_super_admin) return true;
   const isMember = localAccount?.member?.institutes.some(
     (member) => member.instituteId === institute?.id
   );
@@ -53,6 +54,7 @@ export const useMemberDetails = () => {
 export const useAdminDetails = () => {
   const { institute } = useContext(SelectedInstituteCtx);
   const { localAccount } = useContext(ActiveAccountCtx);
+  if (localAccount?.is_super_admin) return true;
   const isAdmin = localAccount?.instituteAdmin.some(
     (admin) => admin.instituteId === institute?.id
   );
@@ -63,5 +65,4 @@ export const useSuperAdminDetails = () => {
   const { localAccount } = useContext(ActiveAccountCtx);
   return localAccount?.is_super_admin;
 };
-
 

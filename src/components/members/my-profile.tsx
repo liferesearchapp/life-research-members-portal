@@ -201,14 +201,14 @@ const MyProfile: FC = () => {
   ];
 
   return (
-    <Card title={header} bodyStyle={{ paddingTop: 0 }}>
+    <Card title={header} styles={{ body: { paddingTop: 0 } }}>
       <Tabs
         items={editMode ? forms : descriptions}
         activeKey={activeTabKey}
         onChange={onChange}
         // Very important to destroy inactive forms,
         // so they register their submit function to the save changes context when navigated back
-        destroyInactiveTabPane
+        destroyOnHidden
       />
     </Card>
   );

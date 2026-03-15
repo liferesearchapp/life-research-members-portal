@@ -5,7 +5,6 @@ import Layout from "../../components/layout/layout";
 import RegisterInstitute from "../../components/institutes/register-institute";
 
 const Register: NextPage = () => {
-  console.log("Registe Page Institue");
   return (
     <PageAuthGuard auths={[Authorizations.superAdmin]}>
       <Layout>

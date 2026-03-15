@@ -44,7 +44,7 @@ const UpdateNameButton: FC<Props> = ({ account, setAccount }) => {
         okText={en ? "Submit" : "Soumettre"}
         cancelButtonProps={{ danger: true }}
         cancelText={en ? "Cancel" : "Annuler"}
-        destroyOnClose
+        destroyOnHidden
       >
         <Form
           form={form}

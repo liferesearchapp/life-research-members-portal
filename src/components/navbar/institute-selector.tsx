@@ -1,13 +1,16 @@
-import { FC, useContext, useEffect, useMemo, useState } from "react";
+import { FC, useContext, useEffect, useMemo } from "react";
 import Dropdown from "antd/lib/dropdown";
-import Menu from "antd/lib/menu";
 import Button from "antd/lib/button";
 import { DownOutlined } from "@ant-design/icons";
 import { InstituteSelectorCtx } from "../../services/context/institute-selector-ctx";
 import { useRouter } from "next/router";
 import { useSelectedInstitute } from "../../services/context/selected-institute-ctx";
 import Notification from "../../services/notifications/notification";
-import { ActiveAccountCtx } from "../../services/context/active-account-ctx";
+import type { MenuProps } from "antd";
+
+function escapeForRegex(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
 
 const InstituteSelector: FC = () => {
   const { instituteSelection, loading } = useContext(InstituteSelectorCtx);
@@ -36,8 +39,28 @@ const InstituteSelector: FC = () => {
     );
     if (selectedInstitute && selectedInstitute.urlIdentifier) {
       setInstitute(selectedInstitute);
-      if ((router.asPath = "/")) {
-        router.push(`/${selectedInstitute.urlIdentifier}`);
+
+      const currentInstituteUrlIdentifier =
+        typeof router.query.instituteId === "string"
+          ? router.query.instituteId
+          : null;
+
+      if (currentInstituteUrlIdentifier) {
+        const nextPath = router.asPath.replace(
+          new RegExp(
+            `^/${escapeForRegex(currentInstituteUrlIdentifier)}(?=/|$)`
+          ),
+          `/${selectedInstitute.urlIdentifier}`
+        );
+
+        if (nextPath !== router.asPath) {
+          void router.push(nextPath);
+          return;
+        }
+      }
+
+      if (router.asPath === "/") {
+        void router.push(`/${selectedInstitute.urlIdentifier}`);
       }
     } else {
       console.error("Selected institute does not have a valid URL identifier.");
@@ -46,20 +69,17 @@ const InstituteSelector: FC = () => {
   const filteredInstitutes = useMemo(
     () =>
       instituteSelection
-        .map((m) => ({...m, key: m.id, name: m.name}))
-        .filter((m) => (m.is_active)),
+        .filter((m) => m.is_active)
+        .map((m) => ({ key: String(m.id), label: m.name })),
     [instituteSelection]
   );
-  const menu = (
-    <Menu onClick={handleMenuClick}>
-      {filteredInstitutes.map((institute) => (
-        <Menu.Item key={institute.id}>{institute.name}</Menu.Item>
-      ))}
-    </Menu>
-  );
+  const menu: MenuProps = {
+    items: filteredInstitutes,
+    onClick: handleMenuClick,
+  };
 
   return (
-    <Dropdown overlay={menu} disabled={loading}>
+    <Dropdown menu={menu} disabled={loading}>
       <Button>
         {institute?.name || "Select Institute"} <DownOutlined />
       </Button>

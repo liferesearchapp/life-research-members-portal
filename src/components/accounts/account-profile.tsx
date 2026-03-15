@@ -217,12 +217,14 @@ const AccountProfile: FC<Props> = ({ id }) => {
         layout="vertical"
         bordered
         column={1}
-        contentStyle={{
-          display: "flex",
-          columnGap: 16,
-          rowGap: 16,
-          flexWrap: "wrap",
-          alignItems: "center",
+        styles={{
+          content: {
+            display: "flex",
+            columnGap: 16,
+            rowGap: 16,
+            flexWrap: "wrap",
+            alignItems: "center",
+          },
         }}
       >
         {lastLoginItem}

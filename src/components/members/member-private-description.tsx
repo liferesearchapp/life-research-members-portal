@@ -39,7 +39,7 @@ const PrivateMemberDescription: FC<Props> = ({ member }) => {
       size="small"
       bordered
       column={1}
-      labelStyle={{ whiteSpace: "nowrap", width: 0 }}
+      styles={{ label: { whiteSpace: "nowrap", width: 0 } }}
       layout={screens.xs ? "vertical" : "horizontal"}
     >
       <Item label={en ? "Active" : "Active"}>

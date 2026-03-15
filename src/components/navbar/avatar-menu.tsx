@@ -14,10 +14,10 @@ const AvatarMenu: FC = () => {
   const { en } = useContext(LanguageCtx);
   const { localAccount } = useContext(ActiveAccountCtx);
   const isAdmin = useAdminDetails();
-  const { instance } = useMsal();
-  const msalAccount = instance.getActiveAccount();
+  const { accounts } = useMsal();
+  const msalAccount = accounts[0] || null;
 
-  if (!msalAccount) return <LoginButton />; // Fallback in case of error
+  if (!localAccount && !msalAccount) return <LoginButton />;
 
   const avatarLabel = localAccount
     ? localAccount.first_name[0] + localAccount.last_name[0]
@@ -25,8 +25,10 @@ const AvatarMenu: FC = () => {
 
   const name = localAccount
     ? localAccount.first_name + " " + localAccount.last_name
-    : msalAccount.name || null;
-  const email = localAccount ? localAccount.login_email : msalAccount.username;
+    : msalAccount?.name || null;
+  const email = localAccount
+    ? localAccount.login_email
+    : msalAccount?.username || null;
 
   const registered = localAccount ? null : (
     <Typography>
@@ -55,7 +57,7 @@ const AvatarMenu: FC = () => {
   ) : null;
 
   const dropdown = (
-    <Card bodyStyle={{ padding: 0 }}>
+    <Card styles={{ body: { padding: 0 } }}>
       <div className="avatar-dropdown">
         <Typography>{name}</Typography>
         <Typography>{email}</Typography>
@@ -71,7 +73,8 @@ const AvatarMenu: FC = () => {
 
   return (
     <Dropdown
-      overlay={dropdown}
+      popupRender={() => dropdown}
+      trigger={["click"]}
       getPopupContainer={() =>
         document.querySelector(".navbar") || document.body
       }

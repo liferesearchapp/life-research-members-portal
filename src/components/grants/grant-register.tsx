@@ -8,7 +8,7 @@ import { Button, Col, DatePicker, Row, Switch } from "antd";
 import Select from "antd/lib/select";
 import Form from "antd/lib/form";
 import Input from "antd/lib/input";
-import React, { FC, useContext, useState } from "react";
+import React, { FC, useContext } from "react";
 import { useForm } from "antd/lib/form/Form";
 import type { Dayjs } from "dayjs";
 import registerGrant from "../../services/register-grant";
@@ -33,6 +33,7 @@ type GrantData = {
   all_investigator: string;
   topic_id: number;
   note: string;
+  throught_lri: boolean;
   institute_id: number;
 };
 
@@ -43,7 +44,6 @@ const RegisterGrant: FC = () => {
   const { grantStatuses } = useContext(GrantStatusCtx);
   const { topics } = useContext(AllTopicsCtx);
   const { institute } = useSelectedInstitute();
-  const [throughtLRI, setThroughtLRI] = useState(false);
 
   async function handleRegister({
     title,
@@ -56,12 +56,13 @@ const RegisterGrant: FC = () => {
     all_investigator,
     topic_id,
     note,
+    throught_lri,
   }: GrantData) {
     if (!institute) return;
     const res = await registerGrant({
       title,
       amount: parseFloat(amount), // Convert amount to a float
-      throught_lri: throughtLRI,
+      throught_lri,
       status_id,
       submission_date: submission_date ? submission_date.toDate() : null,
       obtained_date: obtained_date ? obtained_date.toDate() : null,
@@ -179,16 +180,12 @@ const RegisterGrant: FC = () => {
         </Form.Item>
 
         <Form.Item
+          label={en ? "Through LRI" : "Par l'intermédiaire du LRI"}
           name="throught_lri"
           valuePropName="checked"
-          style={{ display: "inline-block" }}
+          initialValue={false}
         >
-          {en ? "Through LRI: " : "Par l'intermédiaire du LRI: "}
-          <Switch
-            checked={throughtLRI}
-            onChange={() => setThroughtLRI(!throughtLRI)}
-          />
-          {throughtLRI ? " Yes" : " No"}
+          <Switch />
         </Form.Item>
 
         <Form.Item label={en ? "Note" : "Note"} name="note">

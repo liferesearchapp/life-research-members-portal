@@ -10,6 +10,7 @@ import Checkbox from "antd/lib/checkbox/Checkbox";
 import { useForm } from "antd/lib/form/Form";
 import { LanguageCtx } from "../services/context/language-ctx";
 import { MemberInstituteCtx } from "../services/context/member-institutes-ctx";
+import { AllInstitutesCtx } from "../services/context/all-institutes-ctx";
 import {
   useAdminDetails,
   useSelectedInstitute,
@@ -36,7 +37,12 @@ const RegisterAccount: FC = () => {
   const { en } = useContext(LanguageCtx);
   const { institute } = useSelectedInstitute();
   const { institutes } = useContext(MemberInstituteCtx);
+  const { allInstitutes } = useContext(AllInstitutesCtx);
   const isAdmin = useAdminDetails();
+
+  const manageableInstitutes = localAccount?.is_super_admin
+    ? allInstitutes
+    : (localAccount?.instituteAdmin.map((admin) => admin.institute) ?? []);
 
   async function handleRegister({
     first_name,
@@ -137,11 +143,11 @@ const RegisterAccount: FC = () => {
             initialValue={[institute.id]}
             rules={[{ required: true, message: en ? "Required" : "Requis" }]}
           >
-            <Select mode="multiple" defaultValue={institute?.id}>
+            <Select mode="multiple">
               <Option value="">{""}</Option>
-              {localAccount?.instituteAdmin.map((f) => (
-                <Option key={f.institute.id} value={f.institute.id}>
-                  {`${f.institute.name} - ${f.institute.urlIdentifier}`}
+              {manageableInstitutes.map((institute) => (
+                <Option key={institute.id} value={institute.id}>
+                  {`${institute.name} - ${institute.urlIdentifier}`}
                 </Option>
               ))}
             </Select>

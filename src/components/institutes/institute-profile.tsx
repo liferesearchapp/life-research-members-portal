@@ -79,7 +79,7 @@ const InstituteProfile: FC<Props> = ({ id }) => {
   const description = <InstituteDescription institute={institute}/>
 
   return (
-    <Card title={header} bodyStyle={{ paddingTop: 0 }}>
+    <Card title={header} styles={{ body: { paddingTop: 0 } }}>
       {editMode ? form : description}
     </Card>
   );

@@ -22,6 +22,16 @@ const msalConfig: Configuration = {
 
 export const msalInstance = new PublicClientApplication(msalConfig);
 
+let msalInitializationPromise: Promise<void> | null = null;
+
+export function ensureMsalInitialized() {
+  if (!msalInitializationPromise) {
+    msalInitializationPromise = msalInstance.initialize();
+  }
+
+  return msalInitializationPromise;
+}
+
 // MsalProvider (v3+) calls initialize() and handleRedirectPromise() internally.
 // This callback runs after a successful login redirect to ensure the active account is set.
 msalInstance.addEventCallback((event) => {

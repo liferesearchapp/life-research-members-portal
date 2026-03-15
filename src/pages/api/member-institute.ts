@@ -60,7 +60,7 @@ export default async function handler(
     });
 
     if (!member) {
-      return res.status(404).json("Member not found.");
+      return res.status(200).json([]);
     }
 
     const institutes = await getMemberInstitutes(member.id);

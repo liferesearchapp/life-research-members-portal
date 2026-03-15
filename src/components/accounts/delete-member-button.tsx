@@ -41,8 +41,8 @@ const DeleteMemberButton: FC<Props> = ({ account, setAccount }) => {
         okText={en ? "Delete member info" : "Supprimer info membre"}
         cancelButtonProps={{ danger: true }}
         cancelText={en ? "Cancel" : "Annuler"}
-        destroyOnClose
-        bodyStyle={{ paddingBottom: 0 }}
+        destroyOnHidden
+        styles={{ body: { paddingBottom: 0 } }}
       >
         <Alert
           showIcon

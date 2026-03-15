@@ -59,8 +59,6 @@ export default async function handler(
     )
       return;
 
-    console.log({ id, params }, "id, params");
-
     await addInstitute(id, params);
 
     const updatedAccount = await db.account.findUnique({

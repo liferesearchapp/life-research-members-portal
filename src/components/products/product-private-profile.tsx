@@ -144,7 +144,7 @@ const PrivateProductProfile: FC<Props> = ({ id }) => {
   ];
 
   return (
-    <Card title={header} bodyStyle={{ paddingTop: 0 }}>
+    <Card title={header} styles={{ body: { paddingTop: 0 } }}>
       <Tabs
         items={editMode ? forms : descriptions}
         // items={descriptions}
@@ -152,7 +152,7 @@ const PrivateProductProfile: FC<Props> = ({ id }) => {
         onChange={onChange}
         // Very important to destroy inactive forms,
         // so they register their submit function to the save changes context when navigated back
-        destroyInactiveTabPane
+        destroyOnHidden
       />
 
       <DeleteProductButton

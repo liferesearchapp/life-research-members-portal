@@ -35,8 +35,6 @@ const PageAuthGuard: FC<PropsWithChildren<Props>> = ({
 
   const c = <>{children}</>;
 
-  console.log(isAdmin);
-
   if (!localAccount) return notAuthorized;
   if (auths.includes(Authorizations.registered)) return c;
   if (auths.includes(Authorizations.member) && isMember) return c;

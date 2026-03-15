@@ -164,8 +164,7 @@ function handleShowEndDateChange(value: boolean) {
 function clearQueries(institute: { urlIdentifier: string | null }) {
   if (institute?.urlIdentifier) {
     const url = PageRoutes.allSupervisions(institute.urlIdentifier);
-    console.log("Redirecting to:", url); // Debug log
-    Router.push(url); // Redirect to the correct route
+    Router.push(url);
   } else {
     console.error("Unable to reset filters: Institute ID is missing.");
     alert("Unable to reset filters: Institute ID is missing.");

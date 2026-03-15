@@ -103,7 +103,6 @@ export default async function handler(
     const members = await fetchMembers();
 
     const authors = all_author.split(/[,;&]/).map((author) => author.trim());
-    console.log("authors", authors);
 
     const matchedAuthors = Array.from(
       new Set(
@@ -157,9 +156,6 @@ export default async function handler(
     //     },
     //     update: {},
     //   }));
-
-    // console.log("check", check);
-
     await Promise.all(
       params.institute_id.map((instituteId) =>
         db.productInstitute.create({

@@ -35,6 +35,10 @@ type Props = {
   style?: CSSProperties;
 };
 
+function normalizeConfirmationValue(value: string | null | undefined) {
+  return (value ?? "").replace(/\s+/g, " ").trim();
+}
+
 const DeleteSupervisionButton: FC<Props> = ({
   supervision,
   setSupervision,
@@ -47,7 +51,9 @@ const DeleteSupervisionButton: FC<Props> = ({
   const { institute } = useSelectedInstitute();
   const isAdmin = useAdminDetails();
 
-  const supervisionName = supervision.first_name + " " + supervision.last_name;
+  const supervisionName = normalizeConfirmationValue(
+    `${supervision.first_name} ${supervision.last_name}`
+  );
   const { localAccount } = useContext(ActiveAccountCtx);
 
   async function submit() {
@@ -92,8 +98,8 @@ const DeleteSupervisionButton: FC<Props> = ({
         okText={en ? "Delete Supervision" : "Supprimer la supervision"}
         cancelButtonProps={{ danger: true }}
         cancelText={en ? "Cancel" : "Annuler"}
-        destroyOnClose
-        bodyStyle={{ paddingBottom: 0 }}
+        destroyOnHidden
+        styles={{ body: { paddingBottom: 0 } }}
       >
         <Alert
           showIcon
@@ -129,7 +135,7 @@ const DeleteSupervisionButton: FC<Props> = ({
               { required: true, message: "Required" },
               {
                 validator: (_, v) =>
-                  v === supervisionName
+                  normalizeConfirmationValue(v) === supervisionName
                     ? Promise.resolve()
                     : Promise.reject(en ? "Incorrect" : "Incorrect"),
               },

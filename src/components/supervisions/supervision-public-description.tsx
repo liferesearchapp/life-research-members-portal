@@ -26,7 +26,7 @@ const PublicSupervisionDescription: FC<Props> = ({ supervision }) => {
       size="small"
       bordered
       column={1}
-      labelStyle={{ whiteSpace: "nowrap", width: 0 }}
+      styles={{ label: { whiteSpace: "nowrap", width: 0 } }}
       layout={screens.xs ? "vertical" : "horizontal"}
     >
       <Item label={en ? "First Name" : "Prénom"}>{supervision.first_name}</Item>

@@ -183,6 +183,7 @@ const Welcome: FC = () => {
                 alt="LIFE Research Institute Home"
                 width={530} // Set the width and height to the desired values
                 height={340}
+                priority
               />
             </Col>
           </Row>

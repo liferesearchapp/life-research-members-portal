@@ -26,11 +26,14 @@ export const InstituteSelectorCtxProvider: FC<PropsWithChildren> = ({ children }
     const fetchInstitutes = useCallback(async () => {
       try {
         const result = await fetch(ApiRoutes.instituteSelector);
-        if (!result.ok) throw await result.text();
+        if (!result.ok) {
+          const errorText = await result.text();
+          throw new Error(errorText || `Failed to load institutes (${result.status})`);
+        }
         const instituteSelection: InstituteSelectorInfo[] = await result.json();
         setInstitutes(instituteSelection.sort((a, b) => a.name.localeCompare(b.name)));
       } catch (e: any) {
-        new Notification().error(e.message);
+        new Notification().error(e instanceof Error ? e.message : String(e));
       } finally {
         setLoading(false);
       }

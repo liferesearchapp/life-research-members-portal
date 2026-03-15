@@ -74,8 +74,8 @@ const DeleteEventButton: FC<Props> = ({ event, setEvent, style }) => {
         okText={en ? "Delete Event" : "Supprimer l'événement"}
         cancelButtonProps={{ danger: true }}
         cancelText={en ? "Cancel" : "Annuler"}
-        destroyOnClose
-        bodyStyle={{ paddingBottom: 0 }}
+        destroyOnHidden
+        styles={{ body: { paddingBottom: 0 } }}
       >
         <Alert
           showIcon

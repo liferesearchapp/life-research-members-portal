@@ -42,8 +42,8 @@ const PrivateMemberProfile: FC<Props> = ({ id }) => {
   const { localAccount } = useContext(ActiveAccountCtx);
   const isAdmin = useAdminDetails();
 
-  /** check if admin of an institute member is part of, send to public profile if not */
-  if (isAdmin) {
+  /** Institute admins can only access private member profiles within institutes they manage. */
+  if (isAdmin && !localAccount?.is_super_admin) {
     var adminInstituteIds = localAccount?.instituteAdmin.map((admin) => admin.institute.id) || [];
     var memberInstituteIds = member?.institutes.map((institute) => institute.instituteId) || [];
     var hasPermission = false;
@@ -169,14 +169,14 @@ const PrivateMemberProfile: FC<Props> = ({ id }) => {
       : []),
   ];
   return (
-    <Card title={header} bodyStyle={{ paddingTop: 0 }}>
+    <Card title={header} styles={{ body: { paddingTop: 0 } }}>
       <Tabs
         items={editMode ? forms : descriptions}
         activeKey={activeTabKey}
         onChange={onChange}
         // Very important to destroy inactive forms,
         // so they register their submit function to the save changes context when navigated back
-        destroyInactiveTabPane
+        destroyOnHidden
       />
     </Card>
   );

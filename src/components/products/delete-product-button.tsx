@@ -77,8 +77,8 @@ const DeleteProductButton: FC<Props> = ({ product, setProduct, style }) => {
         okText={en ? "Delete Product" : "Supprimer le produit"}
         cancelButtonProps={{ danger: true }}
         cancelText={en ? "Cancel" : "Annuler"}
-        destroyOnClose
-        bodyStyle={{ paddingBottom: 0 }}
+        destroyOnHidden
+        styles={{ body: { paddingBottom: 0 } }}
       >
         <Alert
           showIcon

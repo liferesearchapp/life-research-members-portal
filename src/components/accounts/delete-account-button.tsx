@@ -64,8 +64,8 @@ const DeleteAccountButton: FC<Props> = ({ account, setAccount, style }) => {
         okText={en ? "Delete Account" : "Supprimer le compte"}
         cancelButtonProps={{ danger: true }}
         cancelText={en ? "Cancel" : "Annuler"}
-        destroyOnClose
-        bodyStyle={{ paddingBottom: 0 }}
+        destroyOnHidden
+        styles={{ body: { paddingBottom: 0 } }}
       >
         <Alert
           showIcon

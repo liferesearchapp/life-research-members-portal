@@ -32,7 +32,6 @@ export const AllMembersCtxProvider: FC<AllMembersCtxProviderProps> = ({
 
   const fetchAllMembers = useCallback(async () => {
     if (!institute) {
-      console.log("Institute not found.");
       setLoading(false);
       return;
     }
