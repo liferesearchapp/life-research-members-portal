@@ -1,18 +1,10 @@
 //This is a form component that allows the user to edit public information of a supervision.
 
-import React, { FC, useContext, useState, useCallback, useEffect } from "react";
+import React, { type FC, useContext, useState, useCallback, useEffect } from "react";
 import { LanguageCtx } from "../../services/context/language-ctx";
-import { useForm } from "antd/lib/form/Form";
-import Form from "antd/lib/form";
-import Input from "antd/lib/input";
-import TextArea from "antd/lib/input/TextArea";
-import Button from "antd/lib/button";
-import Select from "antd/lib/select";
-import DatePicker from "antd/lib/date-picker";
 import type { Moment } from "moment";
 import { FacultiesCtx } from "../../services/context/faculties-ctx";
 import { LevelsCtx } from "../../services/context/levels-ctx";
-import Divider from "antd/lib/divider";
 import Notification from "../../services/notifications/notification";
 import {
   SaveChangesCtx,
@@ -28,6 +20,9 @@ import GetLanguage from "../../utils/front-end/get-language";
 import updateSupervisionPublic from "../../services/update-supervision-public";
 import type { UpdateSupervisionPublicParams } from "../../pages/api/update-supervision/[id]/public";
 import MemberSelector from "../members/member-selector";
+import { Form, Input, Button, Select, DatePicker, Divider } from "antd";
+const { useForm } = Form;
+const TextArea = Input.TextArea;
 
 const { Option } = Select;
 

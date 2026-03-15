@@ -1,21 +1,18 @@
 // A component that displays a private supervision profile.
 // It can either show supervision information or allow the user to edit the supervision's information.
 
-import Empty from "antd/lib/empty";
-import Button from "antd/lib/button";
-import Card from "antd/lib/card/Card";
-import Title from "antd/lib/typography/Title";
-import { FC, ReactNode, useCallback, useContext, useState } from "react";
+import { type FC, type ReactNode, useCallback, useContext, useState } from "react";
 import CardSkeleton from "../loading/card-skeleton";
 import PublicSupervisionDescription from "./supervision-public-description";
 import usePrivateSupervisionInfo from "../../services/use-private-supervision-info";
 import { LanguageCtx } from "../../services/context/language-ctx";
-import Tabs from "antd/lib/tabs";
 import type { SupervisionPrivateInfo } from "../../services/_types";
 import DeleteSupervisionButton from "./delete-supervision-button";
 
 import { SaveChangesCtx } from "../../services/context/save-changes-ctx";
 import PublicSupervisionForm from "./supervision-public-form";
+import { Empty, Button, Card, Typography, Tabs } from "antd";
+const Title = Typography.Title;
 
 type Tab = { label: string; key: string; children: ReactNode };
 
@@ -117,7 +114,7 @@ const PrivateSupervisionProfile: FC<Props> = ({ id }) => {
   ];
 
   return (
-    <Card title={header} bodyStyle={{ paddingTop: 0 }}>
+    <Card title={header} styles={{ body: { paddingTop: 0 } }}>
       <Tabs
         items={editMode ? forms : descriptions}
         //items={descriptions}

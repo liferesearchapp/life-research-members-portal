@@ -1,5 +1,5 @@
-import message from "antd/lib/message";
 import { en } from "../context/language-ctx";
+import { message } from "antd";
 
 let counter = 1;
 

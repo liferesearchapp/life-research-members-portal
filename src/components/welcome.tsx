@@ -3,7 +3,7 @@
 // The component also  provides an overview of the portal information and displays a banner image, a tagline, and quick links to key sections of the portal
 // The information displayed is dynamic and changes based on the user's authentication status, language preference and profile information.
 
-import { Row, Col, Typography, Divider, Space } from "antd";
+import { Row, Col, Typography, Divider, Space, Spin } from "antd";
 import {
   TeamOutlined,
   AppstoreOutlined,
@@ -22,8 +22,7 @@ import {
   UnauthenticatedTemplate,
   useMsal,
 } from "@azure/msal-react";
-import Spin from "antd/lib/spin";
-import { FC, useContext } from "react";
+import { type FC, useContext } from "react";
 import { ActiveAccountCtx } from "../services/context/active-account-ctx";
 import { blue, green } from "@ant-design/colors";
 import { LanguageCtx } from "../services/context/language-ctx";
@@ -198,15 +197,13 @@ const Welcome: FC = () => {
             <Space direction="vertical">
               {localAccount ? (
                 <Link href={PageRoutes.allMembers}>
-                  <a>
-                    <div className="rounded-box rounded-box-gradient-1">
-                      <TeamOutlined className="icon-gradient" />
-                      <span className="count">{activeMembersCount}</span>
-                      <span className="title">
-                        {en ? "Active Members" : "Membres actifs"}
-                      </span>
-                    </div>
-                  </a>
+                  <div className="rounded-box rounded-box-gradient-1">
+                    <TeamOutlined className="icon-gradient" />
+                    <span className="count">{activeMembersCount}</span>
+                    <span className="title">
+                      {en ? "Active Members" : "Membres actifs"}
+                    </span>
+                  </div>
                 </Link>
               ) : (
                 <div className="rounded-box rounded-box-gradient-1">
@@ -219,15 +216,13 @@ const Welcome: FC = () => {
               )}
               {localAccount?.is_admin ? (
                 <Link href={PageRoutes.allGrants}>
-                  <a>
-                    <div className="rounded-box rounded-box-gradient-3">
-                      <FundOutlined className="icon-gradient" />
-                      <span className="count">{activeGrantsCount}</span>
-                      <span className="title">
-                        {en ? "Grants" : "Subventions"}
-                      </span>
-                    </div>
-                  </a>
+                  <div className="rounded-box rounded-box-gradient-3">
+                    <FundOutlined className="icon-gradient" />
+                    <span className="count">{activeGrantsCount}</span>
+                    <span className="title">
+                      {en ? "Grants" : "Subventions"}
+                    </span>
+                  </div>
                 </Link>
               ) : (
                 <div className="rounded-box rounded-box-gradient-3">
@@ -242,15 +237,13 @@ const Welcome: FC = () => {
             <Space direction="vertical">
               {localAccount ? (
                 <Link href={PageRoutes.allProducts}>
-                  <a>
-                    <div className="rounded-box rounded-box-gradient-2">
-                      <AppstoreOutlined className="icon-gradient" />
-                      <span className="count">{activeProductsCount}</span>
-                      <span className="title">
-                        {en ? "Products" : "Produits"}
-                      </span>
-                    </div>
-                  </a>
+                  <div className="rounded-box rounded-box-gradient-2">
+                    <AppstoreOutlined className="icon-gradient" />
+                    <span className="count">{activeProductsCount}</span>
+                    <span className="title">
+                      {en ? "Products" : "Produits"}
+                    </span>
+                  </div>
                 </Link>
               ) : (
                 <div className="rounded-box rounded-box-gradient-2">
@@ -262,15 +255,13 @@ const Welcome: FC = () => {
 
               {localAccount && localAccount.is_admin ? (
                 <Link href={PageRoutes.allEvents}>
-                  <a>
-                    <div className="rounded-box rounded-box-gradient-4">
-                      <CalendarOutlined className="icon-gradient" />
-                      <span className="count">{activeEventsCount}</span>
-                      <span className="title">
-                        {en ? "Events" : "Événements"}
-                      </span>
-                    </div>
-                  </a>
+                  <div className="rounded-box rounded-box-gradient-4">
+                    <CalendarOutlined className="icon-gradient" />
+                    <span className="count">{activeEventsCount}</span>
+                    <span className="title">
+                      {en ? "Events" : "Événements"}
+                    </span>
+                  </div>
                 </Link>
               ) : (
                 <div className="rounded-box rounded-box-gradient-4">
@@ -285,15 +276,13 @@ const Welcome: FC = () => {
             <Space direction="vertical">
               {localAccount ? (
                 <Link href={PageRoutes.allPartners}>
-                  <a>
-                    <div className="rounded-box rounded-box-gradient-6">
-                      <TeamOutlined className="icon-gradient" />
-                      <span className="count">{activePartnersCount}</span>
-                      <span className="title">
-                        {en ? "Partners" : "Partenaires"}
-                      </span>
-                    </div>
-                  </a>
+                  <div className="rounded-box rounded-box-gradient-6">
+                    <TeamOutlined className="icon-gradient" />
+                    <span className="count">{activePartnersCount}</span>
+                    <span className="title">
+                      {en ? "Partners" : "Partenaires"}
+                    </span>
+                  </div>
                 </Link>
               ) : (
                 <div className="rounded-box rounded-box-gradient-6">
@@ -307,15 +296,13 @@ const Welcome: FC = () => {
 
               {localAccount?.is_admin ? (
                 <Link href={PageRoutes.allSupervisions}>
-                  <a>
-                    <div className="rounded-box rounded-box-gradient-5">
-                      <SolutionOutlined className="icon-gradient" />
-                      <span className="count">{activeSupervisionsCount}</span>
-                      <span className="title">
-                        {en ? "Supervisions" : "Supervisions"}
-                      </span>
-                    </div>
-                  </a>
+                  <div className="rounded-box rounded-box-gradient-5">
+                    <SolutionOutlined className="icon-gradient" />
+                    <span className="count">{activeSupervisionsCount}</span>
+                    <span className="title">
+                      {en ? "Supervisions" : "Supervisions"}
+                    </span>
+                  </div>
                 </Link>
               ) : (
                 <div className="rounded-box rounded-box-gradient-5">

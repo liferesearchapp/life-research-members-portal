@@ -1,14 +1,10 @@
-import useForm from "antd/lib/form/hooks/useForm";
-import Button from "antd/lib/button";
-import Form from "antd/lib/form";
-import Input from "antd/lib/input";
-import Modal from "antd/lib/modal";
-import { Dispatch, FC, SetStateAction, useContext, useState } from "react";
+import { type Dispatch, type FC, type SetStateAction, useContext, useState } from "react";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import type { AccountInfo } from "../../services/_types";
 import updateAccountDeleteMember from "../../services/update-account-delete-member";
-import Alert from "antd/lib/alert";
-import Text from "antd/lib/typography/Text";
+import { Form, Button, Input, Modal, Alert, Typography } from "antd";
+const useForm = Form.useForm;
+const Text = Typography.Text;
 
 type Data = { confirmation: string };
 type Props = { account: AccountInfo; setAccount: Dispatch<SetStateAction<AccountInfo | null>> };
@@ -42,7 +38,7 @@ const DeleteMemberButton: FC<Props> = ({ account, setAccount }) => {
         cancelButtonProps={{ danger: true }}
         cancelText={en ? "Cancel" : "Annuler"}
         destroyOnClose
-        bodyStyle={{ paddingBottom: 0 }}
+        styles={{ body: { paddingBottom: 0 } }}
       >
         <Alert
           showIcon

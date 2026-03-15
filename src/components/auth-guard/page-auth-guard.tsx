@@ -1,4 +1,4 @@
-import { FC, PropsWithChildren, ReactElement, useContext } from "react";
+import { type FC, type PropsWithChildren, type ReactElement, useContext } from "react";
 import { ActiveAccountCtx } from "../../services/context/active-account-ctx";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import CenteredSpinner from "../loading/centered-spinner";
@@ -7,7 +7,7 @@ import Authorizations from "./authorizations";
 type Props = {
   auths: Authorizations[];
   id?: number;
-  loadingIcon?: ReactElement;
+  loadingIcon?: ReactElement<any>;
 };
 
 const PageAuthGuard: FC<PropsWithChildren<Props>> = ({ auths, id, loadingIcon, children }) => {

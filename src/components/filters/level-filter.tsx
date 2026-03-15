@@ -2,11 +2,12 @@
 // Utilizes antd's Select component and the levels data from the LevelsCtx context
 // Props include the id, value, onChange and getPopupContainer for the Select component
 
-import Select, { SelectProps } from "antd/lib/select";
-import { FC, useContext, useMemo } from "react";
+import { type FC, useContext, useMemo } from "react";
 import { LevelsCtx } from "../../services/context/levels-ctx";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import GetLanguage from "../../utils/front-end/get-language";
+import { Select } from "antd";
+import type { SelectProps } from "antd";
 
 type Props = {
   id?: string;
@@ -53,7 +54,6 @@ const LevelFilter: FC<Props> = ({
       options={options}
       allowClear
       showSearch={false}
-      showArrow
       onSelect={onSelect}
       onDeselect={onDelete}
       getPopupContainer={getPopupContainer}

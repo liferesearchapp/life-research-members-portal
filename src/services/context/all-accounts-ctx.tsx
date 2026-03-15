@@ -1,4 +1,4 @@
-import { createContext, FC, PropsWithChildren, useContext, useEffect, useState } from "react";
+import { createContext, type FC, type PropsWithChildren, useContext, useEffect, useState } from "react";
 import ApiRoutes from "../../routing/api-routes";
 import getAuthHeader from "../headers/auth-header";
 import Notification from "../notifications/notification";

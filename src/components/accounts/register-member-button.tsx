@@ -1,9 +1,9 @@
-import Button from "antd/lib/button";
-import { Dispatch, FC, SetStateAction, useContext } from "react";
+import { type Dispatch, type FC, type SetStateAction, useContext } from "react";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import type { AccountInfo } from "../../services/_types";
-import Popconfirm from "antd/lib/popconfirm";
+
 import updateAccountRegisterMember from "../../services/update-account-register-member";
+import { Button, Popconfirm } from "antd";
 
 type Props = { account: AccountInfo; setAccount: Dispatch<SetStateAction<AccountInfo | null>> };
 

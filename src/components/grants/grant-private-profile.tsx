@@ -3,16 +3,11 @@
 // The component has two modes, view mode and edit mode.
 // The component uses the save-changes context to prompt the user to save unsaved changes before navigating away.
 
-import Empty from "antd/lib/empty";
-import Button from "antd/lib/button";
-import Card from "antd/lib/card/Card";
-import Title from "antd/lib/typography/Title";
-import { FC, ReactNode, useCallback, useContext, useState } from "react";
+import { type FC, type ReactNode, useCallback, useContext, useState } from "react";
 import CardSkeleton from "../loading/card-skeleton";
 
 import usePrivateGrantInfo from "../../services/use-private-grant-info";
 import { LanguageCtx } from "../../services/context/language-ctx";
-import Tabs from "antd/lib/tabs";
 import type { GrantPrivateInfo } from "../../services/_types";
 import { SaveChangesCtx } from "../../services/context/save-changes-ctx";
 import PublicGrantDescription from "./grant-public-description";
@@ -22,6 +17,8 @@ import PublicGrantDescription from "./grant-public-description";
 import PublicGrantForm from "./grant-public-form";
 //import GrantAdminForm from "./grant-admin-form";
 import DeleteGrantButton from "./delete-grant-button";
+import { Empty, Button, Card, Typography, Tabs } from "antd";
+const Title = Typography.Title;
 
 type Tab = { label: string; key: string; children: ReactNode };
 
@@ -137,7 +134,7 @@ const PrivateGrantProfile: FC<Props> = ({ id }) => {
   ];
 
   return (
-    <Card title={header} bodyStyle={{ paddingTop: 0 }}>
+    <Card title={header} styles={{ body: { paddingTop: 0 } }}>
       <Tabs
         items={editMode ? forms : descriptions}
         // items={descriptions}

@@ -1,4 +1,4 @@
-import { account, Prisma } from "@prisma/client";
+import { type account, Prisma } from "@prisma/client";
 import type { NextApiRequest, NextApiResponse } from "next";
 import db from "../../../prisma/prisma-client";
 import getAccountFromRequest from "../../utils/api/get-account-from-request";

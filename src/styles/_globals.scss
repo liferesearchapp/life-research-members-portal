@@ -1,4 +1,4 @@
-@import "antd/dist/antd.css";
+// antd v5 uses CSS-in-JS; no global CSS import needed
 @import "./antd-colors.scss";
 @import "./navbar.scss";
 @import "./all-members.scss";

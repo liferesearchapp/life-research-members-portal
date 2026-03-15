@@ -1,19 +1,16 @@
-import Button from "antd/lib/button";
-import Form from "antd/lib/form";
-import { useForm } from "antd/lib/form/Form";
-import React, { FC, useCallback, useContext, useEffect, useState } from "react";
+import React, { type FC, useCallback, useContext, useEffect, useState } from "react";
 import type { MemberPrivateInfo } from "../../services/_types";
 import { LanguageCtx } from "../../services/context/language-ctx";
-import TextArea from "antd/lib/input/TextArea";
-import Divider from "antd/lib/divider";
-import Text from "antd/lib/typography/Text";
 import type { Moment } from "moment";
 import type { UpdateMemberInsightParams } from "../../pages/api/update-member/[id]/insight";
 import updateMemberInsight from "../../services/update-member-insight";
 import moment from "moment";
-import DatePicker from "antd/lib/date-picker";
 import Notification from "../../services/notifications/notification";
 import { SaveChangesCtx, useResetDirtyOnUnmount } from "../../services/context/save-changes-ctx";
+import { Button, Form, Input, Divider, Typography, DatePicker } from "antd";
+const { useForm } = Form;
+const TextArea = Input.TextArea;
+const Text = Typography.Text;
 
 type Props = {
   member: MemberPrivateInfo;

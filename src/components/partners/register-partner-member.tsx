@@ -3,17 +3,14 @@
 // The component uses the useForm hook from antd/lib/form/Form to handle form data and the onFinish event to trigger the registerPartner function from the "../../services/register-partner-member" service.
 // The component also uses context from the LanguageCtx, OrgTypesCtx, and OrgScopeCtx contexts to determine the language of the form and the available options for organization scope and type.
 
-import { Button } from "antd";
-import Select from "antd/lib/select";
-import Form from "antd/lib/form";
-import Input from "antd/lib/input";
-import React, { FC, useContext } from "react";
-import { useForm } from "antd/lib/form/Form";
+import { Button, Select, Form, Input } from "antd";
+import React, { type FC, useContext } from "react";
 import registerPartner from "../../services/register-partner-member";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import { OrgTypesCtx } from "../../services/context/org-types-ctx";
 import { OrgScopeCtx } from "../../services/context/org-scopes-ctx";
 import GetLanguage from "../../utils/front-end/get-language";
+const { useForm } = Form;
 
 const { Option } = Select;
 

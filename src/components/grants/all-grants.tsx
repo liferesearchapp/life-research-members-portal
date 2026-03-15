@@ -2,11 +2,8 @@
 // The component also has buttons to add a new grant when login in as an administrator and clear the filters.
 // The component also updates the URL query parameters based on the filter values and the query parameters are used to update the filters on component mount.
 
-import Button from "antd/lib/button";
-import Table, { ColumnType } from "antd/lib/table";
-import Title from "antd/lib/typography/Title";
 import {
-  FC,
+  type FC,
   Fragment,
   useCallback,
   useContext,
@@ -16,13 +13,10 @@ import {
 } from "react";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import PageRoutes from "../../routing/page-routes";
-import Descriptions from "antd/lib/descriptions";
-import Item from "antd/lib/descriptions/Item";
 import SafeLink from "../link/safe-link";
 import Router, { useRouter } from "next/router";
-import Form from "antd/lib/form";
 import blurActiveElement from "../../utils/front-end/blur-active-element";
-import { Checkbox } from "antd";
+import { Checkbox, Button, Table, Typography, Descriptions, Form } from "antd";
 import type { ParsedUrlQueryInput } from "querystring";
 import { ActiveAccountCtx } from "../../services/context/active-account-ctx";
 import GrantNameFilter from "../filters/grant-name-filter";
@@ -32,6 +26,9 @@ import { AllGrantsCtx } from "../../services/context/all-grants-ctx";
 import type { GrantPublicInfo } from "../../services/_types";
 import getMemberInvolved from "../getters/grant-member-involved-getter";
 import getInvestigatorMember from "../getters/grant-investigator-member-getter";
+import type { TableColumnType as ColumnType } from "antd";
+const Title = Typography.Title;
+const Item = Descriptions.Item;
 
 function nameSorter(a: { title: string }, b: { title: string }) {
   return a.title.localeCompare(b.title);

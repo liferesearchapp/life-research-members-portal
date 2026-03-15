@@ -1,8 +1,8 @@
-import Button from "antd/lib/button";
-import { FC, useContext } from "react";
+import { type FC, useContext } from "react";
 import updateAccountRegisterMember from "../../services/update-account-register-member";
 import { ActiveAccountCtx } from "../../services/context/active-account-ctx";
 import { LanguageCtx } from "../../services/context/language-ctx";
+import { Button } from "antd";
 
 const MyProfileRegister: FC = () => {
   const { en } = useContext(LanguageCtx);

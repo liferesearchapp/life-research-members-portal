@@ -1,9 +1,5 @@
-import Button from "antd/lib/button";
-import Form from "antd/lib/form";
-import { useForm } from "antd/lib/form/Form";
-import Input from "antd/lib/input";
 import React, {
-  FC,
+  type FC,
   Fragment,
   useCallback,
   useContext,
@@ -18,14 +14,10 @@ import type {
 import updateMemberPublic from "../../services/update-member-public";
 import type { keyword, problem } from "@prisma/client";
 import { LanguageCtx } from "../../services/context/language-ctx";
-import Select from "antd/lib/select";
-import TextArea from "antd/lib/input/TextArea";
 import { FacultiesCtx } from "../../services/context/faculties-ctx";
 import { MemberTypesCtx } from "../../services/context/member-types-ctx";
 import GetLanguage from "../../utils/front-end/get-language";
-import Divider from "antd/lib/divider";
 import type { UpdateMemberPublicParams } from "../../pages/api/update-member/[id]/public";
-import Text from "antd/lib/typography/Text";
 import type { organization, supervision } from "@prisma/client";
 
 import KeywordSelector from "../keywords/keyword-selector";
@@ -35,6 +27,10 @@ import {
   useResetDirtyOnUnmount,
 } from "../../services/context/save-changes-ctx";
 import PartnerSelector from "../partners/partner-selector";
+import { Button, Form, Input, Select, Divider, Typography } from "antd";
+const { useForm } = Form;
+const TextArea = Input.TextArea;
+const Text = Typography.Text;
 
 const { Option } = Select;
 

@@ -1,12 +1,12 @@
-import Button from "antd/lib/button";
-import Table, { ColumnType } from "antd/lib/table";
-import Title from "antd/lib/typography/Title";
-import { FC, useContext, useEffect } from "react";
+import { type FC, useContext, useEffect } from "react";
 import type { AccountRes } from "../../pages/api/account/[id]";
 import PageRoutes from "../../routing/page-routes";
 import { useRouter } from "next/router";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import { AllAccountsCtx } from "../../services/context/all-accounts-ctx";
+import { Button, Table, Typography } from "antd";
+import type { TableColumnType as ColumnType } from "antd";
+const Title = Typography.Title;
 
 const AllAccounts: FC = () => {
   const router = useRouter();

@@ -1,14 +1,10 @@
-import MenuOutlined from "@ant-design/icons/lib/icons/MenuOutlined";
-import Menu from "antd/lib/menu";
-import type { MenuItemType } from "antd/lib/menu/hooks/useItems";
-import Spin from "antd/lib/spin";
 import { useRouter } from "next/router";
 import {
-  FC,
-  JSXElementConstructor,
-  ReactElement,
-  ReactFragment,
-  ReactPortal,
+  type FC,
+  type JSXElementConstructor,
+  type ReactElement,
+  type ReactNode,
+  type ReactPortal,
   useContext,
 } from "react";
 import { ActiveAccountCtx } from "../../services/context/active-account-ctx";
@@ -16,6 +12,11 @@ import { LanguageCtx } from "../../services/context/language-ctx";
 import PageRoutes from "../../routing/page-routes";
 import SafeLink from "../link/safe-link";
 import type { UrlObject } from "url";
+import { Menu, Spin } from "antd";
+import type { MenuProps } from "antd";
+import { MenuOutlined } from "@ant-design/icons";
+
+type MenuItemType = NonNullable<MenuProps["items"]>[number];
 
 const NavMenu: FC = () => {
   const { localAccount, loading } = useContext(ActiveAccountCtx);
@@ -100,7 +101,7 @@ const NavMenu: FC = () => {
               | number
               | boolean
               | ReactElement<any, string | JSXElementConstructor<any>>
-              | ReactFragment
+              | Iterable<ReactNode>
               | ReactPortal
               | null
               | undefined;
@@ -128,7 +129,6 @@ const NavMenu: FC = () => {
         overflowedIndicator={<MenuOutlined className="collapsed-icon" />}
         style={{ fontSize: "inherit" }}
         selectedKeys={activeItem ? [activeItem.label] : []}
-        activeKey={activeItem?.label}
         getPopupContainer={() =>
           document.querySelector(".navbar") || document.body
         }

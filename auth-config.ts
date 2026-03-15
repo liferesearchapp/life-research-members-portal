@@ -1,8 +1,10 @@
 import {
   PublicClientApplication,
-  RedirectRequest,
-  Configuration,
+  type RedirectRequest,
+  type Configuration,
   BrowserCacheLocation,
+  EventType,
+  type AuthenticationResult,
 } from "@azure/msal-browser";
 
 // See https://learn.microsoft.com/en-us/azure/active-directory/develop/tutorial-v2-react
@@ -14,12 +16,20 @@ const msalConfig: Configuration = {
     redirectUri: typeof window === "undefined" ? undefined : window.location.origin, // undefined if in Node.js server
   },
   cache: {
-    cacheLocation: BrowserCacheLocation.LocalStorage, // This configures where your cache will be stored
-    storeAuthStateInCookie: false, // Set this to "true" if you are having issues on IE11 or Edge
+    cacheLocation: BrowserCacheLocation.LocalStorage,
   },
 };
 
 export const msalInstance = new PublicClientApplication(msalConfig);
+
+// MsalProvider (v3+) calls initialize() and handleRedirectPromise() internally.
+// This callback runs after a successful login redirect to ensure the active account is set.
+msalInstance.addEventCallback((event) => {
+  if (event.eventType === EventType.LOGIN_SUCCESS && event.payload) {
+    const payload = event.payload as AuthenticationResult;
+    msalInstance.setActiveAccount(payload.account);
+  }
+});
 
 export const scopes = ["User.Read", "openid", "email"];
 

@@ -1,8 +1,8 @@
 import type { grant } from "@prisma/client";
 import {
   createContext,
-  FC,
-  PropsWithChildren,
+  type FC,
+  type PropsWithChildren,
   useContext,
   useEffect,
   useState,

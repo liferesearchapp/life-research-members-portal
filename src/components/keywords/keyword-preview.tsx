@@ -1,8 +1,9 @@
-import { FC, useContext } from "react";
+import { type FC, useContext } from "react";
 import KeywordTag from "./keyword-tag";
-import Text from "antd/lib/typography/Text";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import type { keyword } from "@prisma/client";
+import { Typography } from "antd";
+const Text = Typography.Text;
 
 type Props = { keyword: keyword; label: { en: string; fr: string } };
 const KeywordPreview: FC<Props> = ({ keyword, label }) => {

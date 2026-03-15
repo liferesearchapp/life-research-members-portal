@@ -4,27 +4,23 @@ The component displays a confirmation modal when the delete button is clicked, a
 The deletion is performed using the deletePartner service, and the user is redirected to the all partners page upon successful deletion.
 */
 
-import Button from "antd/lib/button";
-import Form from "antd/lib/form";
-import useForm from "antd/lib/form/hooks/useForm";
-import Input from "antd/lib/input";
-import Modal from "antd/lib/modal";
 import {
-  CSSProperties,
-  Dispatch,
-  FC,
-  SetStateAction,
+  type CSSProperties,
+  type Dispatch,
+  type FC,
+  type SetStateAction,
   useContext,
   useState,
 } from "react";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import type { PartnerPrivateInfo } from "../../services/_types";
-import Alert from "antd/lib/alert";
-import Text from "antd/lib/typography/Text";
 import deletePartner from "../../services/delete-partner"; // Update the import statement
 import { useRouter } from "next/router";
 import PageRoutes from "../../routing/page-routes";
 import Notification from "../../services/notifications/notification";
+import { Button, Form, Input, Modal, Alert, Typography } from "antd";
+const useForm = Form.useForm;
+const Text = Typography.Text;
 
 type Data = { confirmation: string };
 type Props = {
@@ -79,7 +75,7 @@ const DeletePartnerButton: FC<Props> = ({ partner, setPartner, style }) => {
         cancelButtonProps={{ danger: true }}
         cancelText={en ? "Cancel" : "Annuler"}
         destroyOnClose
-        bodyStyle={{ paddingBottom: 0 }}
+        styles={{ body: { paddingBottom: 0 } }}
       >
         <Alert
           showIcon

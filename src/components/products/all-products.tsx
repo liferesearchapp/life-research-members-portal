@@ -2,11 +2,8 @@
 // The component also has buttons ta add a new product and clear the filters.
 // The component also updates the URL query parameters based on the filter values and the query parameters are used to update the filters on component mount.
 
-import Button from "antd/lib/button";
-import Table, { ColumnType } from "antd/lib/table";
-import Title from "antd/lib/typography/Title";
 import {
-  FC,
+  type FC,
   Fragment,
   useCallback,
   useContext,
@@ -18,13 +15,10 @@ import { LanguageCtx } from "../../services/context/language-ctx";
 import type { ProductPublicInfo } from "../../services/_types";
 import type { MemberPublicInfo } from "../../services/_types";
 import PageRoutes from "../../routing/page-routes";
-import Descriptions from "antd/lib/descriptions";
-import Item from "antd/lib/descriptions/Item";
 import SafeLink from "../link/safe-link";
 import Router, { useRouter } from "next/router";
-import Form from "antd/lib/form";
 import blurActiveElement from "../../utils/front-end/blur-active-element";
-import { Checkbox, Tag } from "antd";
+import { Checkbox, Tag, Button, Table, Typography, Descriptions, Form } from "antd";
 import ProductTitleFilter from "../filters/product-title-filter";
 import ProductTypeFilter from "../filters/product-type-filter";
 import type { ParsedUrlQueryInput } from "querystring";
@@ -34,6 +28,9 @@ import type { PublicMemberRes } from "../../pages/api/member/[id]/public";
 import colorFromString from "../../utils/front-end/color-from-string";
 import ProductAllAuthorFilter from "../filters/product-all-author-filter";
 import getMemberAuthor from "../getters/product-member-author-getter";
+import type { TableColumnType as ColumnType } from "antd";
+const Title = Typography.Title;
+const Item = Descriptions.Item;
 
 function getTitle(product: ProductPublicInfo, en: boolean) {
   return en ? product.title_en : product.title_fr;

@@ -8,7 +8,7 @@
 import React, { useContext } from "react";
 import PageRoutes from "../../routing/page-routes";
 import SafeLink from "../link/safe-link";
-import List from "antd/lib/list";
+import { List } from "antd";
 import colorFromString from "../../utils/front-end/color-from-string";
 import { LanguageCtx } from "../../services/context/language-ctx";
 

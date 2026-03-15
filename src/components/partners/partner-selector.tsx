@@ -5,16 +5,14 @@ The selected partners/organizations are displayed as tags, and the user can dele
 The component also provides an onChange callback that returns the selected partners/organizations as a Map.
 */
 
-import PlusOutlined from "@ant-design/icons/lib/icons/PlusOutlined";
 import type { organization } from "@prisma/client";
-import AutoComplete from "antd/lib/auto-complete";
-import Button from "antd/lib/button/button";
-import Card from "antd/lib/card";
-import { FC, useContext, useEffect, useState } from "react";
+import { type FC, useContext, useEffect, useState } from "react";
 import { AllOrganizationsCtx } from "../../services/context/all-organizations-ctx";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import type { OrganizationInfo } from "../../services/_types";
 import OrganizationTag from "./partner-tag";
+import { AutoComplete, Button, Card } from "antd";
+import { PlusOutlined } from "@ant-design/icons";
 
 type Props = {
   id?: string; // For connecting a label - antd form will pass this in

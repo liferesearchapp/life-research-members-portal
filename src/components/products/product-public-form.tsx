@@ -2,12 +2,8 @@
 //The component has various functions to compare the initial data of the product with the data entered in the form (`diffMembers`, `diffTargets`, and `diffPartners`).
 //The component also has a `validateAndSubmit` function that can be called from the SaveChangesCtx context to validate and submit the form.
 
-import Button from "antd/lib/button";
-import Form from "antd/lib/form";
-import { useForm } from "antd/lib/form/Form";
-import Input from "antd/lib/input";
 import React, {
-  FC,
+  type FC,
   Fragment,
   useCallback,
   useContext,
@@ -20,26 +16,25 @@ import type {
 } from "../../services/_types";
 import updateProductPublic from "../../services/update-product-public";
 import { LanguageCtx } from "../../services/context/language-ctx";
-import Select from "antd/lib/select";
-import TextArea from "antd/lib/input/TextArea";
 import GetLanguage from "../../utils/front-end/get-language";
-import Divider from "antd/lib/divider";
 import type { UpdateProductPublicParams } from "../../pages/api/update-product/[id]/public";
-import Text from "antd/lib/typography/Text";
 import Notification from "../../services/notifications/notification";
 import {
   SaveChangesCtx,
   useResetDirtyOnUnmount,
 } from "../../services/context/save-changes-ctx";
 import { ProductTypesCtx } from "../../services/context/products-types-ctx";
-import moment, { Moment } from "moment";
+import moment, { type Moment } from "moment";
 import type { MemberPublicInfo } from "../../services/_types";
-import DatePicker from "antd/lib/date-picker";
 import type { target } from "@prisma/client";
 import type { organization } from "@prisma/client";
 import TargetSelector from "../targets/target-selector";
 import PartnerSelector from "../partners/partner-selector";
 import MemberSelector from "../members/member-selector";
+import { Button, Form, Input, Select, Divider, Typography, DatePicker } from "antd";
+const { useForm } = Form;
+const TextArea = Input.TextArea;
+const Text = Typography.Text;
 
 const { Option } = Select;
 

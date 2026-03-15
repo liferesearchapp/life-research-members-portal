@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { FC, MouseEvent, PropsWithChildren, useContext } from "react";
+import { type FC, type MouseEvent, type PropsWithChildren, useContext } from "react";
 import { SaveChangesCtx } from "../../services/context/save-changes-ctx";
 import type { LinkProps } from "next/dist/client/link";
 

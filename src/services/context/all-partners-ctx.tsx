@@ -1,9 +1,9 @@
 import {
   createContext,
-  FC,
+  type FC,
   useEffect,
   useState,
-  PropsWithChildren,
+  type PropsWithChildren,
 } from "react";
 import ApiRoutes from "../../routing/api-routes";
 import Notification from "../notifications/notification";

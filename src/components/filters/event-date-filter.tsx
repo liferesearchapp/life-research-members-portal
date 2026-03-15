@@ -5,13 +5,13 @@
 // The component stores the selected date range in its state (dateRange)
 // The component can receive additional props, such as an ID and a getPopupContainer function, to customize the DatePicker component
 
-import { FC, useContext, useState } from "react";
+import { type FC, useContext, useState } from "react";
 import { AllEventsCtx } from "../../services/context/all-events-ctx";
 import type { EventPublicInfo } from "../../services/_types";
-import moment, { Moment } from "moment";
+import moment, { type Moment } from "moment";
 import { DatePicker } from "antd";
-import type { RangePickerProps } from "antd/lib/date-picker";
-import type { RangeValue } from "rc-picker/lib/interface";
+
+type RangeValue<T> = [T | null, T | null] | null;
 
 type Props = {
   id?: string;
@@ -19,7 +19,7 @@ type Props = {
     value: RangeValue<Moment>,
     filteredEvents: EventPublicInfo[]
   ) => void;
-  getPopupContainer?: RangePickerProps["getPopupContainer"];
+  getPopupContainer?: (triggerNode: HTMLElement) => HTMLElement;
 };
 
 const EventDateFilter: FC<Props> = ({
@@ -59,8 +59,8 @@ const EventDateFilter: FC<Props> = ({
     <DatePicker.RangePicker
       id={id}
       className="event-date-filter"
-      value={dateRange}
-      onChange={onDateChange}
+      value={dateRange as any}
+      onChange={onDateChange as any}
       getPopupContainer={getPopupContainer}
     />
   );

@@ -1,12 +1,12 @@
 import { AuthenticatedTemplate, UnauthenticatedTemplate } from "@azure/msal-react";
-import { FC, useContext } from "react";
+import { type FC, useContext } from "react";
 import LoginButton from "./login-button";
 import NavMenu from "./nav-menu";
 import AvatarMenu from "./avatar-menu";
 import HomeLogo from "./home-logo";
 import LanguageButton from "./language-button";
 import { ActiveAccountCtx } from "../../services/context/active-account-ctx";
-import Spin from "antd/lib/spin";
+import { Spin } from "antd";
 
 const Navbar: FC = () => {
   const { loading } = useContext(ActiveAccountCtx);

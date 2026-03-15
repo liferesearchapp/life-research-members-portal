@@ -1,7 +1,4 @@
-import Grid from "antd/lib/grid";
-import Descriptions from "antd/lib/descriptions";
-import Item from "antd/lib/descriptions/Item";
-import { FC, useContext } from "react";
+import { type FC, useContext } from "react";
 import type { MemberPublicInfo } from "../../services/_types";
 import GetLanguage from "../../utils/front-end/get-language";
 import KeywordTag from "../keywords/keyword-tag";
@@ -12,7 +9,6 @@ import {
   LinkedinOutlined,
   TwitterOutlined,
 } from "@ant-design/icons";
-import Tag from "antd/lib/tag";
 import SafeLink from "../link/safe-link";
 import TikTokIcon from "../icons/tiktok-icon";
 import CvIcon from "../icons/cv-icon";
@@ -24,6 +20,8 @@ import getMemberOrg from "../getters/member-partner-getter";
 import getMemberSupervision from "../getters/member-supervision-getter";
 import { ActiveAccountCtx } from "../../services/context/active-account-ctx";
 import getMemberGrant from "../getters/member-grant-getter";
+import { Grid, Descriptions, Tag } from "antd";
+const Item = Descriptions.Item;
 
 const { useBreakpoint } = Grid;
 

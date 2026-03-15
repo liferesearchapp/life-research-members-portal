@@ -1,18 +1,13 @@
 // this is a  component that displays a private product profile.
 // The component also uses several other components such as ProductPrivateDescription, ProductPrivateForm, ProductAdminForm and DeleteProductButton.
 
-import Empty from "antd/lib/empty";
-import Button from "antd/lib/button";
-import Card from "antd/lib/card/Card";
-import Title from "antd/lib/typography/Title";
-import { FC, ReactNode, useCallback, useContext, useState } from "react";
+import { type FC, type ReactNode, useCallback, useContext, useState } from "react";
 import CardSkeleton from "../loading/card-skeleton";
 import PublicProductDescription from "./product-public-description";
 import PublicProductForm from "./product-public-form";
 import ProductAdminForm from "./product-admin-form";
 import usePrivateProductInfo from "../../services/use-private-product-info";
 import { LanguageCtx } from "../../services/context/language-ctx";
-import Tabs from "antd/lib/tabs";
 import type { ProductPrivateInfo } from "../../services/_types";
 import { SaveChangesCtx } from "../../services/context/save-changes-ctx";
 import ProductAdminDescription from "./product-admin-description";
@@ -20,6 +15,8 @@ import PrivateProductDescription from "./product-private-description";
 import PrivateProductForm from "./product-private-form";
 import DeleteProductButton from "./delete-product-button";
 import { ActiveAccountCtx } from "../../services/context/active-account-ctx";
+import { Empty, Button, Card, Typography, Tabs } from "antd";
+const Title = Typography.Title;
 
 type Tab = { label: string; key: string; children: ReactNode };
 
@@ -142,7 +139,7 @@ const PrivateProductProfile: FC<Props> = ({ id }) => {
   ];
 
   return (
-    <Card title={header} bodyStyle={{ paddingTop: 0 }}>
+    <Card title={header} styles={{ body: { paddingTop: 0 } }}>
       <Tabs
         items={editMode ? forms : descriptions}
         // items={descriptions}

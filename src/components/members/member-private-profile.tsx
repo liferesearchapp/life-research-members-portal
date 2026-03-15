@@ -1,14 +1,9 @@
-import Empty from "antd/lib/empty";
-import Button from "antd/lib/button";
-import Card from "antd/lib/card/Card";
-import Title from "antd/lib/typography/Title";
-import { FC, ReactNode, useCallback, useContext, useState } from "react";
+import { type FC, type ReactNode, useCallback, useContext, useState } from "react";
 import CardSkeleton from "../loading/card-skeleton";
 import PublicMemberDescription from "./member-public-description";
 import PublicMemberForm from "./member-public-form";
 import usePrivateMemberInfo from "../../services/use-private-member-info";
 import { LanguageCtx } from "../../services/context/language-ctx";
-import Tabs from "antd/lib/tabs";
 import type { MemberPrivateInfo } from "../../services/_types";
 import PrivateMemberDescription from "./member-private-description";
 import MemberInsightDescription from "./member-insight-description";
@@ -17,6 +12,8 @@ import MemberInsightForm from "./member-insight-form";
 import { SaveChangesCtx } from "../../services/context/save-changes-ctx";
 import router from "next/router";
 import { ActiveAccountCtx } from "../../services/context/active-account-ctx";
+import { Empty, Button, Card, Typography, Tabs } from "antd";
+const Title = Typography.Title;
 
 type Tab = { label: string; key: string; children: ReactNode };
 
@@ -157,7 +154,7 @@ const PrivateMemberProfile: FC<Props> = ({ id }) => {
   ];
 
   return (
-    <Card title={header} bodyStyle={{ paddingTop: 0 }}>
+    <Card title={header} styles={{ body: { paddingTop: 0 } }}>
       <Tabs
         items={editMode ? forms : descriptions}
         activeKey={activeTabKey}

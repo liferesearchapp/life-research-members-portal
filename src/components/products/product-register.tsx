@@ -3,18 +3,15 @@
 // The form uses the Antd UI library components to provide a user-friendly interface for input.
 // Upon submission, the handleRegister function is called to send the product data to the server for storage.
 
-import { Button, Col, DatePicker, Row, Switch } from "antd";
-import Select from "antd/lib/select";
-import Form from "antd/lib/form";
-import Input from "antd/lib/input";
-import React, { FC, useContext, useState } from "react";
-import { useForm } from "antd/lib/form/Form";
+import { Button, Col, DatePicker, Row, Switch, Select, Form, Input } from "antd";
+import React, { type FC, useContext, useState } from "react";
 import moment from "moment";
 import type { Moment } from "moment";
 import registerProduct from "../../services/register-product";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import { ProductTypesCtx } from "../../services/context/products-types-ctx";
 import GetLanguage from "../../utils/front-end/get-language";
+const { useForm } = Form;
 
 const { Option } = Select;
 
