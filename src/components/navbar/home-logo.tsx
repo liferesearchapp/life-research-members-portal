@@ -6,10 +6,8 @@ import logo from "../../../public/favicon.png";
 
 const HomeLogo: FC = () => {
   return (
-    <Link href={PageRoutes.home}>
-      <a className="logo" style={{ lineHeight: 0 }}>
-        <Image src={logo} alt="logo" width={50} height={50} />
-      </a>
+    <Link href={PageRoutes.home} className="logo" style={{ lineHeight: 0 }}>
+      <Image src={logo} alt="logo" width={50} height={50} />
     </Link>
   );
 };

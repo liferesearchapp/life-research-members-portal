@@ -5,30 +5,15 @@ import {
   FC,
   PropsWithChildren,
   SetStateAction,
-  useCallback,
   useEffect,
   useState,
 } from "react";
-import { loginRequest, msalInstance } from "../../../auth-config";
+import { InteractionStatus } from "@azure/msal-browser";
+import { ensureMsalInitialized, loginRequest } from "../../../auth-config";
 import ApiRoutes from "../../routing/api-routes";
 import getAuthHeader from "../headers/auth-header";
-import type { AuthenticationResult } from "@azure/msal-common/dist/response/AuthenticationResult";
 import type { AccountInfo } from "../_types";
 import Notification from "../notifications/notification";
-
-// See https://learn.microsoft.com/en-us/azure/active-directory/develop/scenario-spa-acquire-token?tabs=javascript2
-function handleResponse(response: AuthenticationResult | null) {
-  if (!response) return;
-  msalInstance.setActiveAccount(response.account);
-}
-
-/** Await this promise to make sure active account is loaded on redirecting from login screen*/
-async function onRedirect() {
-  return msalInstance
-    .handleRedirectPromise()
-    .then(handleResponse)
-    .catch((e: any) => console.error("Error after redirect:", e));
-}
 
 export const ActiveAccountCtx = createContext<{
   localAccount: AccountInfo | null;
@@ -43,11 +28,28 @@ export const ActiveAccountCtx = createContext<{
 export const ActiveAccountCtxProvider: FC<PropsWithChildren> = ({
   children,
 }) => {
-  const { instance } = useMsal();
+  const { instance, inProgress, accounts } = useMsal();
 
   const [localAccount, setLocalAccount] = useState<AccountInfo | null>(null);
   const [loading, setLoading] = useState(true); // Start true so loading icons are served first
   const [refreshing, setRefreshing] = useState(false);
+
+  async function withTimeout<T>(promise: Promise<T>, ms = 10000): Promise<T> {
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
+
+    try {
+      return await Promise.race([
+        promise,
+        new Promise<T>((_, reject) => {
+          timeoutId = setTimeout(() => {
+            reject(new Error("Timed out while loading your account."));
+          }, ms);
+        }),
+      ]);
+    } finally {
+      if (timeoutId) clearTimeout(timeoutId);
+    }
+  }
 
   /** Gets the current user's account from the database */
   async function fetchLocalAccount() {
@@ -81,17 +83,28 @@ export const ActiveAccountCtxProvider: FC<PropsWithChildren> = ({
   }
 
   useEffect(() => {
+    if (inProgress !== InteractionStatus.None) return;
+
+    if (accounts.length > 0 && !instance.getActiveAccount()) {
+      instance.setActiveAccount(accounts[0]);
+    }
+
     async function firstLoad() {
-      await onRedirect();
       if (!instance.getActiveAccount()) return setLoading(false);
       const notification = new Notification("bottom-right");
       notification.loading("Loading your account...");
-      await fetchAccountUpdateLastLogin();
-      setLoading(false);
-      notification.close();
+      try {
+        await withTimeout(fetchAccountUpdateLastLogin());
+      } catch (e: any) {
+        new Notification().error(e);
+      } finally {
+        setLoading(false);
+        notification.close();
+      }
     }
+
     firstLoad();
-  }, [instance]);
+  }, [instance, inProgress, accounts]);
 
   async function refresh() {
     if (loading || refreshing) return;
@@ -103,14 +116,16 @@ export const ActiveAccountCtxProvider: FC<PropsWithChildren> = ({
     notification.close();
   }
 
-  function login() {
+  async function login() {
+    await ensureMsalInitialized();
     instance.loginRedirect(loginRequest).catch((e: any) => {
       new Notification().error(e);
     });
   }
 
-  function logout() {
+  async function logout() {
     setLocalAccount(null);
+    await ensureMsalInitialized();
     instance.logoutRedirect().catch((e: any) => {
       new Notification().error(e);
     });

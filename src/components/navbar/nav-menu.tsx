@@ -27,7 +27,7 @@ const NavMenu: FC<{ urlIdentifier: string | undefined }> = ({
   const isAdmin = useAdminDetails();
   const isMember = useMemberDetails();
   const { institute } = useSelectedInstitute();
-  if (!urlIdentifier) return <Spin />;
+  if (!urlIdentifier) return null;
 
   // Everyone
   const generalItems = [

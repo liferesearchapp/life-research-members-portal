@@ -211,16 +211,17 @@ const Welcome: FC = () => {
           <Col xs={24} md={6}>
             <Space direction="vertical">
               {localAccount && institute?.urlIdentifier ? (
-                <Link href={PageRoutes.allMembers(institute?.urlIdentifier)}>
-                  <a>
-                    <div className="rounded-box rounded-box-gradient-1">
-                      <TeamOutlined className="icon-gradient" />
-                      <span className="count">{activeMembersCount}</span>
-                      <span className="title">
-                        {en ? "Active Members" : "Membres actifs"}
-                      </span>
-                    </div>
-                  </a>
+                <Link
+                  href={PageRoutes.allMembers(institute?.urlIdentifier)}
+                  className="rounded-box-link"
+                >
+                  <div className="rounded-box rounded-box-gradient-1">
+                    <TeamOutlined className="icon-gradient" />
+                    <span className="count">{activeMembersCount}</span>
+                    <span className="title">
+                      {en ? "Active Members" : "Membres actifs"}
+                    </span>
+                  </div>
                 </Link>
               ) : (
                 <div className="rounded-box rounded-box-gradient-1">
@@ -232,16 +233,17 @@ const Welcome: FC = () => {
                 </div>
               )}
               {isAdmin && institute?.urlIdentifier ? (
-                <Link href={PageRoutes.allGrants(institute?.urlIdentifier)}>
-                  <a>
-                    <div className="rounded-box rounded-box-gradient-3">
-                      <FundOutlined className="icon-gradient" />
-                      <span className="count">{activeGrantsCount}</span>
-                      <span className="title">
-                        {en ? "Grants" : "Subventions"}
-                      </span>
-                    </div>
-                  </a>
+                <Link
+                  href={PageRoutes.allGrants(institute?.urlIdentifier)}
+                  className="rounded-box-link"
+                >
+                  <div className="rounded-box rounded-box-gradient-3">
+                    <FundOutlined className="icon-gradient" />
+                    <span className="count">{activeGrantsCount}</span>
+                    <span className="title">
+                      {en ? "Grants" : "Subventions"}
+                    </span>
+                  </div>
                 </Link>
               ) : (
                 <div className="rounded-box rounded-box-gradient-3">
@@ -255,16 +257,17 @@ const Welcome: FC = () => {
           <Col xs={24} md={6}>
             <Space direction="vertical">
               {localAccount && institute?.urlIdentifier ? (
-                <Link href={PageRoutes.allProducts(institute?.urlIdentifier)}>
-                  <a>
-                    <div className="rounded-box rounded-box-gradient-2">
-                      <AppstoreOutlined className="icon-gradient" />
-                      <span className="count">{activeProductsCount}</span>
-                      <span className="title">
-                        {en ? "Products" : "Produits"}
-                      </span>
-                    </div>
-                  </a>
+                <Link
+                  href={PageRoutes.allProducts(institute?.urlIdentifier)}
+                  className="rounded-box-link"
+                >
+                  <div className="rounded-box rounded-box-gradient-2">
+                    <AppstoreOutlined className="icon-gradient" />
+                    <span className="count">{activeProductsCount}</span>
+                    <span className="title">
+                      {en ? "Products" : "Produits"}
+                    </span>
+                  </div>
                 </Link>
               ) : (
                 <div className="rounded-box rounded-box-gradient-2">
@@ -275,16 +278,17 @@ const Welcome: FC = () => {
               )}
 
               {localAccount && isAdmin && institute?.urlIdentifier ? (
-                <Link href={PageRoutes.allEvents(institute?.urlIdentifier)}>
-                  <a>
-                    <div className="rounded-box rounded-box-gradient-4">
-                      <CalendarOutlined className="icon-gradient" />
-                      <span className="count">{activeEventsCount}</span>
-                      <span className="title">
-                        {en ? "Events" : "Événements"}
-                      </span>
-                    </div>
-                  </a>
+                <Link
+                  href={PageRoutes.allEvents(institute?.urlIdentifier)}
+                  className="rounded-box-link"
+                >
+                  <div className="rounded-box rounded-box-gradient-4">
+                    <CalendarOutlined className="icon-gradient" />
+                    <span className="count">{activeEventsCount}</span>
+                    <span className="title">
+                      {en ? "Events" : "Événements"}
+                    </span>
+                  </div>
                 </Link>
               ) : (
                 <div className="rounded-box rounded-box-gradient-4">
@@ -298,16 +302,17 @@ const Welcome: FC = () => {
           <Col xs={24} md={6}>
             <Space direction="vertical">
               {localAccount && institute?.urlIdentifier ? (
-                <Link href={PageRoutes.allPartners(institute?.urlIdentifier)}>
-                  <a>
-                    <div className="rounded-box rounded-box-gradient-6">
-                      <TeamOutlined className="icon-gradient" />
-                      <span className="count">{activePartnersCount}</span>
-                      <span className="title">
-                        {en ? "Partners" : "Partenaires"}
-                      </span>
-                    </div>
-                  </a>
+                <Link
+                  href={PageRoutes.allPartners(institute?.urlIdentifier)}
+                  className="rounded-box-link"
+                >
+                  <div className="rounded-box rounded-box-gradient-6">
+                    <TeamOutlined className="icon-gradient" />
+                    <span className="count">{activePartnersCount}</span>
+                    <span className="title">
+                      {en ? "Partners" : "Partenaires"}
+                    </span>
+                  </div>
                 </Link>
               ) : (
                 <div className="rounded-box rounded-box-gradient-6">
@@ -322,16 +327,15 @@ const Welcome: FC = () => {
               {isAdmin && institute?.urlIdentifier ? (
                 <Link
                   href={PageRoutes.allSupervisions(institute?.urlIdentifier)}
+                  className="rounded-box-link"
                 >
-                  <a>
-                    <div className="rounded-box rounded-box-gradient-5">
-                      <SolutionOutlined className="icon-gradient" />
-                      <span className="count">{activeSupervisionsCount}</span>
-                      <span className="title">
-                        {en ? "Supervisions" : "Supervisions"}
-                      </span>
-                    </div>
-                  </a>
+                  <div className="rounded-box rounded-box-gradient-5">
+                    <SolutionOutlined className="icon-gradient" />
+                    <span className="count">{activeSupervisionsCount}</span>
+                    <span className="title">
+                      {en ? "Supervisions" : "Supervisions"}
+                    </span>
+                  </div>
                 </Link>
               ) : (
                 <div className="rounded-box rounded-box-gradient-5">
