@@ -71,7 +71,6 @@ export default async function handler(
 
     return res.status(200).send(partner);
   } catch (e: any) {
-    console.log(e);
     return res.status(500).send({ ...e, message: e.message }); // prisma error messages are getters
   }
 }

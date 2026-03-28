@@ -147,8 +147,7 @@ function handleShowTypeChange(value: boolean) {
 
 function clearQueries(institute: { urlIdentifier: string | null }) {
   if (institute?.urlIdentifier) {
-    const url = PageRoutes.allMembers(institute.urlIdentifier);
-    console.log("Redirecting to:", url); 
+    const url = PageRoutes.allPartners(institute.urlIdentifier);
     Router.push(url); 
   } else {
     console.error("Unable to reset filters: Institute ID is missing.");

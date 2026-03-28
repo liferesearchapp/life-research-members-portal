@@ -34,7 +34,6 @@ function registerAccount(params: RegisterAccountParams) {
       },
       include: { member: true },
     });
-    console.log(newAccount);
 
     if (params.institute_id.length && newAccount.member != null) {
       await Promise.all(
@@ -76,7 +75,6 @@ export default async function handler(
   res: NextApiResponse<RegisterAccountRes | string>
 ) {
   const params: RegisterAccountParams = req.body;
-  console.log(params);
   const { login_email, first_name, last_name, is_admin } = params;
   if (typeof login_email !== "string")
     return res.status(400).send("Email is required.");

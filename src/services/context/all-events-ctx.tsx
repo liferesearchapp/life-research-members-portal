@@ -27,7 +27,6 @@ export const AllEventsCtxProvider: FC<PropsWithChildren> = ({ children }) => {
 
   const fetchAllEvents = useCallback(async () => {
     if (!institute) {
-      console.log("Institute not found.");
       setLoading(false);
       return;
     }

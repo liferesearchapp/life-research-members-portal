@@ -16,6 +16,7 @@ import { LanguageCtx } from "../../services/context/language-ctx";
 import PageRoutes from "../../routing/page-routes";
 import Descriptions from "antd/lib/descriptions";
 import Item from "antd/lib/descriptions/Item";
+import type { RangePickerProps } from "antd/lib/date-picker";
 import SafeLink from "../link/safe-link";
 import Router, { useRouter } from "next/router";
 import Form from "antd/lib/form";
@@ -28,7 +29,6 @@ import EventNameFilter from "../filters/event-name-filter";
 import EventTypeFilter from "../filters/event-type-filter";
 import EventDateFilter from "../filters/event-date-filter";
 import type { EventPublicInfo } from "../../services/_types";
-import type { RangeValueType } from "rc-picker/lib/PickerInput/RangePicker";
 import dayjs, { type Dayjs } from "dayjs";
 import {
   useAdminDetails,
@@ -124,9 +124,9 @@ function handleEventTypeFilterChange(next: Set<number>) {
   );
 }
 
-function handleEventDateFilterChange(value: RangeValueType<Dayjs> | null) {
+function handleEventDateFilterChange(value: RangePickerProps["value"]) {
   const adjustedStartDate =
-    value && value[0] ? value[0].subtract(1, "day") : null;
+    value && value[0] ? value[0].clone().subtract(1, "day") : null;
 
   Router.push(
     {
@@ -174,7 +174,6 @@ function handleShowEndDateChange(value: boolean) {
 function clearQueries(institute: { urlIdentifier: string | null }) {
   if (institute?.urlIdentifier) {
     const url = PageRoutes.allEvents(institute.urlIdentifier);
-    console.log("Redirecting to:", url); 
     Router.push(url); 
   } else {
     console.error("Unable to reset filters: Institute ID is missing.");

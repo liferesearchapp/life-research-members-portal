@@ -8,13 +8,14 @@ import { useRouter } from "next/router";
 import PageRoutes from "../routing/page-routes";
 import AllContextProviders from "../services/context/_ctx-bundler";
 import InstituteGuard from "../components/institute-guard";
-import { useSelectedInstitute } from "../services/context/selected-institute-ctx";
+import InstituteBrandingTheme from "../components/institutes/institute-branding-theme";
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
     <>
       <MsalProvider instance={msalInstance}>
         <AllContextProviders>
+          <InstituteBrandingTheme />
           <Navbar />
           <InstituteGuard>
             <div className="next-page-container">

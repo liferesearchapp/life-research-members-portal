@@ -137,7 +137,7 @@ const RegisterAccount: FC = () => {
             initialValue={[institute.id]}
             rules={[{ required: true, message: en ? "Required" : "Requis" }]}
           >
-            <Select mode="multiple" defaultValue={institute?.id}>
+            <Select mode="multiple">
               <Option value="">{""}</Option>
               {localAccount?.instituteAdmin.map((f) => (
                 <Option key={f.institute.id} value={f.institute.id}>

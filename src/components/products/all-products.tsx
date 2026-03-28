@@ -174,7 +174,6 @@ function handleProductAllAuthorFilterChange(next: Set<string>) {
 function clearQueries(institute: { urlIdentifier: string | null }) {
   if (institute?.urlIdentifier) {
     const url = PageRoutes.allProducts(institute.urlIdentifier);
-    console.log("Redirecting to:", url); 
     Router.push(url); 
   } else {
     console.error("Unable to reset filters: Institute ID is missing.");

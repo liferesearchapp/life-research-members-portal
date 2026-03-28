@@ -22,6 +22,7 @@ const PageAuthGuard: FC<PropsWithChildren<Props>> = ({
   const isAdmin = useAdminDetails();
   const isMember = useMemberDetails();
   const { en } = useContext(LanguageCtx);
+  const isSuperAdmin = !!localAccount?.is_super_admin;
 
   if (loading) return loadingIcon || <CenteredSpinner />;
 
@@ -35,13 +36,13 @@ const PageAuthGuard: FC<PropsWithChildren<Props>> = ({
 
   const c = <>{children}</>;
 
-  console.log(isAdmin);
-
   if (!localAccount) return notAuthorized;
   if (auths.includes(Authorizations.registered)) return c;
-  if (auths.includes(Authorizations.member) && isMember) return c;
-  if (auths.includes(Authorizations.admin) && isAdmin) return c;
-  if (auths.includes(Authorizations.superAdmin) && localAccount.is_super_admin)
+  if (auths.includes(Authorizations.member) && (isMember || isAdmin || isSuperAdmin))
+    return c;
+  if (auths.includes(Authorizations.admin) && (isAdmin || isSuperAdmin))
+    return c;
+  if (auths.includes(Authorizations.superAdmin) && isSuperAdmin)
     return c;
   if (auths.includes(Authorizations.matchAccountId) && localAccount.id === id)
     return c;

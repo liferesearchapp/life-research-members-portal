@@ -1,7 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { selectAllInstituteInfo } from "../../../../prisma/helpers";
 import db from "../../../../prisma/prisma-client";
-import { assertAuthorized } from "../../../utils/api/authorization";
+import {
+  assertAuthorized,
+  hasAnyInstituteAccess,
+} from "../../../utils/api/authorization";
 import getAccountFromRequest from "../../../utils/api/get-account-from-request";
 
 export type InstituteRes = Awaited<ReturnType<typeof getInstituteById>>;
@@ -28,7 +31,11 @@ export default async function handler(
     if (
       !assertAuthorized(
         res,
-        currentAccount.is_super_admin,
+        hasAnyInstituteAccess(currentAccount, [id], {
+          allowAdmin: true,
+          allowMember: true,
+          allowSuperAdmin: true,
+        }),
         "You are not authorized to view institute information."
       )
     )

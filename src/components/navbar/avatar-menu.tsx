@@ -1,7 +1,7 @@
 import Dropdown from "antd/lib/dropdown";
+import Menu from "antd/lib/menu";
 import { FC, useContext } from "react";
 import Typography from "antd/lib/typography";
-import Card from "antd/lib/card";
 import LogoutButton from "./logout-button";
 import { ActiveAccountCtx } from "../../services/context/active-account-ctx";
 import { LanguageCtx } from "../../services/context/language-ctx";
@@ -9,6 +9,7 @@ import CheckCircleTwoTone from "@ant-design/icons/lib/icons/CheckCircleTwoTone";
 import LoginButton from "./login-button";
 import { useMsal } from "@azure/msal-react";
 import { useAdminDetails } from "../../services/context/selected-institute-ctx";
+import type { MenuProps } from "antd";
 
 const AvatarMenu: FC = () => {
   const { en } = useContext(LanguageCtx);
@@ -54,24 +55,34 @@ const AvatarMenu: FC = () => {
     </Typography>
   ) : null;
 
-  const dropdown = (
-    <Card bodyStyle={{ padding: 0 }}>
-      <div className="avatar-dropdown">
-        <Typography>{name}</Typography>
-        <Typography>{email}</Typography>
-        {registered}
-        {superAdmin}
-        {administrator}
-        {member}
-        <div style={{ height: 16 }}></div>
-        <LogoutButton />
-      </div>
-    </Card>
-  );
+  const menuItems: MenuProps["items"] = [
+    {
+      key: "name",
+      label: <Typography.Text strong>{name}</Typography.Text>,
+      disabled: true,
+    },
+    {
+      key: "email",
+      label: <Typography.Text>{email}</Typography.Text>,
+      disabled: true,
+    },
+    ...(registered
+      ? [{ key: "registered", label: registered, disabled: true }]
+      : []),
+    ...(superAdmin
+      ? [{ key: "super-admin", label: superAdmin, disabled: true }]
+      : []),
+    ...(administrator
+      ? [{ key: "admin", label: administrator, disabled: true }]
+      : []),
+    ...(member ? [{ key: "member", label: member, disabled: true }] : []),
+    { type: "divider" as const },
+    { key: "logout", label: <LogoutButton /> },
+  ];
 
   return (
     <Dropdown
-      overlay={dropdown}
+      overlay={<Menu items={menuItems} />}
       getPopupContainer={() =>
         document.querySelector(".navbar") || document.body
       }

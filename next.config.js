@@ -40,15 +40,6 @@ const securityHeaders = [
 
 const nextConfig = {
   reactStrictMode: false,
-  transpilePackages: [
-    "antd",
-    "@ant-design/icons",
-    "@ant-design/icons-svg",
-    "rc-input",
-    "rc-picker",
-    "rc-pagination",
-    "rc-util",
-  ],
   webpack(config) {
     config.resolve.alias["rc-input/es/utils/commonUtils"] =
       "rc-input/lib/utils/commonUtils";

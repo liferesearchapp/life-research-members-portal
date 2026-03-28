@@ -17,6 +17,14 @@ const _selectAllInstituteInfo = {
   urlIdentifier: true,
   description_en: true,
   description_fr: true,
+  largeLogo: true,
+  smallLogoEn: true,
+  smallLogoFr: true,
+  primaryColor: true,
+  primaryColorDark: true,
+  secondaryColor: true,
+  secondaryColorDark: true,
+  accentColor: true,
   is_active: true,
 } as const;
 

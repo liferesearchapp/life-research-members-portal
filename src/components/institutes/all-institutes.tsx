@@ -6,14 +6,14 @@ import PageRoutes from "../../routing/page-routes";
 import { useRouter } from "next/router";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import { AllInstitutesCtx } from "../../services/context/all-institutes-ctx";
-import type { institute } from "@prisma/client";
-import { useSelectedInstitute } from "../../services/context/selected-institute-ctx";
+import { ActiveAccountCtx } from "../../services/context/active-account-ctx";
+import type { InstituteInfo } from "../../services/_types";
 
 const AllInstitutes: FC = () => {
   const router = useRouter();
   const { en } = useContext(LanguageCtx);
   const { allInstitutes, loading, refresh } = useContext(AllInstitutesCtx);
-  const { institute } = useSelectedInstitute();
+  const { localAccount } = useContext(ActiveAccountCtx);
   const keyedInstitutes = allInstitutes.map((m) => ({ ...m, key: m.id }));
 
   useEffect(() => {
@@ -22,14 +22,13 @@ const AllInstitutes: FC = () => {
   }, []);
 
   const handleCreateEvent = () => {
-    if (institute) {
-      router.push({
-        pathname: "/institutes/register-institute",
-      });
-    }
+    if (!localAccount?.is_super_admin) return;
+    router.push({
+      pathname: "/institutes/register-institute",
+    });
   };
 
-  const columns: ColumnType<institute>[] = [
+  const columns: ColumnType<InstituteInfo>[] = [
     {
       title: en ? "Name" : "Nom",
       dataIndex: "name",
@@ -77,9 +76,11 @@ const AllInstitutes: FC = () => {
         {en ? "All Institutes" : "Tous les instituts"}
       </Title>
       <div style={{ flexGrow: 15 }}></div>
-      <Button type="primary" size="large" onClick={() => handleCreateEvent()}>
-        {en ? "Add Institute" : "Ajouter un institut"}
-      </Button>
+      {localAccount?.is_super_admin ? (
+        <Button type="primary" size="large" onClick={() => handleCreateEvent()}>
+          {en ? "Add Institute" : "Ajouter un institut"}
+        </Button>
+      ) : null}
     </div>
   );
 

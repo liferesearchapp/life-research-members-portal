@@ -10,6 +10,12 @@ import type { InstituteInfo } from "../../services/_types";
 import InstituteDescription from "./institute-description";
 import InstituteForm from "./institute-form";
 import { SaveChangesCtx } from "../../services/context/save-changes-ctx";
+import { InstituteSelectorCtx } from "../../services/context/institute-selector-ctx";
+import {
+  useAdminDetails,
+  useSelectedInstitute,
+  useSuperAdminDetails,
+} from "../../services/context/selected-institute-ctx";
 
 type Props = {
   id: number;
@@ -17,14 +23,33 @@ type Props = {
 
 const InstituteProfile: FC<Props> = ({ id }) => {
   const { en } = useContext(LanguageCtx);
-  const { institute, setInstitute, loading } = useInstituteInfo(id);
+  const { institute, setInstitute: setLoadedInstitute, loading } =
+    useInstituteInfo(id);
   const [editMode, setEditMode] = useState(false);
   const { saveChangesPrompt } = useContext(SaveChangesCtx);
+  const { refresh: refreshInstituteSelector } =
+    useContext(InstituteSelectorCtx);
+  const { institute: selectedInstitute, setInstitute: setSelectedInstitute } =
+    useSelectedInstitute();
+  const isAdmin = useAdminDetails();
+  const isSuperAdmin = useSuperAdminDetails();
+  const canManageInstitute = !!isAdmin || !!isSuperAdmin;
 
   /** After saving changes via submit button - dependency of form's submit */
   const onSuccess = useCallback(
-    (updatedInstitute: InstituteInfo) => setInstitute(updatedInstitute),
-    [setInstitute]
+    (updatedInstitute: InstituteInfo) => {
+      setLoadedInstitute(updatedInstitute);
+      if (selectedInstitute?.id === updatedInstitute.id) {
+        setSelectedInstitute(updatedInstitute);
+      }
+      void refreshInstituteSelector();
+    },
+    [
+      refreshInstituteSelector,
+      selectedInstitute?.id,
+      setLoadedInstitute,
+      setSelectedInstitute,
+    ]
   );
 
   if (loading) return <CardSkeleton />;
@@ -71,7 +96,7 @@ const InstituteProfile: FC<Props> = ({ id }) => {
       >
         {institute?.name}
       </Title>
-      {editMode ? doneButton : editButton}
+      {canManageInstitute ? (editMode ? doneButton : editButton) : null}
     </div>
   );
 
@@ -80,7 +105,7 @@ const InstituteProfile: FC<Props> = ({ id }) => {
 
   return (
     <Card title={header} bodyStyle={{ paddingTop: 0 }}>
-      {editMode ? form : description}
+      {canManageInstitute && editMode ? form : description}
     </Card>
   );
 };

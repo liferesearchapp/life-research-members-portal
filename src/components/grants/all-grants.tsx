@@ -185,7 +185,6 @@ function handleShowInvestigatorMemberChange(value: boolean) {
 function clearQueries(institute: { urlIdentifier: string | null }) {
   if (institute?.urlIdentifier) {
     const url = PageRoutes.allGrants(institute.urlIdentifier);
-    console.log("Redirecting to:", url); 
     Router.push(url); 
   } else {
     console.error("Unable to reset filters: Institute ID is missing.");

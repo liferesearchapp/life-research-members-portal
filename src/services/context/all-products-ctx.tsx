@@ -28,7 +28,6 @@ export const AllProductsCtxProvider: FC<PropsWithChildren> = ({ children }) => {
 
   const fetchAllProducts = useCallback(async () => {
     if (!institute) {
-      console.log("Institute not found.");
       setLoading(false);
       return;
     }

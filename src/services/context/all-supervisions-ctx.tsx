@@ -31,7 +31,6 @@ export const AllSupervisionsCtxProvider: FC<PropsWithChildren> = ({
 
   const fetchAllSupervisions = useCallback(async () => {
     if (!institute) {
-      console.log("Institute not found.");
       setLoading(false);
       return;
     }

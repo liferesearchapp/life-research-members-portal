@@ -22,7 +22,6 @@ export default async function handler(
     try {
         const id = parseInt(req.query.id);
         const organization = await getPublicPartnerInfo(id);
-        console.log(organization);
         if (!organization) return res.status(400).send("Organization not found. ID: " + id);
 
         return res.status(200).send(organization);

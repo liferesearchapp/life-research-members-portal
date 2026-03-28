@@ -60,7 +60,6 @@ const GrantSourceFilter: FC<Props> = ({
       options={options}
       allowClear
       showSearch={false}
-      showArrow
       onSelect={onSelect}
       onDeselect={onDelete}
       getPopupContainer={getPopupContainer}

@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 // This component is the main landing page of the LRI Member Portal.
 // The component displays a personalized greeting to the user based on their authentication status and role
 // The component also  provides an overview of the portal information and displays a banner image, a tagline, and quick links to key sections of the portal
@@ -24,16 +25,14 @@ import {
 import Spin from "antd/lib/spin";
 import { type FC, useContext } from "react";
 import { ActiveAccountCtx } from "../services/context/active-account-ctx";
-import { green } from "@ant-design/colors";
 import { LanguageCtx } from "../services/context/language-ctx";
-import Image from "next/image";
-import life from "../../public/life-home2.png";
 import PageRoutes from "../routing/page-routes";
 import Link from "next/link";
 import {
   useAdminDetails,
   useSelectedInstitute,
 } from "../services/context/selected-institute-ctx";
+import { getInstituteLargeLogo } from "../utils/front-end/institute-branding";
 
 const { Title } = Typography;
 
@@ -62,7 +61,7 @@ const Welcome: FC = () => {
   const activePartnersCount = allPartners.length;
 
   const adminGreeting = (
-    <h4 style={{ color: green[6] }}>
+    <h4 style={{ color: "var(--brand-primary-dark)" }}>
       {en
         ? "You are logged in as an administrator"
         : "Vous êtes connecté(e) en tant qu'administrateur"}
@@ -178,11 +177,19 @@ const Welcome: FC = () => {
                 alignItems: "center",
               }}
             >
-              <Image
-                src={life}
-                alt="LIFE Research Institute Home"
-                width={530} // Set the width and height to the desired values
+              <img
+                src={getInstituteLargeLogo(institute)}
+                alt={en ? `${institute?.name || "Institute"} logo` : `Logo ${institute?.name || "institut"}`}
+                width={530}
                 height={340}
+                loading="eager"
+                style={{
+                  display: "block",
+                  maxWidth: "100%",
+                  height: "auto",
+                  maxHeight: 340,
+                  objectFit: "contain",
+                }}
               />
             </Col>
           </Row>

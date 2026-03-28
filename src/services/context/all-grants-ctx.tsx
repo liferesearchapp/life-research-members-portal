@@ -27,7 +27,6 @@ export const AllGrantsCtxProvider: FC<PropsWithChildren> = ({ children }) => {
 
   const fetchAllGrants = useCallback(async () => {
     if (!institute) {
-      console.log("Institute not found.");
       setLoading(false);
       return;
     }

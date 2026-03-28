@@ -13,6 +13,14 @@ model institute {
   urlIdentifier  String                  @unique
   description_en String?
   description_fr String?
+  largeLogo      String?                 @db.NVarChar(Max)
+  smallLogoEn    String?                 @db.NVarChar(Max)
+  smallLogoFr    String?                 @db.NVarChar(Max)
+  primaryColor   String?                 @db.NVarChar(7)
+  primaryColorDark String?               @db.NVarChar(7)
+  secondaryColor String?                 @db.NVarChar(7)
+  secondaryColorDark String?             @db.NVarChar(7)
+  accentColor    String?                 @db.NVarChar(7)
   events         event[]
   grants         grant[]
   instituteAdmin instituteAdmin[]

@@ -8,8 +8,10 @@ import {
     useState,
 } from "react";
 import ApiRoutes from "../../routing/api-routes";
+import getAuthHeader from "../headers/auth-header";
 import Notification from "../notifications/notification";
 import type { InstituteSelectorInfo } from "../_types";
+import { ActiveAccountCtx } from "./active-account-ctx";
   
 export const InstituteSelectorCtx = createContext<{
     instituteSelection: InstituteSelectorInfo[];
@@ -19,13 +21,17 @@ export const InstituteSelectorCtx = createContext<{
 }>(null as any);
   
 export const InstituteSelectorCtxProvider: FC<PropsWithChildren> = ({ children }) => {
+    const { localAccount, loading: accountLoading } = useContext(ActiveAccountCtx);
     const [instituteSelection, setInstitutes] = useState<InstituteSelectorInfo[]>([]);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
   
     const fetchInstitutes = useCallback(async () => {
       try {
-        const result = await fetch(ApiRoutes.instituteSelector);
+        const authHeader = localAccount ? await getAuthHeader() : null;
+        const result = await fetch(ApiRoutes.instituteSelector, authHeader ? {
+          headers: authHeader,
+        } : undefined);
         if (!result.ok) throw await result.text();
         const instituteSelection: InstituteSelectorInfo[] = await result.json();
         setInstitutes(instituteSelection.sort((a, b) => a.name.localeCompare(b.name)));
@@ -34,15 +40,16 @@ export const InstituteSelectorCtxProvider: FC<PropsWithChildren> = ({ children }
       } finally {
         setLoading(false);
       }
-    }, []);
+    }, [localAccount]);
   
     useEffect(() => {
+      if (accountLoading) return;
       async function firstLoad() {
         await fetchInstitutes();
         setLoading(false);
       }
       firstLoad();
-    }, [fetchInstitutes]);
+    }, [accountLoading, fetchInstitutes]);
   
     async function refresh() {
       if (loading || refreshing) return;
