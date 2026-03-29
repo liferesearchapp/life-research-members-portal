@@ -66,6 +66,21 @@ const _includeAllAccountInfo = {
       institute: true,
     },
   },
+  receivedInstituteMembershipInvitations: {
+    include: {
+      institute: {
+        select: _selectAllInstituteInfo,
+      },
+      invitedByAccount: {
+        select: {
+          id: true,
+          first_name: true,
+          last_name: true,
+          login_email: true,
+        },
+      },
+    },
+  },
 } as const;
 
 export const includeAllAccountInfo: CheckKeysAreValid<

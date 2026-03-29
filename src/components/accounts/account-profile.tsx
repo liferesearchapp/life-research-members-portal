@@ -26,6 +26,7 @@ import { Tag } from "antd";
 import AddInstituteButton from "./add-institute-button";
 import RemoveInstituteButton from "./remove-institute-button";
 import { ActiveAccountCtx } from "../../services/context/active-account-ctx";
+import { isPendingInstituteMembershipInvitation } from "../../utils/institute-membership-invitations";
 
 const { Item } = Descriptions;
 
@@ -144,6 +145,9 @@ const AccountProfile: FC<Props> = ({ id }) => {
   var memberProfile = "";
   if (hasPermission) memberProfile = PageRoutes.privateMemberProfile(account.member?.id || 0);
   else memberProfile = PageRoutes.publicMemberProfile(account.member?.id || 0);
+  const pendingInvitations = account.receivedInstituteMembershipInvitations.filter(
+    (invitation) => isPendingInstituteMembershipInvitation(invitation.status)
+  );
   const memberItem = (
     <Item label={en ? "Member Information" : "Informations sur les membres"}>
       {account.member ? (
@@ -171,43 +175,62 @@ const AccountProfile: FC<Props> = ({ id }) => {
               ? "This account is not registered as a member"
               : "Ce compte n'est pas enregistré en tant que membre"}
           </Text>
-          <RegisterMemberButton account={account} setAccount={setAccount} />
+          <div style={{ width: "100%" }} />
+          <Text type="secondary">
+            {en
+              ? "They can create their own member profile from My Profile, or become a member by accepting an institute invitation."
+              : "Ils peuvent créer leur propre profil de membre depuis Mon profil, ou devenir membre en acceptant une invitation d'institut."}
+          </Text>
+          {localAccount?.is_super_admin ? (
+            <RegisterMemberButton account={account} setAccount={setAccount} />
+          ) : null}
         </>
       )}
     </Item>
   );
 
   const addToMoreInstitutes = (
-    <Item label={en ? "Institute Information" : "Informations sur les membres"}>
-      {account.member?.institutes ? (
-        <>
-          <Text>
-            {trueSymbol}
-            {en
-              ? "This account is part of following institutes"
-              : "Ce compte est enregistré en tant que membre"}
-          </Text>
-          {account.member.institutes.map((institute) => {
-            return (
+    <Item label={en ? "Institute Information" : "Informations sur l'institut"}>
+      <>
+        <Text>
+          {account.member?.institutes.length ? trueSymbol : falseSymbol}
+          {account.member?.institutes.length
+            ? en
+              ? "This account is part of the following institutes"
+              : "Ce compte fait partie des instituts suivants"
+            : en
+            ? "This account is not yet a member of any institute"
+            : "Ce compte ne fait encore partie d'aucun institut"}
+        </Text>
+        {account.member?.institutes.length
+          ? account.member.institutes.map((institute) => (
               <Tag key={institute.instituteId}>
-                {institute.institute.name} - {institute.institute.urlIdentifier}{" "}
+                {institute.institute.name} - {institute.institute.urlIdentifier}
               </Tag>
-            );
-          })}
-          <AddInstituteButton account={account} setAccount={setAccount} />
+            ))
+          : null}
+
+        {pendingInvitations.length ? (
+          <>
+            <div style={{ width: "100%", height: 8 }} />
+            <Text strong>
+              {en ? "Pending invitations" : "Invitations en attente"}
+            </Text>
+            <div style={{ width: "100%", height: 4 }} />
+            {pendingInvitations.map((invitation) => (
+              <Tag color="gold" key={invitation.id}>
+                {invitation.institute.name} - {invitation.institute.urlIdentifier}
+              </Tag>
+            ))}
+          </>
+        ) : null}
+
+        <div style={{ width: "100%", height: 12 }} />
+        <AddInstituteButton account={account} setAccount={setAccount} />
+        {account.member?.institutes.length ? (
           <RemoveInstituteButton account={account} setAccount={setAccount} />
-        </>
-      ) : (
-        <>
-          <Text>
-            {falseSymbol}
-            {en
-              ? "This account is not registered as a member"
-              : "Ce compte n'est pas enregistré en tant que membre"}
-          </Text>
-          <RegisterMemberButton account={account} setAccount={setAccount} />
-        </>
-      )}
+        ) : null}
+      </>
     </Item>
   );
 

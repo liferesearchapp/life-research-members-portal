@@ -7,6 +7,7 @@ import {
 } from "../../utils/api/authorization";
 import getAccountFromRequest from "../../utils/api/get-account-from-request";
 import type { AccountDBRes } from "./account/[id]";
+import { instituteMembershipInvitationStatus } from "../../utils/institute-membership-invitations";
 
 function getAllAccounts(instituteId: number): Promise<AccountDBRes[]> {
   return db.account.findMany({
@@ -27,6 +28,14 @@ function getAllAccounts(instituteId: number): Promise<AccountDBRes[]> {
                   instituteId,
                 },
               },
+            },
+          },
+        },
+        {
+          receivedInstituteMembershipInvitations: {
+            some: {
+              instituteId,
+              status: instituteMembershipInvitationStatus.pending,
             },
           },
         },

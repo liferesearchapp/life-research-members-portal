@@ -28,6 +28,7 @@ import {
   useSelectedInstitute,
 } from "../../services/context/selected-institute-ctx";
 import PageRoutes from "../../routing/page-routes";
+import InstituteMembershipInvitations from "../accounts/institute-membership-invitations";
 
 type Tab = { label: string; key: string; children: ReactNode };
 
@@ -201,16 +202,23 @@ const MyProfile: FC = () => {
   ];
 
   return (
-    <Card title={header} bodyStyle={{ paddingTop: 0 }}>
-      <Tabs
-        items={editMode ? forms : descriptions}
-        activeKey={activeTabKey}
-        onChange={onChange}
-        // Very important to destroy inactive forms,
-        // so they register their submit function to the save changes context when navigated back
-        destroyInactiveTabPane
+    <>
+      <InstituteMembershipInvitations
+        account={localAccount}
+        setAccount={setLocalAccount}
+        interactive
       />
-    </Card>
+      <Card title={header} bodyStyle={{ paddingTop: 0 }}>
+        <Tabs
+          items={editMode ? forms : descriptions}
+          activeKey={activeTabKey}
+          onChange={onChange}
+          // Very important to destroy inactive forms,
+          // so they register their submit function to the save changes context when navigated back
+          destroyInactiveTabPane
+        />
+      </Card>
+    </>
   );
 };
 

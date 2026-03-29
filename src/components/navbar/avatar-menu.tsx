@@ -32,8 +32,8 @@ const AvatarMenu: FC = () => {
   const registered = localAccount ? null : (
     <Typography>
       {en
-        ? "This account is not registered. If you are a member, please ask an administrator to register you."
-        : "Ce compte n'est pas enregistré. Si vous êtes membre, veuillez demander à un administrateur de vous inscrire."}
+        ? "This account is not registered. If you belong to an institute, ask an administrator to invite you. You can also create your own member profile from My Profile once your account is available."
+        : "Ce compte n'est pas enregistré. Si vous faites partie d'un institut, demandez à un administrateur de vous inviter. Vous pouvez aussi créer votre propre profil de membre depuis Mon profil une fois votre compte disponible."}
     </Typography>
   );
 
