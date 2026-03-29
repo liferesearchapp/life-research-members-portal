@@ -11,6 +11,7 @@ import InstituteDescription from "./institute-description";
 import InstituteForm from "./institute-form";
 import { SaveChangesCtx } from "../../services/context/save-changes-ctx";
 import { InstituteSelectorCtx } from "../../services/context/institute-selector-ctx";
+import { MemberInstituteCtx } from "../../services/context/member-institutes-ctx";
 import {
   useAdminDetails,
   useSelectedInstitute,
@@ -29,6 +30,7 @@ const InstituteProfile: FC<Props> = ({ id }) => {
   const { saveChangesPrompt } = useContext(SaveChangesCtx);
   const { refresh: refreshInstituteSelector } =
     useContext(InstituteSelectorCtx);
+  const { refresh: refreshMemberInstitutes } = useContext(MemberInstituteCtx);
   const { institute: selectedInstitute, setInstitute: setSelectedInstitute } =
     useSelectedInstitute();
   const isAdmin = useAdminDetails();
@@ -42,10 +44,12 @@ const InstituteProfile: FC<Props> = ({ id }) => {
       if (selectedInstitute?.id === updatedInstitute.id) {
         setSelectedInstitute(updatedInstitute);
       }
-      void refreshInstituteSelector();
+      refreshInstituteSelector();
+      refreshMemberInstitutes();
     },
     [
       refreshInstituteSelector,
+      refreshMemberInstitutes,
       selectedInstitute?.id,
       setLoadedInstitute,
       setSelectedInstitute,

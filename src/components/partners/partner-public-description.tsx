@@ -47,7 +47,9 @@ const PublicPartnerDescription: FC<Props> = ({ partner }) => {
       </Item>
 
       <Item label={en ? "Institute" : "L'institut"}>
-        {partner.organizationInstitute.map((entry, i) => (
+        {partner.organizationInstitute
+          .filter((entry) => entry.institute.is_active)
+          .map((entry, i) => (
           <Tag
             key={entry.institute.id}
           >{`${entry.institute.name} - ${entry.institute.urlIdentifier}`}</Tag>

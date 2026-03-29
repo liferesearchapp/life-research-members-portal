@@ -40,7 +40,7 @@ async function getMemberInstitutes(
     (mi) => mi.institute
   );
 
-  return institutes;
+  return institutes.filter((institute) => institute.is_active);
 }
 
 export default async function handler(
