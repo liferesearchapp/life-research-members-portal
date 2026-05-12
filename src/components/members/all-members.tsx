@@ -1,5 +1,8 @@
+import Button from "antd/lib/button";
+import Table, { ColumnType } from "antd/lib/table";
+import Title from "antd/lib/typography/Title";
 import {
-  type FC,
+  FC,
   Fragment,
   useCallback,
   useContext,
@@ -12,21 +15,25 @@ import PageRoutes from "../../routing/page-routes";
 import KeywordTag from "../keywords/keyword-tag";
 import { AllMembersCtx } from "../../services/context/all-members-ctx";
 import GetLanguage from "../../utils/front-end/get-language";
+import Descriptions from "antd/lib/descriptions";
+import Item from "antd/lib/descriptions/Item";
 import SafeLink from "../link/safe-link";
 import Router, { useRouter } from "next/router";
+import Form from "antd/lib/form";
 import type { keyword } from "@prisma/client";
 import KeywordFilter from "../filters/keyword-filter";
 import blurActiveElement from "../../utils/front-end/blur-active-element";
-import { Checkbox, Button, Table, Typography, Descriptions, Form } from "antd";
+import { Checkbox } from "antd";
 import type { MemberPublicInfo } from "../../services/_types";
 import MemberTypeFilter from "../filters/member-type-filter";
 import FacultyFilter from "../filters/faculty-filter";
 import MemberNameFilter from "../filters/member-name-filter";
 import { AllKeywordsCtx } from "../../services/context/all-keywords-ctx";
 import type { ParsedUrlQueryInput } from "querystring";
-import type { TableColumnType as ColumnType } from "antd";
-const Title = Typography.Title;
-const Item = Descriptions.Item;
+import {
+  useAdminDetails,
+  useSelectedInstitute,
+} from "../../services/context/selected-institute-ctx";
 
 function nameSorter(a: { name: string }, b: { name: string }) {
   return a.name.localeCompare(b.name);
@@ -159,8 +166,14 @@ function handleKeywordFilterChange(next: Set<number>) {
   );
 }
 
-function clearQueries() {
-  Router.push({ query: null }, undefined, { scroll: false });
+function clearQueries(institute: { urlIdentifier: string | null }) {
+  if (institute?.urlIdentifier) {
+    const url = PageRoutes.allMembers(institute.urlIdentifier);
+    Router.push(url);
+  } else {
+    console.error("Unable to reset filters: Institute ID is missing.");
+    alert("Unable to reset filters: Institute ID is missing.");
+  }
 }
 
 function getIdsFromQueryParams(key: string): Set<number> {
@@ -185,11 +198,14 @@ function getPopupContainer(): HTMLElement {
 
 const AllMembers: FC = () => {
   const { en } = useContext(LanguageCtx);
+  const { institute } = useSelectedInstitute();
+  
   const {
     allMembers,
     loading,
     refresh: refreshMembers,
   } = useContext(AllMembersCtx);
+
   const { refresh: refreshKeywords } = useContext(AllKeywordsCtx);
 
   useEffect(() => {
@@ -257,8 +273,13 @@ const AllMembers: FC = () => {
   }, [keywordsQuery]);
 
   function refreshAndClearFilters() {
-    clearQueries();
-    refreshMembers();
+    const instituteUrlIdentifier = institute?.urlIdentifier; // Retrieve urlIdentifier instead of id
+    if (instituteUrlIdentifier) {
+      clearQueries({ urlIdentifier: instituteUrlIdentifier }); // Pass as an object
+    refreshMembers();}
+    else {
+      console.error("Cannot reset filters: Institute ID is missing.");
+    }
     refreshKeywords();
   }
 
@@ -284,7 +305,7 @@ const AllMembers: FC = () => {
     [allMembers, facultyFilter, keywordFilter, memberTypeFilter, nameFilter]
   );
 
-  type MemberColumnType = ColumnType<typeof filteredMembers[number]>;
+  type MemberColumnType = ColumnType<(typeof filteredMembers)[number]>;
 
   const nameColumn: MemberColumnType = useMemo(
     () => ({

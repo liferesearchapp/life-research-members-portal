@@ -3,11 +3,16 @@
 // The component has two modes, view mode and edit mode.
 // The component uses the save-changes context to prompt the user to save unsaved changes before navigating away.
 
-import { type FC, type ReactNode, useCallback, useContext, useState } from "react";
+import Empty from "antd/lib/empty";
+import Button from "antd/lib/button";
+import Card from "antd/lib/card/Card";
+import Title from "antd/lib/typography/Title";
+import { type FC, ReactNode, useCallback, useContext, useState } from "react";
 import CardSkeleton from "../loading/card-skeleton";
 
 import usePrivateGrantInfo from "../../services/use-private-grant-info";
 import { LanguageCtx } from "../../services/context/language-ctx";
+import Tabs from "antd/lib/tabs";
 import type { GrantPrivateInfo } from "../../services/_types";
 import { SaveChangesCtx } from "../../services/context/save-changes-ctx";
 import PublicGrantDescription from "./grant-public-description";
@@ -17,8 +22,6 @@ import PublicGrantDescription from "./grant-public-description";
 import PublicGrantForm from "./grant-public-form";
 //import GrantAdminForm from "./grant-admin-form";
 import DeleteGrantButton from "./delete-grant-button";
-import { Empty, Button, Card, Typography, Tabs } from "antd";
-const Title = Typography.Title;
 
 type Tab = { label: string; key: string; children: ReactNode };
 
@@ -142,7 +145,7 @@ const PrivateGrantProfile: FC<Props> = ({ id }) => {
         onChange={onChange}
         // Very important to destroy inactive forms,
         // so they register their submit function to the save changes context when navigated back
-        destroyInactiveTabPane
+        destroyOnHidden
       />
       <DeleteGrantButton
         grant={grant}

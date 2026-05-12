@@ -9,6 +9,8 @@ const ApiRoutes = {
   allEvents: "/api/all-events",
   allSources: "/api/all-sources",
   allStatuses: "/api/all-statuses",
+  allInstitutes: "/api/all-institutes",
+  registerInstitute: "/api/register-institute",
   registerAccount: "/api/register-account",
   registerPartner: "/api/register-partner",
   registerPartnerMember: "/api/register-partner-member",
@@ -18,7 +20,10 @@ const ApiRoutes = {
   registerEvent: "/api/register-event",
   activeAccount: "/api/active-account",
   activeAccountUpdateLastLogin: "/api/active-account/update-last-login",
+  memberInstitute: "/api/member-institute",
+  instituteSelector: "/api/institute-selector",
   account: (id: number) => "/api/account/" + id,
+  institute: (id: number) => "/api/institute/" +id,
   publicMemberInfo: (id: number) => "/api/member/" + id + "/public",
   publicPartnerInfo: (id: number) => "/api/partner/" + id + "/public",
   privatePartnerInfo: (id: number) => "/api/partner/" + id + "/private",
@@ -38,22 +43,34 @@ const ApiRoutes = {
   deleteEvent: (id: number) => "/api/delete-event/" + id,
   deleteSupervision: (id: number) => "/api/delete-supervision/" + id,
   updateAccountName: (id: number) => "/api/update-account/" + id + "/name",
+  addInstitute: (id: number) => "/api/update-account/" + id + "/add-institute",
+  removeInstitute: (id: number) =>
+    "/api/update-account/" + id + "/remove-institute",
   updateAccountEmail: (id: number) => "/api/update-account/" + id + "/email",
-  updateAccountGrantAdmin: (id: number) => "/api/update-account/" + id + "/grant-admin",
-  updateAccountRemoveAdmin: (id: number) => "/api/update-account/" + id + "/remove-admin",
-  updateAccountRegisterMember: (id: number) => "/api/update-account/" + id + "/register-member",
-  updateAccountDeleteMember: (id: number) => "/api/update-account/" + id + "/delete-member",
+  updateAccountGrantAdmin: (id: number) =>
+    "/api/update-account/" + id + "/grant-admin",
+  updateAccountRemoveAdmin: (id: number) =>
+    "/api/update-account/" + id + "/remove-admin",
+  updateAccountRegisterMember: (id: number) =>
+    "/api/update-account/" + id + "/register-member",
+  updateAccountDeleteMember: (id: number) =>
+    "/api/update-account/" + id + "/delete-member",
+  updateInstitute: (id: number) => "/api/update-institute/" + id + "/private",
   updateMemberPublic: (id: number) => "/api/update-member/" + id + "/public",
   updateMemberPrivate: (id: number) => "/api/update-member/" + id + "/private",
   updateProductPublic: (id: number) => "/api/update-product/" + id + "/public",
-  updateSupervisionPublic: (id: number) => "/api/update-supervision/" + id + "/public",
-  updateSupervisionPrivate: (id: number) => "/api/update-supervision/" + id + "/private",
+  updateSupervisionPublic: (id: number) =>
+    "/api/update-supervision/" + id + "/public",
+  updateSupervisionPrivate: (id: number) =>
+    "/api/update-supervision/" + id + "/private",
   updateEventPublic: (id: number) => "/api/update-event/" + id + "/public",
-  updateProductPrivate: (id: number) => "/api/update-product/" + id + "/private",
+  updateProductPrivate: (id: number) =>
+    "/api/update-product/" + id + "/private",
   updateGrantPublic: (id: number) => "/api/update-grant/" + id + "/public",
   updateGrantPrivate: (id: number) => "/api/update-grant/" + id + "/private",
   updateProductAdmin: (id: number) => "/api/update-product/" + id + "/admin",
-  updatePartnerPrivate: (id: number) => "/api/update-partner/" + id + "/private",
+  updatePartnerPrivate: (id: number) =>
+    "/api/update-partner/" + id + "/private",
   updatePartnerPublic: (id: number) => "/api/update-partner/" + id + "/public",
   updateMemberInsight: (id: number) => "/api/update-member/" + id + "/insight",
   updateKeyword: (id: number) => "/api/update-keyword/" + id,

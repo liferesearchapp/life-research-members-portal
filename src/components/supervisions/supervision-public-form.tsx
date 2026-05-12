@@ -1,16 +1,23 @@
 //This is a form component that allows the user to edit public information of a supervision.
 
-import React, { type FC, useContext, useState, useCallback, useEffect } from "react";
+import React, { FC, useContext, useState, useCallback, useEffect } from "react";
 import { LanguageCtx } from "../../services/context/language-ctx";
-import type { Moment } from "moment";
+import { useForm } from "antd/lib/form/Form";
+import Form from "antd/lib/form";
+import Input from "antd/lib/input";
+import TextArea from "antd/lib/input/TextArea";
+import Button from "antd/lib/button";
+import Select from "antd/lib/select";
+import DatePicker from "antd/lib/date-picker";
+import type { Dayjs } from "dayjs";
 import { FacultiesCtx } from "../../services/context/faculties-ctx";
 import { LevelsCtx } from "../../services/context/levels-ctx";
+import Divider from "antd/lib/divider";
 import Notification from "../../services/notifications/notification";
 import {
   SaveChangesCtx,
   useResetDirtyOnUnmount,
 } from "../../services/context/save-changes-ctx";
-import moment from "moment";
 import type {
   MemberPublicInfo,
   SupervisionPrivateInfo,
@@ -20,9 +27,7 @@ import GetLanguage from "../../utils/front-end/get-language";
 import updateSupervisionPublic from "../../services/update-supervision-public";
 import type { UpdateSupervisionPublicParams } from "../../pages/api/update-supervision/[id]/public";
 import MemberSelector from "../members/member-selector";
-import { Form, Input, Button, Select, DatePicker, Divider } from "antd";
-const { useForm } = Form;
-const TextArea = Input.TextArea;
+import toDayjsDate from "../../utils/front-end/to-dayjs-date";
 
 const { Option } = Select;
 
@@ -74,8 +79,8 @@ type SupervisionCommittee = {
 type SupervisionData = {
   last_name: string;
   first_name: string;
-  start_date: Moment | null;
-  end_date: Moment | null;
+  start_date: Dayjs | null;
+  end_date: Dayjs | null;
   faculty_id: number;
   level_id: number;
   note: string;
@@ -341,20 +346,8 @@ const PublicSupervisionForm: FC<Props> = ({ supervision, onSuccess }) => {
   const initialValues: SupervisionData = {
     last_name: supervision.last_name,
     first_name: supervision.first_name,
-    start_date: supervision.start_date
-      ? moment(
-          supervision.start_date instanceof Date
-            ? supervision.start_date.toISOString().split("T")[0]
-            : (supervision.start_date as string).split("T")[0]
-        )
-      : null,
-    end_date: supervision.end_date
-      ? moment(
-          supervision.end_date instanceof Date
-            ? supervision.end_date.toISOString().split("T")[0]
-            : (supervision.end_date as string).split("T")[0]
-        )
-      : null,
+    start_date: toDayjsDate(supervision.start_date),
+    end_date: toDayjsDate(supervision.end_date),
     faculty_id: supervision.faculty_id || 0,
     level_id: supervision.level_id || 0,
     note: supervision.note || "",

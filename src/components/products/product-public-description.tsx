@@ -2,17 +2,20 @@
 //The information displayed includes the product's abstract, product type, published date, DOI, product partnerships, product target, authors, and member authors.
 //The component uses the LanguageCtx to toggle between English and French content.
 
-import { type FC, useContext } from "react";
+import Grid from "antd/lib/grid";
+import Descriptions from "antd/lib/descriptions";
+import Item from "antd/lib/descriptions/Item";
+import { FC, useContext } from "react";
 import type { ProductPublicInfo } from "../../services/_types";
 import React from "react";
 import { LanguageCtx } from "../../services/context/language-ctx";
+import Tag from "antd/lib/tag";
 import SafeLink from "../link/safe-link";
 import ProductTypeLink from "../link/product-type-link";
 import type { PublicMemberRes } from "../../pages/api/member/[id]/public";
 import { useState, useEffect } from "react";
 import getMemberAuthor from "../getters/product-member-author-getter";
-import { Grid, Descriptions, Tag } from "antd";
-const Item = Descriptions.Item;
+import { MemberInstituteCtx } from "../../services/context/member-institutes-ctx";
 
 const { useBreakpoint } = Grid;
 
@@ -41,7 +44,7 @@ const PublicProductDescription: FC<Props> = ({ product }) => {
       size="small"
       bordered
       column={1}
-      labelStyle={{ whiteSpace: "nowrap", width: 0 }}
+      styles={{ label: { whiteSpace: "nowrap", width: 0 } }}
       layout={screens.xs ? "vertical" : "horizontal"}
     >
       <Item
@@ -80,6 +83,14 @@ const PublicProductDescription: FC<Props> = ({ product }) => {
           <Tag key={entry.target.id} color="blue">
             {en ? entry.target.name_en : entry.target.name_fr}
           </Tag>
+        ))}
+      </Item>
+
+      <Item label={en ? "Institute" : "L'institut"}>
+        {product.institutes.map((entry, i) => (
+          <Tag
+            key={entry.institute.id}
+          >{`${entry.institute.name} - ${entry.institute.urlIdentifier}`}</Tag>
         ))}
       </Item>
 

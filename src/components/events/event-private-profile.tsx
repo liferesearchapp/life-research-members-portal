@@ -1,16 +1,19 @@
 // This component displays the profile of an event, with the possibility to view or edit it
 
+import Empty from "antd/lib/empty";
+import Button from "antd/lib/button";
+import Card from "antd/lib/card/Card";
+import Title from "antd/lib/typography/Title";
 import { type FC, type ReactNode, useCallback, useContext, useState } from "react";
 import CardSkeleton from "../loading/card-skeleton";
 import PublicEventDescription from "./event-public-description";
 import usePrivateEventInfo from "../../services/use-private-event-info";
 import { LanguageCtx } from "../../services/context/language-ctx";
+import Tabs from "antd/lib/tabs";
 import type { EventPrivateInfo } from "../../services/_types";
 import DeleteEventButton from "./delete-event-button";
 import { SaveChangesCtx } from "../../services/context/save-changes-ctx";
 import PublicEventForm from "./event-public-form";
-import { Empty, Button, Card, Typography, Tabs } from "antd";
-const Title = Typography.Title;
 
 type Tab = { label: string; key: string; children: ReactNode };
 
@@ -110,7 +113,7 @@ const PrivateEventProfile: FC<Props> = ({ id }) => {
         items={editMode ? forms : descriptions}
         activeKey={activeTabKey}
         onChange={onChange}
-        destroyInactiveTabPane
+        destroyOnHidden
       />
       <DeleteEventButton
         event={event}

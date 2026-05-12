@@ -1,9 +1,14 @@
-import { type FC, type ReactNode, useCallback, useContext, useState } from "react";
+import Empty from "antd/lib/empty";
+import Button from "antd/lib/button";
+import Card from "antd/lib/card/Card";
+import Title from "antd/lib/typography/Title";
+import { FC, ReactNode, useCallback, useContext, useState } from "react";
 import CardSkeleton from "../loading/card-skeleton";
 import PublicMemberDescription from "./member-public-description";
 import PublicMemberForm from "./member-public-form";
 import usePrivateMemberInfo from "../../services/use-private-member-info";
 import { LanguageCtx } from "../../services/context/language-ctx";
+import Tabs from "antd/lib/tabs";
 import type { MemberPrivateInfo } from "../../services/_types";
 import PrivateMemberDescription from "./member-private-description";
 import MemberInsightDescription from "./member-insight-description";
@@ -12,8 +17,8 @@ import MemberInsightForm from "./member-insight-form";
 import { SaveChangesCtx } from "../../services/context/save-changes-ctx";
 import router from "next/router";
 import { ActiveAccountCtx } from "../../services/context/active-account-ctx";
-import { Empty, Button, Card, Typography, Tabs } from "antd";
-const Title = Typography.Title;
+import { useAdminDetails } from "../../services/context/selected-institute-ctx";
+import PageRoutes from "../../routing/page-routes";
 
 type Tab = { label: string; key: string; children: ReactNode };
 
@@ -35,6 +40,17 @@ const PrivateMemberProfile: FC<Props> = ({ id }) => {
   };
 
   const { localAccount } = useContext(ActiveAccountCtx);
+  const isAdmin = useAdminDetails();
+
+  /** Institute admins can only access private member profiles within institutes they manage. */
+  if (isAdmin && !localAccount?.is_super_admin) {
+    var adminInstituteIds = localAccount?.instituteAdmin.map((admin) => admin.institute.id) || [];
+    var memberInstituteIds = member?.institutes.map((institute) => institute.instituteId) || [];
+    var hasPermission = false;
+    for (var a of adminInstituteIds) if (memberInstituteIds.includes(a)) hasPermission = true;
+    if (!hasPermission)
+      router.replace(PageRoutes.publicMemberProfile(id));
+  }
 
   /** After saving changes via submit button - dependency of form's submit */
   const onSuccess = useCallback(
@@ -118,7 +134,7 @@ const PrivateMemberProfile: FC<Props> = ({ id }) => {
       key: keys.private,
       children: <PrivateMemberDescription member={member} />,
     },
-    ...(localAccount && localAccount.is_admin
+    ...(localAccount && isAdmin
       ? [
           {
             label: en ? "Insight" : "Aperçu",
@@ -140,7 +156,7 @@ const PrivateMemberProfile: FC<Props> = ({ id }) => {
       key: keys.private,
       children: <PrivateMemberForm member={member} onSuccess={onSuccess} />,
     },
-    ...(localAccount && localAccount.is_admin
+    ...(localAccount && isAdmin
       ? [
           {
             label: en ? "Insight" : "Aperçu",
@@ -152,7 +168,6 @@ const PrivateMemberProfile: FC<Props> = ({ id }) => {
         ]
       : []),
   ];
-
   return (
     <Card title={header} styles={{ body: { paddingTop: 0 } }}>
       <Tabs
@@ -161,7 +176,7 @@ const PrivateMemberProfile: FC<Props> = ({ id }) => {
         onChange={onChange}
         // Very important to destroy inactive forms,
         // so they register their submit function to the save changes context when navigated back
-        destroyInactiveTabPane
+        destroyOnHidden
       />
     </Card>
   );

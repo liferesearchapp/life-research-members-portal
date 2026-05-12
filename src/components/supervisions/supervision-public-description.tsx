@@ -26,7 +26,7 @@ const PublicSupervisionDescription: FC<Props> = ({ supervision }) => {
       size="small"
       bordered
       column={1}
-      labelStyle={{ whiteSpace: "nowrap", width: 0 }}
+      styles={{ label: { whiteSpace: "nowrap", width: 0 } }}
       layout={screens.xs ? "vertical" : "horizontal"}
     >
       <Item label={en ? "First Name" : "Prénom"}>{supervision.first_name}</Item>
@@ -103,7 +103,13 @@ const PublicSupervisionDescription: FC<Props> = ({ supervision }) => {
           </SafeLink>
         ))}
       </Item>
-
+      {supervision.institute && (
+        <Item label={en ? "Institute" : "L'institut"}>
+          <Tag
+            key={supervision.institute.id}
+          >{`${supervision.institute.name} - ${supervision.institute.urlIdentifier}`}</Tag>
+        </Item>
+      )}
       <Item label={en ? "Committee Members" : "Membres du comité"}>
         {supervision.supervision_committee.map((entry, i) => (
           <SafeLink

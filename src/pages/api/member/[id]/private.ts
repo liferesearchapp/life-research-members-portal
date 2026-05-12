@@ -2,6 +2,11 @@ import type { insight } from "@prisma/client";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { includeAllMemberInfo } from "../../../../../prisma/helpers";
 import db from "../../../../../prisma/prisma-client";
+import {
+  assertAuthorized,
+  hasAnyInstituteAccess,
+  isCurrentMember,
+} from "../../../../utils/api/authorization";
 import getAccountFromRequest from "../../../../utils/api/get-account-from-request";
 
 export type PrivateMemberDBRes = Awaited<ReturnType<typeof getPrivateMemberInfo>>;
@@ -36,16 +41,20 @@ export default async function handler(
     const currentAccount = await getAccountFromRequest(req, res);
     if (!currentAccount) return;
 
-    const authorized =
-      currentAccount.is_admin || (currentAccount.member && currentAccount.member.id === id);
-
-    if (!authorized)
-      return res
-        .status(401)
-        .send("You are not authorized to view this member's private information.");
-
     const member = await getPrivateMemberInfo(id);
     if (!member) return res.status(400).send("Member not found. ID: " + id);
+    if (
+      !assertAuthorized(
+        res,
+        isCurrentMember(currentAccount, id) ||
+          hasAnyInstituteAccess(
+            currentAccount,
+            member.institutes.map((entry) => entry.instituteId)
+          ),
+        "You are not authorized to view this member's private information."
+      )
+    )
+      return;
 
     return res.status(200).send(member);
   } catch (e: any) {

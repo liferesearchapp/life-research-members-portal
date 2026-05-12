@@ -1,8 +1,13 @@
 // This is a modal button component that, when clicked, opens a modal to confirm the deletion of an event.
 // The modal includes a form with an input field to confirm the deletion by typing the name of the event.
 
+import Button from "antd/lib/button";
+import Form from "antd/lib/form";
+import useForm from "antd/lib/form/hooks/useForm";
+import Input from "antd/lib/input";
+import Modal from "antd/lib/modal";
 import {
-  type CSSProperties,
+  CSSProperties,
   type Dispatch,
   type FC,
   type SetStateAction,
@@ -11,13 +16,12 @@ import {
 } from "react";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import type { EventPrivateInfo } from "../../services/_types";
+import Alert from "antd/lib/alert";
+import Text from "antd/lib/typography/Text";
 import deleteEvent from "../../services/delete-event"; // Update the import statement
 import { useRouter } from "next/router";
 import PageRoutes from "../../routing/page-routes";
-import Notification from "../../services/notifications/notification";
-import { Button, Form, Input, Modal, Alert, Typography } from "antd";
-const useForm = Form.useForm;
-const Text = Typography.Text;
+import { useSelectedInstitute } from "../../services/context/selected-institute-ctx";
 
 type Data = { confirmation: string };
 type Props = {
@@ -28,6 +32,7 @@ type Props = {
 
 const DeleteEventButton: FC<Props> = ({ event, setEvent, style }) => {
   const { en } = useContext(LanguageCtx);
+  const { institute } = useSelectedInstitute();
   const router = useRouter();
   const [modalOpen, setModalOpen] = useState(false);
   const [form] = useForm<Data>();
@@ -36,9 +41,9 @@ const DeleteEventButton: FC<Props> = ({ event, setEvent, style }) => {
 
   async function submit() {
     const res = await deleteEvent(event.id);
-    if (res) {
+    if (res && institute?.urlIdentifier) {
       setModalOpen(false);
-      router.push(PageRoutes.allEvents);
+      router.push(PageRoutes.allEvents(institute?.urlIdentifier));
     }
   }
 
@@ -69,7 +74,7 @@ const DeleteEventButton: FC<Props> = ({ event, setEvent, style }) => {
         okText={en ? "Delete Event" : "Supprimer l'événement"}
         cancelButtonProps={{ danger: true }}
         cancelText={en ? "Cancel" : "Annuler"}
-        destroyOnClose
+        destroyOnHidden
         styles={{ body: { paddingBottom: 0 } }}
       >
         <Alert

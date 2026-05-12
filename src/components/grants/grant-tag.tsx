@@ -6,7 +6,10 @@
 */
 
 
+import CloseOutlined from "@ant-design/icons/lib/icons/CloseOutlined";
+import EditOutlined from "@ant-design/icons/lib/icons/EditOutlined";
 import type { grant } from "@prisma/client";
+import Tag from "antd/lib/tag";
 import type { CSSProperties, FC } from "react";
 import PageRoutes from "../../routing/page-routes";
 import colorFromString from "../../utils/front-end/color-from-string";
@@ -14,8 +17,7 @@ import GetLanguage from "../../utils/front-end/get-language";
 
 import SafeLink from "../link/safe-link";
 import { queryKeys } from "../grants/all-grants";
-import { Tag } from "antd";
-import { CloseOutlined, EditOutlined } from "@ant-design/icons";
+import { useSelectedInstitute } from "../../services/context/selected-institute-ctx";
 
 type Props = {
   grant: grant;
@@ -41,13 +43,17 @@ const GrantTag: FC<Props> = ({
   style,
 }) => {
   const classList = ["grant-tag"];
+  const { institute } = useSelectedInstitute();
+
   if (linked || editable || onClick) classList.push("cursor-pointer");
 
   //const text = <GetLanguage obj={g} />;
   const content = linked ? (
     <SafeLink
       href={{
-        pathname: PageRoutes.allGrants,
+        pathname:
+          institute?.urlIdentifier &&
+          PageRoutes.allGrants(institute?.urlIdentifier),
         //query: { [queryKeys.grants]: g.id },
       }}
     >

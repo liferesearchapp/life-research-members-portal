@@ -1,13 +1,15 @@
 // Displays information about a public event
 
+import Grid from "antd/lib/grid";
+import Descriptions from "antd/lib/descriptions";
+import Item from "antd/lib/descriptions/Item";
 import { type FC, useContext } from "react";
 import type { EventPublicInfo } from "../../services/_types";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import React from "react";
-import { Tag, Grid, Descriptions } from "antd";
+import { Tag } from "antd";
 import SafeLink from "../link/safe-link";
 import PageRoutes from "../../routing/page-routes";
-const Item = Descriptions.Item;
 
 const { useBreakpoint } = Grid;
 
@@ -25,7 +27,7 @@ const PublicEventDescription: FC<Props> = ({ event }) => {
       bordered
       column={1}
       className="event-description"
-      labelStyle={{ whiteSpace: "nowrap", width: 0 }}
+      styles={{ label: { whiteSpace: "nowrap", width: 0 } }}
       layout={screens.xs ? "vertical" : "horizontal"}
     >
       <Item label={en ? "Name (English)" : "Nom (anglais)"}>
@@ -149,6 +151,12 @@ const PublicEventDescription: FC<Props> = ({ event }) => {
             ) : null
           )}
         </ol>
+      </Item>
+
+      <Item label={en ? "Institute" : "L'institut"}>
+        <Tag
+          key={event.institute.id}
+        >{`${event.institute.name} - ${event.institute.urlIdentifier}`}</Tag>
       </Item>
 
       <Item label={en ? "Event Topic" : "Sujet de l'événement"}>

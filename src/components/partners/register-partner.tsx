@@ -3,14 +3,19 @@
 // The component uses the useForm hook from antd/lib/form/Form to handle form data and the onFinish event to trigger the registerPartner function from the "../../services/register-partner-member" service.
 // The component also uses context from the LanguageCtx, OrgTypesCtx, and OrgScopeCtx contexts to determine the language of the form and the available options for organization scope and type.
 
-import { Button, Select, Form, Input } from "antd";
-import React, { type FC, useContext } from "react";
+import { Button } from "antd";
+import Select from "antd/lib/select";
+import Form from "antd/lib/form";
+import Input from "antd/lib/input";
+import React, { FC, useContext } from "react";
+import { useForm } from "antd/lib/form/Form";
 import registerPartner from "../../services/register-partner";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import { OrgTypesCtx } from "../../services/context/org-types-ctx";
 import { OrgScopeCtx } from "../../services/context/org-scopes-ctx";
 import GetLanguage from "../../utils/front-end/get-language";
-const { useForm } = Form;
+import { MemberInstituteCtx } from "../../services/context/member-institutes-ctx";
+import { useSelectedInstitute } from "../../services/context/selected-institute-ctx";
 
 const { Option } = Select;
 
@@ -20,6 +25,7 @@ type Data = {
   scope_id: number;
   type_id: number;
   description: string;
+  institute_id: number[];
 };
 
 const RegisterPartner: FC = () => {
@@ -27,6 +33,8 @@ const RegisterPartner: FC = () => {
   const { en } = useContext(LanguageCtx);
   const { orgTypes } = useContext(OrgTypesCtx);
   const { orgScopes } = useContext(OrgScopeCtx);
+  const { institutes } = useContext(MemberInstituteCtx);
+  const { institute } = useSelectedInstitute();
 
   async function handleRegister({
     name_en,
@@ -34,6 +42,7 @@ const RegisterPartner: FC = () => {
     scope_id,
     type_id,
     description,
+    institute_id,
   }: Data) {
     const res = await registerPartner({
       name_en,
@@ -41,6 +50,7 @@ const RegisterPartner: FC = () => {
       scope_id,
       type_id,
       description,
+      institute_id,
     });
     if (res) form.resetFields();
   }
@@ -97,7 +107,22 @@ const RegisterPartner: FC = () => {
             ))}
           </Select>
         </Form.Item>
-
+        {institute && (
+          <Form.Item
+            label={en ? "Select Institute" : "Sélectionnez l'institut"}
+            name="institute_id"
+            initialValue={[institute.id]}
+          >
+            <Select mode="multiple">
+              <Option value="">{""}</Option>
+              {institutes.map((f) => (
+                <Option key={f.id} value={f.id}>
+                  {`${f.name} - ${f.urlIdentifier}`}
+                </Option>
+              ))}
+            </Select>
+          </Form.Item>
+        )}
         <Form.Item
           label={en ? "Description" : "Description"}
           name="description"

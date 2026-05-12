@@ -1,15 +1,21 @@
-import React, { type FC, useCallback, useContext, useEffect, useState } from "react";
+import Button from "antd/lib/button";
+import Form from "antd/lib/form";
+import { useForm } from "antd/lib/form/Form";
+import Input from "antd/lib/input";
+import React, { FC, useCallback, useContext, useEffect, useState } from "react";
 import type { MemberPrivateInfo } from "../../services/_types";
 import { LanguageCtx } from "../../services/context/language-ctx";
+import Divider from "antd/lib/divider";
+import Text from "antd/lib/typography/Text";
 import type { UpdateMemberPrivateParams } from "../../pages/api/update-member/[id]/private";
 import updateMemberPrivate from "../../services/update-member-private";
-import moment, { type Moment } from "moment";
+import DatePicker from "antd/lib/date-picker";
+import type { Dayjs } from "dayjs";
 import { red } from "@ant-design/colors";
+import Switch from "antd/lib/switch";
 import Notification from "../../services/notifications/notification";
 import { SaveChangesCtx, useResetDirtyOnUnmount } from "../../services/context/save-changes-ctx";
-import { Button, Form, Input, Divider, Typography, DatePicker, Switch } from "antd";
-const { useForm } = Form;
-const Text = Typography.Text;
+import toDayjsDate from "../../utils/front-end/to-dayjs-date";
 
 type Props = {
   member: MemberPrivateInfo;
@@ -23,7 +29,7 @@ type Data = {
   country: string;
   postal_code: string;
   mobile_phone: string;
-  date_joined: Moment | null;
+  date_joined: Dayjs | null;
   is_active: boolean;
 };
 
@@ -95,7 +101,7 @@ const PrivateMemberForm: FC<Props> = ({ member, onSuccess }) => {
     country: member.country || "",
     postal_code: member.postal_code || "",
     mobile_phone: member.mobile_phone || "",
-    date_joined: member.date_joined ? moment(member.date_joined.split("T")[0]) : null,
+    date_joined: toDayjsDate(member.date_joined),
     is_active: member.is_active,
   };
 

@@ -1,13 +1,13 @@
 //This component is a form element that allows a user to search for existing events and select one or more of them.
 
 import type { event } from "@prisma/client";
+import AutoComplete from "antd/lib/auto-complete";
+import Card from "antd/lib/card";
 import { type FC, useContext, useEffect, useState } from "react";
 import { EventsCtx } from "../../services/context/events-ctx";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import type { EventPublicInfo } from "../../services/_types";
 import EventTag from "./event-tag";
-import { AutoComplete, Button, Card } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
 
 type Props = {
   id?: string; // For connecting a label - antd form will pass this in

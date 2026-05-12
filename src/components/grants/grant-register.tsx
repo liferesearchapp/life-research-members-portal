@@ -4,17 +4,21 @@
 // The form uses the context API to access language, grant sources, grant statuses, and all topics data from the global state.
 // The component uses the useForm hook from the Ant Design library to handle form submissions and reset the form after a successful submission.
 
-import { Button, Col, DatePicker, Row, Switch, Select, Form, Input } from "antd";
-import React, { type FC, useContext, useState } from "react";
-import moment from "moment";
-import type { Moment } from "moment";
+import { Button, Col, DatePicker, Row, Switch } from "antd";
+import Select from "antd/lib/select";
+import Form from "antd/lib/form";
+import Input from "antd/lib/input";
+import React, { FC, useContext } from "react";
+import { useForm } from "antd/lib/form/Form";
+import type { Dayjs } from "dayjs";
 import registerGrant from "../../services/register-grant";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import { GrantSourcesCtx } from "../../services/context/grant-sources-ctx";
 import { GrantStatusCtx } from "../../services/context/grant-statuses-ctx";
 import { AllTopicsCtx } from "../../services/context/all-topics-ctx";
 import GetLanguage from "../../utils/front-end/get-language";
-const { useForm } = Form;
+import { MemberInstituteCtx } from "../../services/context/member-institutes-ctx";
+import { useSelectedInstitute } from "../../services/context/selected-institute-ctx";
 
 const { Option } = Select;
 
@@ -22,13 +26,15 @@ type GrantData = {
   title: string;
   amount: string;
   status_id: number;
-  submission_date: Moment | null;
-  obtained_date: Moment | null;
-  completed_date: Moment | null;
+  submission_date: Dayjs | null;
+  obtained_date: Dayjs | null;
+  completed_date: Dayjs | null;
   source_id: number;
   all_investigator: string;
   topic_id: number;
   note: string;
+  throught_lri: boolean;
+  institute_id: number;
 };
 
 const RegisterGrant: FC = () => {
@@ -37,7 +43,7 @@ const RegisterGrant: FC = () => {
   const { grantSources } = useContext(GrantSourcesCtx);
   const { grantStatuses } = useContext(GrantStatusCtx);
   const { topics } = useContext(AllTopicsCtx);
-  const [throughtLRI, setThroughtLRI] = useState(false);
+  const { institute } = useSelectedInstitute();
 
   async function handleRegister({
     title,
@@ -50,11 +56,13 @@ const RegisterGrant: FC = () => {
     all_investigator,
     topic_id,
     note,
+    throught_lri,
   }: GrantData) {
+    if (!institute) return;
     const res = await registerGrant({
       title,
       amount: parseFloat(amount), // Convert amount to a float
-      throught_lri: throughtLRI,
+      throught_lri,
       status_id,
       submission_date: submission_date ? submission_date.toDate() : null,
       obtained_date: obtained_date ? obtained_date.toDate() : null,
@@ -63,6 +71,7 @@ const RegisterGrant: FC = () => {
       all_investigator,
       topic_id,
       note,
+      institute_id: institute?.id,
     });
     if (res) form.resetFields();
   }
@@ -171,16 +180,12 @@ const RegisterGrant: FC = () => {
         </Form.Item>
 
         <Form.Item
+          label={en ? "Through LRI" : "Par l'intermédiaire du LRI"}
           name="throught_lri"
           valuePropName="checked"
-          style={{ display: "inline-block" }}
+          initialValue={false}
         >
-          {en ? "Through LRI: " : "Par l'intermédiaire du LRI: "}
-          <Switch
-            checked={throughtLRI}
-            onChange={() => setThroughtLRI(!throughtLRI)}
-          />
-          {throughtLRI ? " Yes" : " No"}
+          <Switch />
         </Form.Item>
 
         <Form.Item label={en ? "Note" : "Note"} name="note">

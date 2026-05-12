@@ -1,8 +1,13 @@
 // This component is a button that opens a modal to delete a grant.
 // The modal contains a form that requires the user to confirm the grant name before deletion.
 
+import Button from "antd/lib/button";
+import Form from "antd/lib/form";
+import useForm from "antd/lib/form/hooks/useForm";
+import Input from "antd/lib/input";
+import Modal from "antd/lib/modal";
 import {
-  type CSSProperties,
+  CSSProperties,
   type Dispatch,
   type FC,
   type SetStateAction,
@@ -11,13 +16,12 @@ import {
 } from "react";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import type { GrantPrivateInfo } from "../../services/_types";
+import Alert from "antd/lib/alert";
+import Text from "antd/lib/typography/Text";
 import deleteGrant from "../../services/delete-grant";
 import { useRouter } from "next/router";
 import PageRoutes from "../../routing/page-routes";
-import Notification from "../../services/notifications/notification";
-import { Button, Form, Input, Modal, Alert, Typography } from "antd";
-const useForm = Form.useForm;
-const Text = Typography.Text;
+import { useSelectedInstitute } from "../../services/context/selected-institute-ctx";
 
 type Data = { confirmation: string };
 type Props = {
@@ -31,6 +35,7 @@ const DeleteGrantButton: FC<Props> = ({ grant, setGrant, style }) => {
   const router = useRouter();
   const [modalOpen, setModalOpen] = useState(false);
   const [form] = useForm<Data>();
+  const { institute } = useSelectedInstitute();
 
   const grantName = grant.title;
 
@@ -38,7 +43,8 @@ const DeleteGrantButton: FC<Props> = ({ grant, setGrant, style }) => {
     const res = await deleteGrant(grant.id);
     if (res) {
       setModalOpen(false);
-      router.push(PageRoutes.allGrants);
+      if (institute)
+        router.push(PageRoutes.allGrants(institute?.urlIdentifier));
     }
   }
 
@@ -71,7 +77,7 @@ const DeleteGrantButton: FC<Props> = ({ grant, setGrant, style }) => {
         okText={en ? "Delete Grant" : "Supprimer la subvention"}
         cancelButtonProps={{ danger: true }}
         cancelText={en ? "Cancel" : "Annuler"}
-        destroyOnClose
+        destroyOnHidden
         styles={{ body: { paddingBottom: 0 } }}
       >
         <Alert

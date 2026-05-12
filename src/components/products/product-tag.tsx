@@ -1,15 +1,17 @@
 // this component is a presentational component that displays a product in a tag format.
 
+import CloseOutlined from "@ant-design/icons/lib/icons/CloseOutlined";
+import EditOutlined from "@ant-design/icons/lib/icons/EditOutlined";
 import type { product } from "@prisma/client";
-import { type CSSProperties, type FC, useState } from "react";
+import Tag from "antd/lib/tag";
+import { CSSProperties, FC, useState } from "react";
 import PageRoutes from "../../routing/page-routes";
 import colorFromString from "../../utils/front-end/color-from-string";
 import GetLanguage from "../../utils/front-end/get-product-language";
 import GetProductLanguage from "../../utils/front-end/get-product-language";
 import SafeLink from "../link/safe-link";
 import { queryKeys } from "../products/all-products";
-import { Tag } from "antd";
-import { CloseOutlined, EditOutlined } from "@ant-design/icons";
+import { useSelectedInstitute } from "../../services/context/selected-institute-ctx";
 
 type Props = {
   product: product;
@@ -35,6 +37,7 @@ const ProductTag: FC<Props> = ({
   style,
 }) => {
   const [modalOpen, setModalOpen] = useState(false);
+  const { institute } = useSelectedInstitute();
 
   const classList = ["product-tag"];
   if (linked || editable || onClick) classList.push("cursor-pointer");
@@ -47,7 +50,7 @@ const ProductTag: FC<Props> = ({
   const content = linked ? (
     <SafeLink
       href={{
-        pathname: PageRoutes.allProducts,
+        pathname: PageRoutes.allProducts(institute?.urlIdentifier || ""),
         //query: { [queryKeys.products]: p.id },
       }}
     >

@@ -9,7 +9,7 @@ import {
   useEffect,
   useState,
 } from "react";
-import { loginRequest } from "../../../auth-config";
+import { ensureMsalInitialized, loginRequest } from "../../../auth-config";
 import ApiRoutes from "../../routing/api-routes";
 import getAuthHeader from "../headers/auth-header";
 import type { AccountInfo } from "../_types";
@@ -25,7 +25,9 @@ export const ActiveAccountCtx = createContext<{
   setLocalAccount: Dispatch<SetStateAction<AccountInfo | null>>;
 }>(null as any);
 
-export const ActiveAccountCtxProvider: FC<PropsWithChildren> = ({ children }) => {
+export const ActiveAccountCtxProvider: FC<PropsWithChildren> = ({
+  children,
+}) => {
   const { instance, inProgress, accounts } = useMsal();
 
   const [localAccount, setLocalAccount] = useState<AccountInfo | null>(null);
@@ -60,17 +62,13 @@ export const ActiveAccountCtxProvider: FC<PropsWithChildren> = ({ children }) =>
     }
   }
 
-  // Wait until MsalProvider has finished initializing (and processing any login redirect)
-  // before checking auth state. inProgress === None means MSAL is idle.
   useEffect(() => {
     if (inProgress !== InteractionStatus.None) return;
-    // msal-browser v5 does not auto-set the active account after login/redirect.
-    // If accounts exist in the cache but no active account is selected yet, pick the first one.
-    // This covers both fresh logins (in case the LOGIN_SUCCESS event fires after this effect)
-    // and cached sessions on page refresh.
+
     if (accounts.length > 0 && !instance.getActiveAccount()) {
       instance.setActiveAccount(accounts[0]);
     }
+
     async function firstLoad() {
       if (!instance.getActiveAccount()) return setLoading(false);
       const notification = new Notification("bottom-right");
@@ -79,6 +77,7 @@ export const ActiveAccountCtxProvider: FC<PropsWithChildren> = ({ children }) =>
       setLoading(false);
       notification.close();
     }
+
     firstLoad();
   }, [instance, inProgress, accounts]);
 
@@ -92,15 +91,16 @@ export const ActiveAccountCtxProvider: FC<PropsWithChildren> = ({ children }) =>
     notification.close();
   }
 
-  function login() {
+  async function login() {
+    await ensureMsalInitialized();
     instance.loginRedirect(loginRequest).catch((e: any) => {
       new Notification().error(e);
     });
   }
 
-  function logout() {
+  async function logout() {
     setLocalAccount(null);
-    // clearCache clears MSAL state without triggering a browser redirect (v5 replacement for onRedirectNavigate: () => false)
+    await ensureMsalInitialized();
     instance.clearCache().catch((e: any) => {
       new Notification().error(e);
     });
@@ -108,7 +108,15 @@ export const ActiveAccountCtxProvider: FC<PropsWithChildren> = ({ children }) =>
 
   return (
     <ActiveAccountCtx.Provider
-      value={{ localAccount, loading, login, logout, refresh, refreshing, setLocalAccount }}
+      value={{
+        localAccount,
+        loading,
+        refresh,
+        login,
+        logout,
+        refreshing,
+        setLocalAccount,
+      }}
     >
       {children}
     </ActiveAccountCtx.Provider>

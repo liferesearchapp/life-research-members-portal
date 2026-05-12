@@ -10,7 +10,10 @@ const AccountProfilePage: NextPage = () => {
   const { id } = router.query;
   if (!(typeof id === "string")) return null;
   return (
-    <PageAuthGuard auths={[Authorizations.admin]} loadingIcon={<CardSkeleton />}>
+    <PageAuthGuard
+      auths={[Authorizations.admin, Authorizations.superAdmin]}
+      loadingIcon={<CardSkeleton />}
+    >
       <AccountProfile id={parseInt(id)} />
     </PageAuthGuard>
   );

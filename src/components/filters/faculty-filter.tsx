@@ -5,12 +5,11 @@
   and the changes to the selection can be passed as the `onChange` prop (a callback with the new Set of IDs).
   The `getPopupContainer` prop can be used to specify the container of the dropdown menu.
 */
+import Select, { SelectProps } from "antd/lib/select";
 import { type FC, useContext, useMemo } from "react";
 import { FacultiesCtx } from "../../services/context/faculties-ctx";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import GetLanguage from "../../utils/front-end/get-language";
-import { Select } from "antd";
-import type { SelectProps } from "antd";
 
 type Props = {
   id?: string;

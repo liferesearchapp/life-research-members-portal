@@ -21,8 +21,10 @@ const MemberInsightDescription: FC<Props> = ({ member }) => {
       size="small"
       bordered
       column={1}
-      labelStyle={{ whiteSpace: "break-spaces", width: "8rem" }}
-      contentStyle={{ whiteSpace: "break-spaces" }}
+      styles={{
+        label: { whiteSpace: "break-spaces", width: "8rem" },
+        content: { whiteSpace: "break-spaces" },
+      }}
       layout={screens.xs ? "vertical" : "horizontal"}
     >
       <Item label={en ? "Interview Date" : "Date de l'entretien"}>

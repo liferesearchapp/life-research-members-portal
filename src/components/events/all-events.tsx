@@ -2,10 +2,11 @@
 // The component also has buttons to create new events, refresh the events and clear the filters.
 // The component also updates the URL query parameters based on the filter values and the query parameters are used to update the filters on component mount.
 
+import Button from "antd/lib/button";
+import Table, { ColumnType } from "antd/lib/table";
+import Title from "antd/lib/typography/Title";
 import {
   type FC,
-  Fragment,
-  useCallback,
   useContext,
   useEffect,
   useMemo,
@@ -13,10 +14,13 @@ import {
 } from "react";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import PageRoutes from "../../routing/page-routes";
+import Descriptions from "antd/lib/descriptions";
+import Item from "antd/lib/descriptions/Item";
 import SafeLink from "../link/safe-link";
 import Router, { useRouter } from "next/router";
+import Form from "antd/lib/form";
 import blurActiveElement from "../../utils/front-end/blur-active-element";
-import { Checkbox, Button, Table, Typography, Descriptions, Form } from "antd";
+import { Checkbox } from "antd";
 import type { ParsedUrlQueryInput } from "querystring";
 import { ActiveAccountCtx } from "../../services/context/active-account-ctx";
 import { AllEventsCtx } from "../../services/context/all-events-ctx";
@@ -24,12 +28,12 @@ import EventNameFilter from "../filters/event-name-filter";
 import EventTypeFilter from "../filters/event-type-filter";
 import EventDateFilter from "../filters/event-date-filter";
 import type { EventPublicInfo } from "../../services/_types";
-import moment, { type Moment } from "moment";
-import type { TableColumnType as ColumnType } from "antd";
-
-type RangeValue<T> = [T | null, T | null] | null;
-const Title = Typography.Title;
-const Item = Descriptions.Item;
+import type { RangeValueType } from "rc-picker/lib/PickerInput/RangePicker";
+import dayjs, { type Dayjs } from "dayjs";
+import {
+  useAdminDetails,
+  useSelectedInstitute,
+} from "../../services/context/selected-institute-ctx";
 
 function nameSorter(en: boolean) {
   return (
@@ -50,8 +54,8 @@ function filterFn(
   filters: {
     nameFilter: Set<number>;
     typeFilter: Set<number>;
-    startDateFilter: moment.Moment | null;
-    endDateFilter: moment.Moment | null;
+    startDateFilter: Dayjs | null;
+    endDateFilter: Dayjs | null;
   }
 ): boolean {
   const { nameFilter, typeFilter, startDateFilter, endDateFilter } = filters;
@@ -64,12 +68,12 @@ function filterFn(
   }
 
   if (startDateFilter && m.start_date) {
-    const eventStartDate = moment(m.start_date);
+    const eventStartDate = dayjs(m.start_date);
     if (eventStartDate.isBefore(startDateFilter, "day")) return false;
   }
 
   if (endDateFilter && m.end_date) {
-    const eventEndDate = moment(m.end_date);
+    const eventEndDate = dayjs(m.end_date);
     if (eventEndDate.isAfter(endDateFilter, "day")) return false;
   }
 
@@ -120,9 +124,9 @@ function handleEventTypeFilterChange(next: Set<number>) {
   );
 }
 
-function handleEventDateFilterChange(value: RangeValue<Moment> | null) {
+function handleEventDateFilterChange(value: RangeValueType<Dayjs> | null) {
   const adjustedStartDate =
-    value && value[0] ? value[0].clone().subtract(1, "day") : null;
+    value && value[0] ? value[0].subtract(1, "day") : null;
 
   Router.push(
     {
@@ -167,8 +171,14 @@ function handleShowEndDateChange(value: boolean) {
   Router.push({ query }, undefined, { scroll: false });
 }
 
-function clearQueries() {
-  Router.push({ query: null }, undefined, { scroll: false });
+function clearQueries(institute: { urlIdentifier: string | null }) {
+  if (institute?.urlIdentifier) {
+    const url = PageRoutes.allEvents(institute.urlIdentifier);
+    Router.push(url);
+  } else {
+    console.error("Unable to reset filters: Institute ID is missing.");
+    alert("Unable to reset filters: Institute ID is missing.");
+  }
 }
 
 function getIdsFromQueryParams(key: string): Set<number> {
@@ -187,6 +197,11 @@ function getIdsFromQueryParams(key: string): Set<number> {
   return res;
 }
 
+function getDateFromQueryParam(query: string | string[] | undefined): string | null {
+  if (!query) return null;
+  return Array.isArray(query) ? query[0] || null : query;
+}
+
 function getPopupContainer(): HTMLElement {
   return (
     document.querySelector(".all-organizations-table .filters") || document.body
@@ -195,6 +210,7 @@ function getPopupContainer(): HTMLElement {
 
 const AllEvents: FC = () => {
   const { en } = useContext(LanguageCtx);
+  const { institute } = useSelectedInstitute();
 
   const {
     allEvents,
@@ -208,10 +224,16 @@ const AllEvents: FC = () => {
   }, []);
 
   const handleCreateEvent = () => {
-    router.push("events/register");
+    if (institute) {
+      router.push({
+        pathname: "/[instituteId]/events/register",
+        query: { instituteId: institute.urlIdentifier },
+      });
+    }
   };
 
   const { localAccount } = useContext(ActiveAccountCtx);
+  const isAdmin = useAdminDetails();
 
   const [showType, setShowType] = useState<boolean>(defaultQueries.showType);
   const [showStartDate, setShowStartDate] = useState<boolean>(
@@ -223,12 +245,8 @@ const AllEvents: FC = () => {
 
   const [nameFilter, setNameFilter] = useState(new Set<number>());
   const [typeFilter, setTypeFilter] = useState(new Set<number>());
-  const [startDateFilter, setStartDateFilter] = useState<moment.Moment | null>(
-    null
-  );
-  const [endDateFilter, setEndDateFilter] = useState<moment.Moment | null>(
-    null
-  );
+  const [startDateFilter, setStartDateFilter] = useState<Dayjs | null>(null);
+  const [endDateFilter, setEndDateFilter] = useState<Dayjs | null>(null);
 
   const router = useRouter();
   const showTypeQuery = router.query[queryKeys.showType];
@@ -253,12 +271,14 @@ const AllEvents: FC = () => {
   }, [showStartDateQuery]);
 
   useEffect(() => {
-    if (!startDateQuery) setStartDateFilter(null);
-    else setStartDateFilter(moment(startDateQuery));
+    const nextStartDate = getDateFromQueryParam(startDateQuery);
+    if (!nextStartDate) setStartDateFilter(null);
+    else setStartDateFilter(dayjs(nextStartDate));
   }, [startDateQuery]);
   useEffect(() => {
-    if (!endDateQuery) setEndDateFilter(null);
-    else setEndDateFilter(moment(endDateQuery));
+    const nextEndDate = getDateFromQueryParam(endDateQuery);
+    if (!nextEndDate) setEndDateFilter(null);
+    else setEndDateFilter(dayjs(nextEndDate));
   }, [endDateQuery]);
 
   useEffect(() => {
@@ -276,8 +296,14 @@ const AllEvents: FC = () => {
   }, [typeQuery]);
 
   function refreshAndClearFilters() {
-    clearQueries();
-    refreshEvents();
+    const instituteUrlIdentifier = institute?.urlIdentifier; 
+    if (instituteUrlIdentifier) {
+      clearQueries({ urlIdentifier: instituteUrlIdentifier }); 
+       refreshEvents();
+    }else {
+      console.error("Cannot reset filters: Institute ID is missing.");
+    }
+    
   }
   const filteredEvents = useMemo(
     () =>
@@ -437,7 +463,7 @@ const AllEvents: FC = () => {
         <Button type="primary" onClick={refreshAndClearFilters} size="large">
           {en ? "Reset the filter" : "Réinitialiser le filtre"}
         </Button>{" "}
-        {localAccount && localAccount.is_admin && (
+        {localAccount && isAdmin && (
           <Button
             type="primary"
             size="large"

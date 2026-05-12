@@ -2,8 +2,11 @@
 // The component also has buttons ta add a new supervision and clear the filters.
 // The component also updates the URL query parameters based on the filter values and the query parameters are used to update the filters on component mount.
 
+import Button from "antd/lib/button";
+import Table, { ColumnType } from "antd/lib/table";
+import Title from "antd/lib/typography/Title";
 import {
-  type FC,
+  FC,
   Fragment,
   useCallback,
   useContext,
@@ -14,10 +17,13 @@ import {
 import { LanguageCtx } from "../../services/context/language-ctx";
 import PageRoutes from "../../routing/page-routes";
 import GetLanguage from "../../utils/front-end/get-language";
+import Descriptions from "antd/lib/descriptions";
+import Item from "antd/lib/descriptions/Item";
 import SafeLink from "../link/safe-link";
 import Router, { useRouter } from "next/router";
+import Form from "antd/lib/form";
 import blurActiveElement from "../../utils/front-end/blur-active-element";
-import { Checkbox, Button, Table, Typography, Descriptions, Form } from "antd";
+import { Checkbox } from "antd";
 import type { SupervisionPublicInfo } from "../../services/_types";
 import { AllSupervisionsCtx } from "../../services/context/all-supervisions-ctx";
 import LevelFilter from "../filters/level-filter";
@@ -25,9 +31,10 @@ import FacultyFilter from "../filters/faculty-filter";
 import SupervisionNameFilter from "../filters/supervision-name-filter";
 import type { ParsedUrlQueryInput } from "querystring";
 import { ActiveAccountCtx } from "../../services/context/active-account-ctx";
-import type { TableColumnType as ColumnType } from "antd";
-const Title = Typography.Title;
-const Item = Descriptions.Item;
+import {
+  useAdminDetails,
+  useSelectedInstitute,
+} from "../../services/context/selected-institute-ctx";
 
 function nameSorter(a: { name: string }, b: { name: string }) {
   return a.name.localeCompare(b.name);
@@ -154,10 +161,15 @@ function handleShowEndDateChange(value: boolean) {
   Router.push({ query }, undefined, { scroll: false });
 }
 
-function clearQueries() {
-  Router.push({ query: null }, undefined, { scroll: false });
+function clearQueries(institute: { urlIdentifier: string | null }) {
+  if (institute?.urlIdentifier) {
+    const url = PageRoutes.allSupervisions(institute.urlIdentifier);
+    Router.push(url);
+  } else {
+    console.error("Unable to reset filters: Institute ID is missing.");
+    alert("Unable to reset filters: Institute ID is missing.");
+  }
 }
-
 function getIdsFromQueryParams(key: string): Set<number> {
   const res = new Set<number>();
   const query = Router.query[key];
@@ -182,6 +194,7 @@ function getPopupContainer(): HTMLElement {
 
 const AllSupervisions: FC = () => {
   const { en } = useContext(LanguageCtx);
+  const { institute } = useSelectedInstitute();
 
   const {
     allSupervisions,
@@ -190,7 +203,12 @@ const AllSupervisions: FC = () => {
   } = useContext(AllSupervisionsCtx);
 
   const handleCreateEvent = () => {
-    router.push("supervisions/register");
+    if (institute) {
+      router.push({
+        pathname: "/[instituteId]/supervisions/register",
+        query: { instituteId: institute.urlIdentifier },
+      });
+    }
   };
 
   const { localAccount } = useContext(ActiveAccountCtx);
@@ -267,8 +285,13 @@ const AllSupervisions: FC = () => {
   }, [levelsQuery]);
 
   function refreshAndClearFilters() {
-    clearQueries();
-    refreshSupervisions();
+    const instituteUrlIdentifier = institute?.urlIdentifier; 
+    if (instituteUrlIdentifier) {
+      clearQueries({ urlIdentifier: instituteUrlIdentifier }); 
+    refreshSupervisions();}
+    else {
+      console.error("Cannot reset filters: Institute ID is missing.");
+    }
   }
   const filteredSupervisions = useMemo(
     () =>
@@ -436,6 +459,8 @@ const AllSupervisions: FC = () => {
     </Form>
   );
 
+  const isAdmin = useAdminDetails();
+
   const Header = () => (
     <>
       <div className="header-title-row">
@@ -445,7 +470,7 @@ const AllSupervisions: FC = () => {
         <Button type="primary" onClick={refreshAndClearFilters} size="large">
           {en ? "Reset the filter" : "Réinitialiser le filtre"}
         </Button>{" "}
-        {localAccount && localAccount.is_admin && (
+        {localAccount && isAdmin && (
           <Button
             type="primary"
             size="large"

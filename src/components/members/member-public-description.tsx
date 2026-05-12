@@ -1,4 +1,7 @@
-import { type FC, useContext } from "react";
+import Grid from "antd/lib/grid";
+import Descriptions from "antd/lib/descriptions";
+import Item from "antd/lib/descriptions/Item";
+import { FC, useContext } from "react";
 import type { MemberPublicInfo } from "../../services/_types";
 import GetLanguage from "../../utils/front-end/get-language";
 import KeywordTag from "../keywords/keyword-tag";
@@ -9,6 +12,7 @@ import {
   LinkedinOutlined,
   TwitterOutlined,
 } from "@ant-design/icons";
+import Tag from "antd/lib/tag";
 import SafeLink from "../link/safe-link";
 import TikTokIcon from "../icons/tiktok-icon";
 import CvIcon from "../icons/cv-icon";
@@ -20,8 +24,7 @@ import getMemberOrg from "../getters/member-partner-getter";
 import getMemberSupervision from "../getters/member-supervision-getter";
 import { ActiveAccountCtx } from "../../services/context/active-account-ctx";
 import getMemberGrant from "../getters/member-grant-getter";
-import { Grid, Descriptions, Tag } from "antd";
-const Item = Descriptions.Item;
+import { useAdminDetails } from "../../services/context/selected-institute-ctx";
 
 const { useBreakpoint } = Grid;
 
@@ -33,13 +36,14 @@ const PublicMemberDescription: FC<Props> = ({ member }) => {
   const screens = useBreakpoint();
   const { en } = useContext(LanguageCtx);
   const { localAccount } = useContext(ActiveAccountCtx);
+  const isAdmin = useAdminDetails();
 
   return (
     <Descriptions
       size="small"
       bordered
       column={1}
-      labelStyle={{ whiteSpace: "nowrap", width: 0 }}
+      styles={{ label: { whiteSpace: "nowrap", width: 0 } }}
       layout={screens.xs ? "vertical" : "horizontal"}
     >
       <Item
@@ -58,7 +62,7 @@ const PublicMemberDescription: FC<Props> = ({ member }) => {
         label={
           en ? "Problems I Work On" : "Problèmes sur lesquels je travaille"
         }
-        labelStyle={{ whiteSpace: "break-spaces" }}
+        styles={{ label: { whiteSpace: "break-spaces" } }}
       >
         {member.problem.map((p, i) => (
           <React.Fragment key={i}>
@@ -131,7 +135,7 @@ const PublicMemberDescription: FC<Props> = ({ member }) => {
 
       {member.partnership_member_org.length > 0 &&
         localAccount &&
-        (localAccount.member?.id === member.id || localAccount.is_admin) && (
+        (localAccount.member?.id === member.id || isAdmin) && (
           <Item label={en ? "Member's Partners" : "Partenaires du membre"}>
             {getMemberOrg(member.partnership_member_org)}
           </Item>
@@ -139,7 +143,7 @@ const PublicMemberDescription: FC<Props> = ({ member }) => {
 
       {member.supervision_principal_supervisor.length > 0 &&
         localAccount &&
-        (localAccount.member?.id === member.id || localAccount.is_admin) && (
+        (localAccount.member?.id === member.id || isAdmin) && (
           <Item label={en ? "Member's Supervision" : "Supervisions du membre"}>
             {getMemberSupervision(member.supervision_principal_supervisor)}
           </Item>
@@ -147,7 +151,7 @@ const PublicMemberDescription: FC<Props> = ({ member }) => {
 
       {member.grant_member_involved.length > 0 &&
         localAccount &&
-        (localAccount.member?.id === member.id || localAccount.is_admin) && (
+        (localAccount.member?.id === member.id || isAdmin) && (
           <Item label={en ? "Grant involved" : "Subvention impliqué"}>
             {getMemberGrant(member.grant_member_involved)}
           </Item>

@@ -1,10 +1,11 @@
+import MenuOutlined from "@ant-design/icons/lib/icons/MenuOutlined";
+import Menu from "antd/lib/menu";
+import Spin from "antd/lib/spin";
 import { useRouter } from "next/router";
 import {
-  type FC,
-  type JSXElementConstructor,
-  type ReactElement,
+  type ComponentProps,
+  FC,
   type ReactNode,
-  type ReactPortal,
   useContext,
 } from "react";
 import { ActiveAccountCtx } from "../../services/context/active-account-ctx";
@@ -12,27 +13,44 @@ import { LanguageCtx } from "../../services/context/language-ctx";
 import PageRoutes from "../../routing/page-routes";
 import SafeLink from "../link/safe-link";
 import type { UrlObject } from "url";
-import { Menu, Spin } from "antd";
-import type { MenuProps } from "antd";
-import { MenuOutlined } from "@ant-design/icons";
+import { useAdminDetails, useMemberDetails } from "../../services/context/selected-institute-ctx";
+import { useSelectedInstitute } from "../../services/context/selected-institute-ctx";
 
-type MenuItemType = NonNullable<MenuProps["items"]>[number];
+type MenuItemType = NonNullable<ComponentProps<typeof Menu>["items"]>[number];
 
-const NavMenu: FC = () => {
+const NavMenu: FC<{ urlIdentifier: string | undefined }> = ({
+  urlIdentifier,
+}) => {
   const { localAccount, loading } = useContext(ActiveAccountCtx);
   const router = useRouter();
   const { en } = useContext(LanguageCtx);
+  const isAdmin = useAdminDetails();
+  const isMember = useMemberDetails();
+  const { institute } = useSelectedInstitute();
+  if (!urlIdentifier) return <Spin />;
 
   // Everyone
   const generalItems = [
-    { label: en ? "Home" : "Accueil", href: PageRoutes.home },
+    {
+      label: en ? "Home" : "Accueil",
+      href: PageRoutes.instituteHome(urlIdentifier),
+    },
   ];
 
-  // Registered Acounts
+  // Member Acounts
   const registeredItemsFirst = [
-    { label: en ? "Members" : "Membres", href: PageRoutes.allMembers },
-    { label: en ? "Products" : "Produits", href: PageRoutes.products },
-    { label: en ? "Partners" : "Partenaires", href: PageRoutes.allPartners },
+    {
+      label: en ? "Members" : "Membres",
+      href: PageRoutes.allMembers(urlIdentifier),
+    },
+    {
+      label: en ? "Products" : "Produits",
+      href: PageRoutes.allProducts(urlIdentifier),
+    },
+    {
+      label: en ? "Partners" : "Partenaires",
+      href: PageRoutes.allPartners(urlIdentifier),
+    },
   ];
 
   // Registered Acounts
@@ -42,33 +60,51 @@ const NavMenu: FC = () => {
 
   // Admins
   const adminItems = [
-    { label: en ? "Grants" : "Subventions", href: PageRoutes.allGrants },
-    { label: en ? "Events" : "Événements", href: PageRoutes.allEvents },
+    {
+      label: en ? "Grants" : "Subventions",
+      href: PageRoutes.allGrants(urlIdentifier),
+    },
+    {
+      label: en ? "Events" : "Événements",
+      href: PageRoutes.allEvents(urlIdentifier),
+    },
     {
       label: en ? "Supervisions" : "Supervisions",
-      href: PageRoutes.allSupervisions,
+      href: PageRoutes.allSupervisions(urlIdentifier),
     },
+  ];
 
+  const adminSuperAdminItems = {
+    label: en ? "Accounts" : "Comptes",
+    href: PageRoutes.allAccounts(urlIdentifier),
+    children: [
+      {
+        label: en ? "All accounts" : "Tous les comptes",
+        href: PageRoutes.allAccounts(urlIdentifier),
+      },
+      {
+        label: en ? "Register an account" : "Enregistrer un compte",
+        href: PageRoutes.register,
+      },
+    ],
+  };
+
+  const superAdminItems = [
     {
-      label: en ? "Accounts" : "Comptes",
-      href: PageRoutes.allAccounts,
-      children: [
-        {
-          label: en ? "All accounts" : "Tous les comptes",
-          href: PageRoutes.allAccounts,
-        },
-        {
-          label: en ? "Register an account" : "Enregistrer un compte",
-          href: PageRoutes.register,
-        },
-      ],
+      label: en ? "Institutes" : "Instituts",
+      href: PageRoutes.allInstitutes(),
     },
   ];
 
   const items: { label: string; href: string; children?: any }[] = generalItems;
   if (!loading) {
-    if (localAccount) for (const it of registeredItemsFirst) items.push(it);
-    if (localAccount?.is_admin) for (const it of adminItems) items.push(it);
+    if (localAccount && isMember) for (const it of registeredItemsFirst) items.push(it);
+    if (isAdmin)
+      for (const it of adminItems) items.push(it);
+    if (isAdmin || localAccount?.is_super_admin)
+      items.push(adminSuperAdminItems)
+    if (localAccount?.is_super_admin)
+      for (const it of superAdminItems) items.push(it);
     if (localAccount) for (const it of registeredItemsLast) items.push(it);
   }
 
@@ -96,15 +132,7 @@ const NavMenu: FC = () => {
         children: it.children.map(
           (child: {
             href: string | UrlObject;
-            label:
-              | string
-              | number
-              | boolean
-              | ReactElement<any, string | JSXElementConstructor<any>>
-              | Iterable<ReactNode>
-              | ReactPortal
-              | null
-              | undefined;
+            label: ReactNode;
           }) => ({
             label: <SafeLink href={child.href}>{child.label}</SafeLink>,
             key: child.label,

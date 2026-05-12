@@ -1,27 +1,35 @@
-import "@ant-design/v5-patch-for-react-19";
+import "../antd-react19-patch";
 import "../styles/_globals.scss";
 import type { AppProps } from "next/app";
-import { MsalProvider } from "@azure/msal-react";
-import { msalInstance } from "../../auth-config";
-import Head from "next/head";
-import Navbar from "../components/navbar/_navbar";
-import { useRouter } from "next/router";
-import PageRoutes from "../routing/page-routes";
-import AllContextProviders from "../services/context/_ctx-bundler";
 import { App } from "antd";
+import { MsalProvider } from "@azure/msal-react";
+import Head from "next/head";
+import { useRouter } from "next/router";
+import { msalInstance } from "../../auth-config";
+import InstituteGuard from "../components/institute-guard";
+import Navbar from "../components/navbar/_navbar";
+import AllContextProviders from "../services/context/_ctx-bundler";
 
 function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter();
+
   function getSuffix() {
     const path = router.pathname;
-    if (path.startsWith(PageRoutes.allAccounts)) return "Accounts";
-    if (path.startsWith(PageRoutes.allMembers)) return "Members";
-    if (path.startsWith(PageRoutes.register)) return "Register";
-    if (path.startsWith(PageRoutes.myProfile)) return "My Profile";
-    if (path === PageRoutes.home) return "Home";
+    if (path.includes("/accounts")) return "Accounts";
+    if (path.includes("/members")) return "Members";
+    if (path.includes("/products")) return "Products";
+    if (path.includes("/partners")) return "Partners";
+    if (path.includes("/grants")) return "Grants";
+    if (path.includes("/events")) return "Events";
+    if (path.includes("/supervisions")) return "Supervisions";
+    if (path.includes("/institutes")) return "Institutes";
+    if (path === "/register") return "Register";
+    if (path === "/my-profile") return "My Profile";
+    if (path === "/" || path === "/[instituteId]") return "Home";
     return "";
   }
-  let suffix = getSuffix();
+
+  const suffix = getSuffix();
   let title = "LIFE";
   if (suffix) title += " - " + suffix;
 
@@ -34,9 +42,11 @@ function MyApp({ Component, pageProps }: AppProps) {
         <App>
           <AllContextProviders>
             <Navbar />
-            <div className="next-page-container">
-              <Component {...pageProps} />
-            </div>
+            <InstituteGuard>
+              <div className="next-page-container">
+                <Component {...pageProps} />
+              </div>
+            </InstituteGuard>
           </AllContextProviders>
         </App>
       </MsalProvider>

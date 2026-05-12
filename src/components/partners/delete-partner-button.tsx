@@ -4,23 +4,28 @@ The component displays a confirmation modal when the delete button is clicked, a
 The deletion is performed using the deletePartner service, and the user is redirected to the all partners page upon successful deletion.
 */
 
+import Button from "antd/lib/button";
+import Form from "antd/lib/form";
+import useForm from "antd/lib/form/hooks/useForm";
+import Input from "antd/lib/input";
+import Modal from "antd/lib/modal";
 import {
-  type CSSProperties,
-  type Dispatch,
-  type FC,
-  type SetStateAction,
+  CSSProperties,
+  Dispatch,
+  FC,
+  SetStateAction,
   useContext,
   useState,
 } from "react";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import type { PartnerPrivateInfo } from "../../services/_types";
+import Alert from "antd/lib/alert";
+import Text from "antd/lib/typography/Text";
 import deletePartner from "../../services/delete-partner"; // Update the import statement
 import { useRouter } from "next/router";
 import PageRoutes from "../../routing/page-routes";
 import Notification from "../../services/notifications/notification";
-import { Button, Form, Input, Modal, Alert, Typography } from "antd";
-const useForm = Form.useForm;
-const Text = Typography.Text;
+import { useSelectedInstitute } from "../../services/context/selected-institute-ctx";
 
 type Data = { confirmation: string };
 type Props = {
@@ -34,6 +39,7 @@ const DeletePartnerButton: FC<Props> = ({ partner, setPartner, style }) => {
   const router = useRouter();
   const [modalOpen, setModalOpen] = useState(false);
   const [form] = useForm<Data>();
+  const { institute } = useSelectedInstitute();
 
   const partnerName = en ? partner.name_en : partner.name_fr;
 
@@ -41,7 +47,8 @@ const DeletePartnerButton: FC<Props> = ({ partner, setPartner, style }) => {
     const res = await deletePartner(partner.id);
     if (res) {
       setModalOpen(false);
-      router.push(PageRoutes.allPartners); // Update the route
+      if (institute?.urlIdentifier)
+        router.push(PageRoutes.allPartners(institute?.urlIdentifier));
     }
   }
 
@@ -74,7 +81,7 @@ const DeletePartnerButton: FC<Props> = ({ partner, setPartner, style }) => {
         okText={en ? "Delete Partner" : "Supprimer le partenaire"}
         cancelButtonProps={{ danger: true }}
         cancelText={en ? "Cancel" : "Annuler"}
-        destroyOnClose
+        destroyOnHidden
         styles={{ body: { paddingBottom: 0 } }}
       >
         <Alert

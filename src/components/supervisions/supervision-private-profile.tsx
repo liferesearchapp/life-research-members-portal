@@ -122,7 +122,7 @@ const PrivateSupervisionProfile: FC<Props> = ({ id }) => {
         onChange={onChange}
         // Very important to destroy inactive forms,
         // so they register their submit function to the save changes context when navigated back
-        destroyInactiveTabPane
+        destroyOnHidden
       />
       <DeleteSupervisionButton
         supervision={supervision}

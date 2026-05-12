@@ -7,15 +7,59 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model institute {
+  id             Int                     @id @default(autoincrement())
+  name           String                  @unique
+  urlIdentifier  String                  @unique
+  description_en String?
+  description_fr String?
+  events         event[]
+  grants         grant[]
+  instituteAdmin instituteAdmin[]
+  members        memberInstitute[]
+  organizations  organizationInstitute[]
+  products       productInstitute[]
+  supervisions   supervision[]
+  is_active      Boolean @default(true, map: "DF_institute_is_active")
+}
+
+model memberInstitute {
+  memberId    Int
+  instituteId Int
+  institute   institute @relation(fields: [instituteId], references: [id])
+  member      member    @relation(fields: [memberId], references: [id])
+
+  @@id([memberId, instituteId])
+}
+
+model productInstitute {
+  productId   Int
+  instituteId Int
+  institute   institute @relation(fields: [instituteId], references: [id])
+  product     product   @relation(fields: [productId], references: [id])
+
+  @@id([productId, instituteId])
+}
+
+model organizationInstitute {
+  organizationId Int
+  instituteId    Int
+  institute      institute    @relation(fields: [instituteId], references: [id])
+  organization   organization @relation(fields: [organizationId], references: [id])
+
+  @@id([organizationId, instituteId])
+}
+
 model account {
-  id           Int       @id(map: "PK_account") @default(autoincrement())
-  login_email  String    @unique(map: "UK_login_email") @db.NVarChar(255)
-  microsoft_id String?   @db.NVarChar(255)
-  first_name   String    @db.NVarChar(255)
-  last_name    String    @db.NVarChar(255)
-  is_admin     Boolean   @default(false, map: "DF_account_is_admin")
-  last_login   DateTime? @db.Date
-  member       member?
+  id             Int              @id(map: "PK_account") @default(autoincrement())
+  login_email    String           @unique(map: "UK_login_email") @db.NVarChar(255)
+  microsoft_id   String?          @db.NVarChar(255)
+  first_name     String           @db.NVarChar(255)
+  last_name      String           @db.NVarChar(255)
+  last_login     DateTime?        @db.Date
+  is_super_admin Boolean          @default(false, map: "DF_account_is_super_admin")
+  instituteAdmin instituteAdmin[]
+  member         member?
 }
 
 model current_promotion_strategy {
@@ -56,6 +100,8 @@ model event {
   event_type_id                                                      Int?
   topic_id                                                           Int?
   note                                                               String?                  @db.NVarChar(Max)
+  instituteId                                                        Int
+  institute                                                          institute                @relation(fields: [instituteId], references: [id])
   topic                                                              topic?                   @relation(fields: [topic_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_event_topic")
   event_type                                                         event_type?              @relation(fields: [event_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_event_type")
   event_grant_resulted                                               event_grant_resulted[]
@@ -167,10 +213,12 @@ model grant {
   all_investigator          String?                     @db.NVarChar(3000)
   topic_id                  Int?
   note                      String?                     @db.NVarChar(3000)
+  instituteId               Int
   event_grant_resulted      event_grant_resulted[]
   source                    source?                     @relation(fields: [source_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_grant_source")
   status                    status?                     @relation(fields: [status_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_grant_status")
   topic                     topic?                      @relation(fields: [topic_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_grant_topic")
+  institute                 institute                   @relation(fields: [instituteId], references: [id], onUpdate: NoAction)
   grant_investigator_member grant_investigator_member[]
   grant_member_involved     grant_member_involved[]
 }
@@ -304,9 +352,11 @@ model member {
   grant_member_involved            grant_member_involved[]
   has_keyword                      has_keyword[]
   insight                          insight?
+  instituteAdmin                   instituteAdmin[]
   account                          account                            @relation(fields: [account_id], references: [id], onDelete: Cascade, map: "FK_member_account_id")
   faculty                          faculty?                           @relation(fields: [faculty_id], references: [id], map: "FK_member_faculty_id")
   member_type                      member_type?                       @relation(fields: [type_id], references: [id], map: "FK_member_type_id")
+  institutes                       memberInstitute[]
   partnership_member_org           partnership_member_org[]
   problem                          problem[]
   product_member_author            product_member_author[]
@@ -349,6 +399,7 @@ model organization {
   event_partner_involved event_partner_involved[]
   org_scope              org_scope?               @relation(fields: [scope_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_organization_scope_id")
   org_type               org_type?                @relation(fields: [type_id], references: [id], onUpdate: SetNull, map: "FK_organization_type_id")
+  organizationInstitute  organizationInstitute[]
   partnership_member_org partnership_member_org[]
   product_partnership    product_partnership[]
 }
@@ -388,6 +439,7 @@ model product {
   product_partnership    product_partnership[]
   product_target         product_target[]
   product_topic          product_topic[]
+  institutes             productInstitute[]
 }
 
 model product_member_all_author {
@@ -471,8 +523,10 @@ model supervision {
   faculty_id                       Int?
   level_id                         Int?
   note                             String?                            @db.NVarChar(Max)
+  instituteId                      Int
   faculty                          faculty?                           @relation(fields: [faculty_id], references: [id], map: "FK_supervision_faculty")
   level                            level?                             @relation(fields: [level_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_supervision_level")
+  institute                        institute                          @relation(fields: [instituteId], references: [id], onUpdate: NoAction)
   supervision_co_supervisor        supervision_co_supervisor[]
   supervision_committee            supervision_committee[]
   supervision_principal_supervisor supervision_principal_supervisor[]
@@ -540,4 +594,15 @@ model topic {
   event_topic   event_topic[]
   grant         grant[]
   product_topic product_topic[]
+}
+
+model instituteAdmin {
+  memberId    Int
+  instituteId Int
+  accountId   Int
+  account     account   @relation(fields: [accountId], references: [id], onUpdate: NoAction, map: "FK_instituteAdmin_accountId")
+  institute   institute @relation(fields: [instituteId], references: [id], onUpdate: NoAction, map: "FK_instituteAdmin_instituteId")
+  member      member    @relation(fields: [memberId], references: [id], onUpdate: NoAction, map: "FK_instituteAdmin_memberId")
+
+  @@id([accountId, instituteId], map: "PK_instituteAdmin")
 }

@@ -1,11 +1,14 @@
+import useForm from "antd/lib/form/hooks/useForm";
+import Button from "antd/lib/button";
+import Form from "antd/lib/form";
+import Input from "antd/lib/input";
+import Modal from "antd/lib/modal";
 import { type Dispatch, type FC, type SetStateAction, useContext, useState } from "react";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import type { AccountInfo } from "../../services/_types";
 import updateAccountEmail from "../../services/update-account-email";
 import { ActiveAccountCtx } from "../../services/context/active-account-ctx";
 import Notification from "../../services/notifications/notification";
-import { Form, Button, Input, Modal } from "antd";
-const useForm = Form.useForm;
 
 type Data = { login_email: string; confirm_email: string };
 type Props = { account: AccountInfo; setAccount: Dispatch<SetStateAction<AccountInfo | null>> };
@@ -52,7 +55,7 @@ const UpdateEmailButton: FC<Props> = ({ account, setAccount }) => {
         okText={en ? "Submit" : "Soumettre"}
         cancelButtonProps={{ danger: true }}
         cancelText={en ? "Cancel" : "Annuler"}
-        destroyOnClose
+        destroyOnHidden
       >
         <Form
           form={form}

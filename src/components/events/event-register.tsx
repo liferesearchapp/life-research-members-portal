@@ -1,15 +1,17 @@
 // This component allows users to register a new event by providing the event's name in English and French, date range, event type, and a note.
 
-import { Button, Col, DatePicker, Row, Switch, Select, Form, Input } from "antd";
-import React, { type FC, useContext, useState } from "react";
-import moment from "moment";
-import type { Moment } from "moment";
+import { Button, DatePicker } from "antd";
+import Select from "antd/lib/select";
+import Form from "antd/lib/form";
+import Input from "antd/lib/input";
+import React, { type FC, useContext } from "react";
+import { useForm } from "antd/lib/form/Form";
+import type { Dayjs } from "dayjs";
 import registerEvent from "../../services/register-event";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import { EventTypesCtx } from "../../services/context/event-types-ctx";
-import { AllTopicsCtx } from "../../services/context/all-topics-ctx";
 import GetLanguage from "../../utils/front-end/get-language";
-const { useForm } = Form;
+import { useSelectedInstitute } from "../../services/context/selected-institute-ctx";
 
 const { Option } = Select;
 const { RangePicker } = DatePicker; // Add RangePicker import
@@ -17,15 +19,17 @@ const { RangePicker } = DatePicker; // Add RangePicker import
 type EventData = {
   name_en: string;
   name_fr: string;
-  date_range: [Moment | null, Moment | null];
+  date_range: [Dayjs | null, Dayjs | null] | null;
   event_type_id: number;
   note: string;
+  institute_id: number;
 };
 
 const RegisterEvent: FC = () => {
   const [form] = useForm<EventData>();
   const { en } = useContext(LanguageCtx);
   const { eventTypes } = useContext(EventTypesCtx);
+  const { institute } = useSelectedInstitute();
 
   async function handleRegister({
     name_en,
@@ -34,14 +38,15 @@ const RegisterEvent: FC = () => {
     event_type_id,
     note,
   }: EventData) {
+    if (!institute) return;
     const res = await registerEvent({
       name_en,
       name_fr,
-      start_date: date_range[0] ? date_range[0].toDate() : null, // Access start_date from date_range
-      end_date: date_range[1] ? date_range[1].toDate() : null, // Access end_date from date_range
+      start_date: date_range?.[0] ? date_range[0].toDate() : null,
+      end_date: date_range?.[1] ? date_range[1].toDate() : null,
       event_type_id,
-
       note,
+      institute_id: institute.id,
     });
     if (res) form.resetFields();
   }
