@@ -13,14 +13,40 @@ model institute {
   urlIdentifier  String                  @unique
   description_en String?
   description_fr String?
+  largeLogo      String?                 @db.NVarChar(Max)
+  smallLogoEn    String?                 @db.NVarChar(Max)
+  smallLogoFr    String?                 @db.NVarChar(Max)
+  primaryColor   String?                 @db.NVarChar(7)
+  primaryColorDark String?               @db.NVarChar(7)
+  secondaryColor String?                 @db.NVarChar(7)
+  secondaryColorDark String?             @db.NVarChar(7)
+  accentColor    String?                 @db.NVarChar(7)
   events         event[]
   grants         grant[]
   instituteAdmin instituteAdmin[]
+  membershipInvitations instituteMembershipInvitation[]
   members        memberInstitute[]
   organizations  organizationInstitute[]
   products       productInstitute[]
   supervisions   supervision[]
   is_active      Boolean @default(true, map: "DF_institute_is_active")
+}
+
+model instituteMembershipInvitation {
+  id                 Int       @id(map: "PK_instituteMembershipInvitation") @default(autoincrement())
+  accountId          Int
+  instituteId        Int
+  invitedByAccountId Int
+  status             String    @default("PENDING") @db.NVarChar(20)
+  note               String?   @db.NVarChar(2000)
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  respondedAt        DateTime?
+  account            account   @relation("InstituteMembershipInvitationAccount", fields: [accountId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  institute          institute @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+  invitedByAccount   account   @relation("InstituteMembershipInvitationInvitedBy", fields: [invitedByAccountId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([accountId, instituteId], map: "UK_instituteMembershipInvitation_accountId_instituteId")
 }
 
 model memberInstitute {
@@ -58,6 +84,8 @@ model account {
   last_name      String           @db.NVarChar(255)
   last_login     DateTime?        @db.Date
   is_super_admin Boolean          @default(false, map: "DF_account_is_super_admin")
+  receivedInstituteMembershipInvitations instituteMembershipInvitation[] @relation("InstituteMembershipInvitationAccount")
+  sentInstituteMembershipInvitations     instituteMembershipInvitation[] @relation("InstituteMembershipInvitationInvitedBy")
   instituteAdmin instituteAdmin[]
   member         member?
 }

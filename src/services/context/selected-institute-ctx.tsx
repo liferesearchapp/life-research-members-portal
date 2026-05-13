@@ -4,14 +4,13 @@ import React, {
   useContext,
   FC,
   PropsWithChildren,
-  useEffect,
 } from "react";
-import type { MemberInstitutesRes } from "../../pages/api/member-institute";
 import { ActiveAccountCtx } from "./active-account-ctx";
+import type { SelectedInstituteInfo } from "../_types";
 
 interface SelectedInstituteContextType {
-  institute: MemberInstitutesRes | null;
-  setInstitute: (institute: MemberInstitutesRes | null) => void;
+  institute: SelectedInstituteInfo | null;
+  setInstitute: (institute: SelectedInstituteInfo | null) => void;
 }
 const SelectedInstituteCtx = createContext<SelectedInstituteContextType>({
   institute: null,
@@ -21,7 +20,7 @@ const SelectedInstituteCtx = createContext<SelectedInstituteContextType>({
 export const SelectedInstituteCtxProvider: FC<PropsWithChildren<{}>> = ({
   children,
 }) => {
-  const [institute, setInstitute] = useState<MemberInstitutesRes | null>(null);
+  const [institute, setInstitute] = useState<SelectedInstituteInfo | null>(null);
 
   return (
     <SelectedInstituteCtx.Provider value={{ institute, setInstitute }}>

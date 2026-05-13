@@ -19,6 +19,22 @@ import type { InstituteSelectorRes } from "../pages/api/institute-selector";
 export type AccountInfo = NonNullable<AccountRes>;
 export type InstituteInfo = NonNullable<InstituteRes>;
 export type InstituteSelectorInfo = NonNullable<InstituteSelectorRes>;
+export type SelectedInstituteInfo = {
+  id: number;
+  name: string;
+  urlIdentifier: string;
+  description_en: string | null;
+  description_fr: string | null;
+  is_active: boolean;
+  largeLogo?: string | null;
+  smallLogoEn?: string | null;
+  smallLogoFr?: string | null;
+  primaryColor?: string | null;
+  primaryColorDark?: string | null;
+  secondaryColor?: string | null;
+  secondaryColorDark?: string | null;
+  accentColor?: string | null;
+};
 export type MemberPublicInfo = NonNullable<PublicMemberRes>;
 export type PartnerPublicInfo = NonNullable<PublicPartnerRes>;
 export type PartnerPrivateInfo = NonNullable<PrivatePartnerRes>;
@@ -37,4 +53,3 @@ export type KeywordInfo = Omit<keyword, "id">;
 export type TargetInfo = Omit<target, "id">;
 export type TopicInfo = Omit<topic, "id">;
 export type OrganizationInfo = Omit<organization, "id">;
-

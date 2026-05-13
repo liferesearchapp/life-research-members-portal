@@ -10,10 +10,10 @@ import ApiRoutes from "../../routing/api-routes";
 import getAuthHeader from "../headers/auth-header";
 import Notification from "../notifications/notification";
 import { ActiveAccountCtx } from "./active-account-ctx";
-import type { institute } from "@prisma/client";
+import type { InstituteInfo } from "../_types";
 
 export const AllInstitutesCtx = createContext<{
-  allInstitutes: institute[];
+  allInstitutes: InstituteInfo[];
   loading: boolean;
   refreshing: boolean;
   refresh: () => void;
@@ -23,7 +23,7 @@ export const AllInstitutesCtxProvider: FC<PropsWithChildren> = ({
   children,
 }) => {
   const { localAccount } = useContext(ActiveAccountCtx);
-  const [allInstitutes, setAllInstitutes] = useState<institute[]>([]);
+  const [allInstitutes, setAllInstitutes] = useState<InstituteInfo[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -35,7 +35,7 @@ export const AllInstitutesCtxProvider: FC<PropsWithChildren> = ({
         headers: authHeader,
       }); // Ensure ApiRoutes has an 'allInstitutes' endpoint
       if (!result.ok) throw await result.text();
-      const institutes: institute[] = await result.json();
+      const institutes: InstituteInfo[] = await result.json();
       institutes.sort((a, b) => a.name.localeCompare(b.name));
       setAllInstitutes(institutes);
     } catch (e: any) {
@@ -44,7 +44,18 @@ export const AllInstitutesCtxProvider: FC<PropsWithChildren> = ({
   }
 
   useEffect(() => {
-    if (!localAccount?.is_super_admin) return;
+    if (!localAccount) {
+      setLoading(false);
+      return;
+    }
+    if (
+      !localAccount.is_super_admin &&
+      localAccount.instituteAdmin.length === 0 &&
+      (localAccount.member?.institutes.length || 0) === 0
+    ) {
+      setLoading(false);
+      return;
+    }
     async function firstLoad() {
       await fetchAllInstitutes();
       setLoading(false);
@@ -53,7 +64,13 @@ export const AllInstitutesCtxProvider: FC<PropsWithChildren> = ({
   }, [localAccount]);
 
   async function refresh() {
-    if (!localAccount?.is_super_admin) return;
+    if (!localAccount) return;
+    if (
+      !localAccount.is_super_admin &&
+      localAccount.instituteAdmin.length === 0 &&
+      (localAccount.member?.institutes.length || 0) === 0
+    )
+      return;
     if (loading || refreshing) return;
     const notification = new Notification("bottom-right");
     setRefreshing(true);

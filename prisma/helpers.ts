@@ -17,6 +17,14 @@ const _selectAllInstituteInfo = {
   urlIdentifier: true,
   description_en: true,
   description_fr: true,
+  largeLogo: true,
+  smallLogoEn: true,
+  smallLogoFr: true,
+  primaryColor: true,
+  primaryColorDark: true,
+  secondaryColor: true,
+  secondaryColorDark: true,
+  accentColor: true,
   is_active: true,
 } as const;
 
@@ -56,6 +64,21 @@ const _includeAllAccountInfo = {
   instituteAdmin: {
     include: {
       institute: true,
+    },
+  },
+  receivedInstituteMembershipInvitations: {
+    include: {
+      institute: {
+        select: _selectAllInstituteInfo,
+      },
+      invitedByAccount: {
+        select: {
+          id: true,
+          first_name: true,
+          last_name: true,
+          login_email: true,
+        },
+      },
     },
   },
 } as const;

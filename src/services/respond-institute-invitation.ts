@@ -1,15 +1,14 @@
-// Assuming a type definition for updating institute parameters
+import type { RespondInstituteInvitationParams } from "../pages/api/update-account/[id]/respond-institute-invitation";
 import ApiRoutes from "../routing/api-routes";
 import { en } from "./context/language-ctx";
 import getAuthHeader from "./headers/auth-header";
 import { contentTypeJsonHeader } from "./headers/content-type-headers";
 import Notification from "./notifications/notification";
 import type { AccountInfo } from "./_types";
-import type { addInstituteParams } from "../pages/api/update-account/[id]/add-institute";
 
-export default async function addInstitute(
+export default async function respondInstituteInvitation(
   id: number,
-  params: addInstituteParams
+  params: RespondInstituteInvitationParams
 ): Promise<AccountInfo | null> {
   const authHeader = await getAuthHeader();
   if (!authHeader) return null;
@@ -18,19 +17,23 @@ export default async function addInstitute(
   try {
     notification.loading(
       en
-        ? "Sending institute invitation..."
-        : "Envoi de l'invitation à l'institut..."
+        ? "Updating invitation..."
+        : "Mise à jour de l'invitation..."
     );
-    const res = await fetch(ApiRoutes.addInstitute(id), {
+    const res = await fetch(ApiRoutes.respondInstituteInvitation(id), {
       headers: { ...authHeader, ...contentTypeJsonHeader },
       method: "PATCH",
       body: JSON.stringify(params),
     });
     if (!res.ok) throw await res.text();
     notification.success(
-      en
-        ? "Institute invitation sent."
-        : "Invitation à l'institut envoyée."
+      params.action === "accept"
+        ? en
+          ? "Invitation accepted."
+          : "Invitation acceptée."
+        : en
+        ? "Invitation rejected."
+        : "Invitation refusée."
     );
     return await res.json();
   } catch (e: any) {

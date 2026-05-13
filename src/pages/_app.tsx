@@ -9,6 +9,7 @@ import { msalInstance } from "../../auth-config";
 import InstituteGuard from "../components/institute-guard";
 import Navbar from "../components/navbar/_navbar";
 import AllContextProviders from "../services/context/_ctx-bundler";
+import InstituteBrandingTheme from "../components/institutes/institute-branding-theme";
 
 function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter();
@@ -41,6 +42,7 @@ function MyApp({ Component, pageProps }: AppProps) {
       <MsalProvider instance={msalInstance}>
         <App>
           <AllContextProviders>
+            <InstituteBrandingTheme />
             <Navbar />
             <InstituteGuard>
               <div className="next-page-container">

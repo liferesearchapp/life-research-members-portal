@@ -9,9 +9,17 @@ import getAccountFromRequest from "../../../utils/api/get-account-from-request";
 import type { AccountDBRes } from "../account/[id]";
 
 function deleteAccount(id: number): Promise<AccountDBRes> {
-  return db.account.delete({
-    where: { id },
-    include: includeAllAccountInfo,
+  return db.$transaction(async (prisma) => {
+    await prisma.instituteMembershipInvitation.deleteMany({
+      where: {
+        OR: [{ accountId: id }, { invitedByAccountId: id }],
+      },
+    });
+
+    return prisma.account.delete({
+      where: { id },
+      include: includeAllAccountInfo,
+    });
   });
 }
 

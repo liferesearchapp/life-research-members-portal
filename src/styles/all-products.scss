@@ -1,0 +1,137 @@
+.all-products-table {
+  position: relative;
+  z-index: 0;
+
+  .header-title-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px;
+
+    h1 {
+      margin: 0;
+    }
+
+    button {
+      flex: 0 0 auto;
+      min-width: 180px;
+    }
+
+    button:first-of-type {
+      margin-left: auto;
+    }
+  }
+
+  .filters {
+    .ant-form-item {
+      margin-top: 2px;
+      margin-bottom: 6px;
+    }
+
+    .ant-form-item-label {
+      padding: 0;
+    }
+
+    > label {
+      display: inline-block;
+    }
+
+    > label,
+    .ant-form-item label {
+      width: 13rem;
+    }
+
+    .product-title-filter,
+    .member-type-filter,
+    .product-all-author-filter {
+      width: 100%;
+
+      .ant-select-selector {
+        width: 100%;
+      }
+    }
+
+    .ant-picker-range {
+      width: min(100%, 320px);
+    }
+
+    .show-column-checkboxes {
+      display: inline-flex;
+      flex-wrap: wrap;
+      column-gap: 8px;
+
+      .ant-checkbox-wrapper {
+        margin: 0;
+      }
+    }
+  }
+
+  .ant-table-column-sort {
+    background: inherit;
+  }
+
+  .ant-table-row-expand-icon-cell,
+  .ant-table-expand-icon-col {
+    width: 36px !important;
+  }
+
+  .table-row,
+  .expanded-table-row {
+    height: 65px;
+
+    &.odd {
+      background-color: var(--gray-3);
+    }
+  }
+
+  .table-row:hover {
+    background-color: var(--blue-1);
+
+    + .expanded-table-row {
+      background-color: var(--blue-1);
+    }
+  }
+
+  .title-column {
+    min-width: 260px;
+  }
+
+  .doi-column {
+    min-width: 180px;
+  }
+
+  .type-column {
+    min-width: 180px;
+  }
+
+  .publish-date-column {
+    min-width: 170px;
+    white-space: nowrap;
+  }
+
+  .member-authors-column {
+    min-width: 220px;
+  }
+
+  .all-authors-column {
+    min-width: 260px;
+  }
+
+  .problems-container {
+    padding-left: 48px;
+    padding-right: 20px;
+    max-width: 90vw;
+  }
+}
+
+@media screen and (max-width: 900px) {
+  .all-products-table {
+    .header-title-row button:first-of-type {
+      margin-left: 0;
+    }
+
+    .header-title-row button {
+      min-width: 150px;
+    }
+  }
+}

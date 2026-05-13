@@ -53,6 +53,9 @@ const PublicPartnerForm: FC<Props> = ({ partner, onSuccess }) => {
   const { orgScopes } = useContext(OrgScopeCtx);
   const { institutes } = useContext(MemberInstituteCtx);
   const { institute } = useSelectedInstitute();
+  const inactiveInstituteIds = partner.organizationInstitute
+    .filter((entry) => !entry.institute.is_active)
+    .map((entry) => entry.institute.id);
   const [loading, setLoading] = useState(false);
   const { dirty, setDirty, setSubmit } = useContext(SaveChangesCtx);
   useResetDirtyOnUnmount();
@@ -70,7 +73,9 @@ const PublicPartnerForm: FC<Props> = ({ partner, onSuccess }) => {
         scope_id: data.scope_id || null,
         type_id: data.type_id || null,
         description: data.description,
-        institute_id: data.institute_id,
+        institute_id: Array.from(
+          new Set([...(data.institute_id || []), ...inactiveInstituteIds])
+        ),
       };
 
       const newPartner = await updatePartnerPublic(partner.id, params);
@@ -81,7 +86,7 @@ const PublicPartnerForm: FC<Props> = ({ partner, onSuccess }) => {
       }
       return !!newPartner;
     },
-    [dirty, en, onSuccess, partner.id, setDirty]
+    [dirty, en, inactiveInstituteIds, onSuccess, partner.id, setDirty]
   );
 
   const validateAndSubmit = useCallback(async () => {
@@ -106,7 +111,9 @@ const PublicPartnerForm: FC<Props> = ({ partner, onSuccess }) => {
     type_id: partner.org_type?.id,
     description: partner.description || "",
     institute_id: partner.organizationInstitute
-      ? partner.organizationInstitute.map((i) => i.institute.id)
+      ? partner.organizationInstitute
+          .filter((i) => i.institute.is_active)
+          .map((i) => i.institute.id)
       : [],
   };
 

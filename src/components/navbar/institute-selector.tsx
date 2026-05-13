@@ -5,7 +5,6 @@ import { DownOutlined } from "@ant-design/icons";
 import { InstituteSelectorCtx } from "../../services/context/institute-selector-ctx";
 import { useRouter } from "next/router";
 import { useSelectedInstitute } from "../../services/context/selected-institute-ctx";
-import Notification from "../../services/notifications/notification";
 import type { MenuProps } from "antd";
 
 function escapeForRegex(value: string) {
@@ -27,13 +26,14 @@ const InstituteSelector: FC = () => {
     if (currentInstitute) {
       setInstitute(currentInstitute);
     } else if (instituteSelection.length > 0 && !currentInstitute) {
-      const notification = new Notification();
       setInstitute(null);
-      router.push("/");
+      if (router.asPath !== "/" && router.pathname !== "/") {
+        router.replace("/");
+      }
     }
   }, [instituteSelection, router, setInstitute]);
 
-  const handleMenuClick = (e: any) => {
+  const handleMenuClick: MenuProps["onClick"] = (e) => {
     const selectedInstitute = instituteSelection.find(
       (institute) => String(institute.id) === String(e.key)
     );

@@ -10,10 +10,9 @@ import { AllEventsCtx } from "../../services/context/all-events-ctx";
 import type { EventPublicInfo } from "../../services/_types";
 import { DatePicker } from "antd";
 import type { RangePickerProps } from "antd/lib/date-picker";
-import type { RangeValueType } from "rc-picker/lib/PickerInput/RangePicker";
 import dayjs, { type Dayjs } from "dayjs";
 
-type EventDateRange = RangeValueType<Dayjs> | null;
+type EventDateRange = RangePickerProps["value"];
 
 type Props = {
   id?: string;
@@ -44,8 +43,12 @@ const EventDateFilter: FC<Props> = ({
       const startDate = dayjs(event.start_date);
       const endDate = event.end_date ? dayjs(event.end_date) : startDate;
 
-      const selectedStartDate = values[0]?.startOf("day");
-      const selectedEndDate = values[1]?.endOf("day");
+      const selectedStartDate = values[0]
+        ? dayjs(values[0].toDate()).startOf("day")
+        : null;
+      const selectedEndDate = values[1]
+        ? dayjs(values[1].toDate()).endOf("day")
+        : null;
 
       return (
         (!selectedStartDate || !endDate.isBefore(selectedStartDate)) &&

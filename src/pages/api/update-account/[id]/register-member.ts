@@ -2,10 +2,7 @@ import { Prisma } from "@prisma/client";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { includeAllAccountInfo } from "../../../../../prisma/helpers";
 import db from "../../../../../prisma/prisma-client";
-import {
-  assertAuthorized,
-  hasAdministrativeRole,
-} from "../../../../utils/api/authorization";
+import { assertAuthorized } from "../../../../utils/api/authorization";
 import getAccountFromRequest from "../../../../utils/api/get-account-from-request";
 import type { AccountDBRes } from "../../account/[id]";
 
@@ -32,7 +29,7 @@ export default async function handler(
     if (
       !assertAuthorized(
         res,
-        hasAdministrativeRole(currentUser),
+        currentUser.is_super_admin || currentUser.id === id,
         "You are not authorized to register this account as a member."
       )
     )

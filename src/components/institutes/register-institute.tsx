@@ -5,6 +5,8 @@ import { FC, useContext } from "react";
 
 import { useForm } from "antd/lib/form/Form";
 import { LanguageCtx } from "../../services/context/language-ctx";
+import { InstituteSelectorCtx } from "../../services/context/institute-selector-ctx";
+import { MemberInstituteCtx } from "../../services/context/member-institutes-ctx";
 import registerInstitute from "../../services/register-institute";
 
 type Data = {
@@ -17,6 +19,8 @@ type Data = {
 const RegisterInstitute: FC = () => {
   const [form] = useForm<Data>();
   const { en } = useContext(LanguageCtx);
+  const { refresh: refreshInstituteSelector } = useContext(InstituteSelectorCtx);
+  const { refresh: refreshMemberInstitutes } = useContext(MemberInstituteCtx);
 
   async function handleRegister({
     name,
@@ -30,7 +34,11 @@ const RegisterInstitute: FC = () => {
       description_en,
       description_fr,
     });
-    if (res) form.resetFields();
+    if (res) {
+      form.resetFields();
+      refreshInstituteSelector();
+      refreshMemberInstitutes();
+    }
   }
 
   return (

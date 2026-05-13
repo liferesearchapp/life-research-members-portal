@@ -14,7 +14,6 @@ import PageRoutes from "../../routing/page-routes";
 import SafeLink from "../link/safe-link";
 import type { UrlObject } from "url";
 import { useAdminDetails, useMemberDetails } from "../../services/context/selected-institute-ctx";
-import { useSelectedInstitute } from "../../services/context/selected-institute-ctx";
 
 type MenuItemType = NonNullable<ComponentProps<typeof Menu>["items"]>[number];
 
@@ -26,8 +25,14 @@ const NavMenu: FC<{ urlIdentifier: string | undefined }> = ({
   const { en } = useContext(LanguageCtx);
   const isAdmin = useAdminDetails();
   const isMember = useMemberDetails();
-  const { institute } = useSelectedInstitute();
-  if (!urlIdentifier) return <Spin />;
+  const isSuperAdmin = !!localAccount?.is_super_admin;
+  const hasInstituteAccess =
+    isSuperAdmin ||
+    (localAccount?.instituteAdmin.length || 0) > 0 ||
+    (localAccount?.member?.institutes.length || 0) > 0;
+  const canAccessAdminPages = !!isAdmin || isSuperAdmin;
+  const canAccessMemberPages = !!isMember || canAccessAdminPages;
+  if (!urlIdentifier) return null;
 
   // Everyone
   const generalItems = [
@@ -98,12 +103,12 @@ const NavMenu: FC<{ urlIdentifier: string | undefined }> = ({
 
   const items: { label: string; href: string; children?: any }[] = generalItems;
   if (!loading) {
-    if (localAccount && isMember) for (const it of registeredItemsFirst) items.push(it);
-    if (isAdmin)
+    if (canAccessMemberPages)
+      for (const it of registeredItemsFirst) items.push(it);
+    if (canAccessAdminPages)
       for (const it of adminItems) items.push(it);
-    if (isAdmin || localAccount?.is_super_admin)
-      items.push(adminSuperAdminItems)
-    if (localAccount?.is_super_admin)
+    if (canAccessAdminPages) items.push(adminSuperAdminItems);
+    if (hasInstituteAccess)
       for (const it of superAdminItems) items.push(it);
     if (localAccount) for (const it of registeredItemsLast) items.push(it);
   }

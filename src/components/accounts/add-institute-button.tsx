@@ -1,6 +1,7 @@
 import useForm from "antd/lib/form/hooks/useForm";
 import Button from "antd/lib/button";
 import Form from "antd/lib/form";
+import Input from "antd/lib/input";
 import Modal from "antd/lib/modal";
 import Select from "antd/lib/select";
 import {
@@ -8,6 +9,7 @@ import {
   type FC,
   type SetStateAction,
   useContext,
+  useMemo,
   useState,
 } from "react";
 import { LanguageCtx } from "../../services/context/language-ctx";
@@ -15,9 +17,10 @@ import type { AccountInfo } from "../../services/_types";
 import { ActiveAccountCtx } from "../../services/context/active-account-ctx";
 import { AllInstitutesCtx } from "../../services/context/all-institutes-ctx";
 import addInstitute from "../../services/add-institute";
+import { isPendingInstituteMembershipInvitation } from "../../utils/institute-membership-invitations";
 
 const { Option } = Select;
-type Data = { instituteId: number[] };
+type Data = { instituteId: number[]; note?: string };
 type Props = {
   account: AccountInfo;
   setAccount: Dispatch<SetStateAction<AccountInfo | null>>;
@@ -30,20 +33,37 @@ const AddInstituteButton: FC<Props> = ({ account, setAccount }) => {
   const { localAccount } = useContext(ActiveAccountCtx);
   const { allInstitutes } = useContext(AllInstitutesCtx);
 
-  const manageableInstitutes = localAccount?.is_super_admin
-    ? allInstitutes
-    : (localAccount?.instituteAdmin.map((admin) => admin.institute) ?? []);
+  // Super admins can invite to any institute; regular admins only to institutes they administer.
+  const invitableInstitutes = useMemo(() => {
+    if (localAccount?.is_super_admin) return allInstitutes;
+    return (localAccount?.instituteAdmin || []).map((admin) => admin.institute);
+  }, [allInstitutes, localAccount]);
 
-  // Extract IDs of institutes where the localAccount is an admin
-  const adminInstituteIds = manageableInstitutes.map((institute) => institute.id);
+  const activeInstituteIds = useMemo(
+    () => new Set(account.member?.institutes.map((inst) => inst.institute.id) || []),
+    [account.member?.institutes]
+  );
+  const pendingInstituteIds = useMemo(
+    () =>
+      new Set(
+        account.receivedInstituteMembershipInvitations
+          .filter((invitation) =>
+            isPendingInstituteMembershipInvitation(invitation.status)
+          )
+          .map((invitation) => invitation.institute.id)
+      ),
+    [account.receivedInstituteMembershipInvitations]
+  );
 
-  // Filter the account.member.institutes to include only those that match the adminInstituteIds
-  const initialInstitutes =
-    account.member?.institutes
-      .filter((inst) => adminInstituteIds.includes(inst.institute.id))
-      .map((inst) => inst.institute.id) || [];
-
-  const initialValues = { instituteId: initialInstitutes };
+  const inviteOptions = useMemo(
+    () =>
+      invitableInstitutes.filter(
+        (institute) =>
+          !activeInstituteIds.has(institute.id) &&
+          !pendingInstituteIds.has(institute.id)
+      ),
+    [activeInstituteIds, invitableInstitutes, pendingInstituteIds]
+  );
 
   async function submit(data: Data) {
     const res = await addInstitute(account.id, data);
@@ -55,15 +75,20 @@ const AddInstituteButton: FC<Props> = ({ account, setAccount }) => {
 
   return (
     <>
-      <Button ghost type="primary" onClick={() => setModalOpen(true)}>
-        {en ? "Add Institute" : "Ajouter l'institut"}
+      <Button
+        ghost
+        type="primary"
+        onClick={() => setModalOpen(true)}
+        disabled={inviteOptions.length === 0}
+      >
+        {en ? "Invite to Institute" : "Inviter à l'institut"}
       </Button>
       <Modal
-        title={en ? "Add Institute: " : "Ajouter l'institut:"}
+        title={en ? "Invite to Institute" : "Inviter à l'institut"}
         open={modalOpen}
         onCancel={() => setModalOpen(false)}
         okButtonProps={{ htmlType: "submit", form: "update-institute-form" }}
-        okText={en ? "Submit" : "Soumettre"}
+        okText={en ? "Send Invitation" : "Envoyer l'invitation"}
         cancelButtonProps={{ danger: true }}
         cancelText={en ? "Cancel" : "Annuler"}
         destroyOnHidden
@@ -72,7 +97,6 @@ const AddInstituteButton: FC<Props> = ({ account, setAccount }) => {
           form={form}
           layout="vertical"
           id="update-institute-form"
-          initialValues={initialValues}
           onFinish={submit}
           preserve={false}
         >
@@ -81,13 +105,25 @@ const AddInstituteButton: FC<Props> = ({ account, setAccount }) => {
             name="instituteId"
           >
             <Select mode="multiple">
-              <Option value="">{""}</Option>
-              {manageableInstitutes.map((institute) => (
+              {inviteOptions.map((institute) => (
                 <Option key={institute.id} value={institute.id}>
                   {`${institute.name} - ${institute.urlIdentifier}`}
                 </Option>
               ))}
             </Select>
+          </Form.Item>
+          <Form.Item
+            label={en ? "Invitation note (optional)" : "Note d'invitation (facultative)"}
+            name="note"
+          >
+            <Input.TextArea
+              rows={3}
+              placeholder={
+                en
+                  ? "Add context for the invited account."
+                  : "Ajoutez un contexte pour le compte invité."
+              }
+            />
           </Form.Item>
         </Form>
       </Modal>

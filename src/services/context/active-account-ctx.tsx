@@ -34,6 +34,23 @@ export const ActiveAccountCtxProvider: FC<PropsWithChildren> = ({
   const [loading, setLoading] = useState(true); // Start true so loading icons are served first
   const [refreshing, setRefreshing] = useState(false);
 
+  async function withTimeout<T>(promise: Promise<T>, ms = 10000): Promise<T> {
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
+
+    try {
+      return await Promise.race([
+        promise,
+        new Promise<T>((_, reject) => {
+          timeoutId = setTimeout(() => {
+            reject(new Error("Timed out while loading your account."));
+          }, ms);
+        }),
+      ]);
+    } finally {
+      if (timeoutId) clearTimeout(timeoutId);
+    }
+  }
+
   /** Gets the current user's account from the database */
   async function fetchLocalAccount() {
     try {
@@ -73,9 +90,14 @@ export const ActiveAccountCtxProvider: FC<PropsWithChildren> = ({
       if (!instance.getActiveAccount()) return setLoading(false);
       const notification = new Notification("bottom-right");
       notification.loading("Loading your account...");
-      await fetchAccountUpdateLastLogin();
-      setLoading(false);
-      notification.close();
+      try {
+        await withTimeout(fetchAccountUpdateLastLogin());
+      } catch (e: any) {
+        new Notification().error(e);
+      } finally {
+        setLoading(false);
+        notification.close();
+      }
     }
 
     firstLoad();

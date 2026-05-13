@@ -87,7 +87,9 @@ const PublicProductDescription: FC<Props> = ({ product }) => {
       </Item>
 
       <Item label={en ? "Institute" : "L'institut"}>
-        {product.institutes.map((entry, i) => (
+        {product.institutes
+          .filter((entry) => entry.institute.is_active)
+          .map((entry, i) => (
           <Tag
             key={entry.institute.id}
           >{`${entry.institute.name} - ${entry.institute.urlIdentifier}`}</Tag>

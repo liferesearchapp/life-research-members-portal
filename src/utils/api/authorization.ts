@@ -65,6 +65,13 @@ export function getMemberInstituteIds(account: AuthenticatedAccount) {
   );
 }
 
+export function getVisibleInstituteIds(account: AuthenticatedAccount) {
+  return getUniqueInstituteIds([
+    ...getManagedInstituteIds(account),
+    ...getMemberInstituteIds(account),
+  ]);
+}
+
 export function hasAdministrativeRole(account: AuthenticatedAccount) {
   return account.is_super_admin || account.instituteAdmin.length > 0;
 }

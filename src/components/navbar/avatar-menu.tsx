@@ -1,7 +1,6 @@
 import Dropdown from "antd/lib/dropdown";
 import { FC, useContext } from "react";
 import Typography from "antd/lib/typography";
-import Card from "antd/lib/card";
 import LogoutButton from "./logout-button";
 import { ActiveAccountCtx } from "../../services/context/active-account-ctx";
 import { LanguageCtx } from "../../services/context/language-ctx";
@@ -9,6 +8,7 @@ import CheckCircleTwoTone from "@ant-design/icons/lib/icons/CheckCircleTwoTone";
 import LoginButton from "./login-button";
 import { useMsal } from "@azure/msal-react";
 import { useAdminDetails } from "../../services/context/selected-institute-ctx";
+import type { MenuProps } from "antd";
 
 const AvatarMenu: FC = () => {
   const { en } = useContext(LanguageCtx);
@@ -33,8 +33,8 @@ const AvatarMenu: FC = () => {
   const registered = localAccount ? null : (
     <Typography>
       {en
-        ? "This account is not registered. If you are a member, please ask an administrator to register you."
-        : "Ce compte n'est pas enregistré. Si vous êtes membre, veuillez demander à un administrateur de vous inscrire."}
+        ? "This account is not registered. If you belong to an institute, ask an administrator to invite you. You can also create your own member profile from My Profile once your account is available."
+        : "Ce compte n'est pas enregistré. Si vous faites partie d'un institut, demandez à un administrateur de vous inviter. Vous pouvez aussi créer votre propre profil de membre depuis Mon profil une fois votre compte disponible."}
     </Typography>
   );
 
@@ -56,24 +56,34 @@ const AvatarMenu: FC = () => {
     </Typography>
   ) : null;
 
-  const dropdown = (
-    <Card styles={{ body: { padding: 0 } }}>
-      <div className="avatar-dropdown">
-        <Typography>{name}</Typography>
-        <Typography>{email}</Typography>
-        {registered}
-        {superAdmin}
-        {administrator}
-        {member}
-        <div style={{ height: 16 }}></div>
-        <LogoutButton />
-      </div>
-    </Card>
-  );
+  const menuItems: MenuProps["items"] = [
+    {
+      key: "name",
+      label: <Typography.Text strong>{name}</Typography.Text>,
+      disabled: true,
+    },
+    {
+      key: "email",
+      label: <Typography.Text>{email}</Typography.Text>,
+      disabled: true,
+    },
+    ...(registered
+      ? [{ key: "registered", label: registered, disabled: true }]
+      : []),
+    ...(superAdmin
+      ? [{ key: "super-admin", label: superAdmin, disabled: true }]
+      : []),
+    ...(administrator
+      ? [{ key: "admin", label: administrator, disabled: true }]
+      : []),
+    ...(member ? [{ key: "member", label: member, disabled: true }] : []),
+    { type: "divider" as const },
+    { key: "logout", label: <LogoutButton /> },
+  ];
 
   return (
     <Dropdown
-      popupRender={() => dropdown}
+      menu={{ items: menuItems }}
       trigger={["click"]}
       getPopupContainer={() =>
         document.querySelector(".navbar") || document.body

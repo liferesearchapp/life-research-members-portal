@@ -83,6 +83,9 @@ const PublicProductForm: FC<Props> = ({ product, onSuccess }) => {
   const { dirty, setDirty, setSubmit } = useContext(SaveChangesCtx);
   const { institutes } = useContext(MemberInstituteCtx);
   const { institute: selectedInstitute } = useSelectedInstitute();
+  const inactiveInstituteIds = product.institutes
+    .filter((entry) => !entry.institute.is_active)
+    .map((entry) => entry.institute.id);
   useResetDirtyOnUnmount();
 
   const diffMembers = useCallback(
@@ -180,7 +183,9 @@ const PublicProductForm: FC<Props> = ({ product, onSuccess }) => {
         addPartners,
         deleteMembers,
         addMembers,
-        institutes: data.institutes,
+        institutes: Array.from(
+          new Set([...(data.institutes || []), ...inactiveInstituteIds])
+        ),
       };
 
       const newInfo =
@@ -199,6 +204,7 @@ const PublicProductForm: FC<Props> = ({ product, onSuccess }) => {
       diffTargets,
       diffPartners,
       diffMembers,
+      inactiveInstituteIds,
       product.id,
       dirty,
       en,
@@ -266,7 +272,9 @@ const PublicProductForm: FC<Props> = ({ product, onSuccess }) => {
     // @ts-ignore
     members: getInitialMembers(product.product_member_author),
     institutes: product.institutes
-      ? product.institutes.map((i) => i.institute.id)
+      ? product.institutes
+          .filter((i) => i.institute.is_active)
+          .map((i) => i.institute.id)
       : [],
   };
 
