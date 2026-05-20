@@ -8,6 +8,14 @@ export type RegisterInstituteParams = {
   urlIdentifier: string;
   description_en?: string;
   description_fr?: string;
+  largeLogo?: string | null;
+  smallLogoEn?: string | null;
+  smallLogoFr?: string | null;
+  primaryColor?: string | null;
+  primaryColorDark?: string | null;
+  secondaryColor?: string | null;
+  secondaryColorDark?: string | null;
+  accentColor?: string | null;
 };
 export type RegisterInstituteRes = Awaited<
   ReturnType<typeof registerInstitute>
@@ -20,6 +28,14 @@ function registerInstitute(params: RegisterInstituteParams) {
       urlIdentifier: params.urlIdentifier,
       description_en: params.description_en,
       description_fr: params.description_fr,
+      largeLogo: params.largeLogo,
+      smallLogoEn: params.smallLogoEn,
+      smallLogoFr: params.smallLogoFr,
+      primaryColor: params.primaryColor,
+      primaryColorDark: params.primaryColorDark,
+      secondaryColor: params.secondaryColor,
+      secondaryColorDark: params.secondaryColorDark,
+      accentColor: params.accentColor,
     },
   });
 }
