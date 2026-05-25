@@ -10,6 +10,7 @@ datasource db {
 model institute {
   id             Int                     @id @default(autoincrement())
   name           String                  @unique
+  name_fr        String?
   urlIdentifier  String                  @unique
   description_en String?
   description_fr String?

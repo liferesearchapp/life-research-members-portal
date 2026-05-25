@@ -22,6 +22,7 @@ export type InstituteSelectorInfo = NonNullable<InstituteSelectorRes>;
 export type SelectedInstituteInfo = {
   id: number;
   name: string;
+  name_fr?: string | null;
   urlIdentifier: string;
   description_en: string | null;
   description_fr: string | null;

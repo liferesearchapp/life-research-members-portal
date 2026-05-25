@@ -32,7 +32,8 @@ const NavMenu: FC<{ urlIdentifier: string | undefined }> = ({
     (localAccount?.member?.institutes.length || 0) > 0;
   const canAccessAdminPages = !!isAdmin || isSuperAdmin;
   const canAccessMemberPages = !!isMember || canAccessAdminPages;
-  if (!urlIdentifier) return null;
+
+  if (!urlIdentifier && !hasInstituteAccess) return null;
 
   // Everyone
   const generalItems = [
@@ -101,16 +102,19 @@ const NavMenu: FC<{ urlIdentifier: string | undefined }> = ({
     },
   ];
 
-  const items: { label: string; href: string; children?: any }[] = generalItems;
+  const items: { label: string; href: string; children?: any }[] = [];
+  if (urlIdentifier) {
+    for (const it of generalItems) items.push(it);
+  }
   if (!loading) {
-    if (canAccessMemberPages)
+    if (urlIdentifier && canAccessMemberPages)
       for (const it of registeredItemsFirst) items.push(it);
-    if (canAccessAdminPages)
+    if (urlIdentifier && canAccessAdminPages)
       for (const it of adminItems) items.push(it);
-    if (canAccessAdminPages) items.push(adminSuperAdminItems);
+    if (urlIdentifier && canAccessAdminPages) items.push(adminSuperAdminItems);
     if (hasInstituteAccess)
       for (const it of superAdminItems) items.push(it);
-    if (localAccount) for (const it of registeredItemsLast) items.push(it);
+    if (urlIdentifier && localAccount) for (const it of registeredItemsLast) items.push(it);
   }
 
   function isMenuItemActive(item: { href: string; children?: any }): boolean {

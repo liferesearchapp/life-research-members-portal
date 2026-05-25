@@ -5,6 +5,8 @@ import { DownOutlined } from "@ant-design/icons";
 import { InstituteSelectorCtx } from "../../services/context/institute-selector-ctx";
 import { useRouter } from "next/router";
 import { useSelectedInstitute } from "../../services/context/selected-institute-ctx";
+import { LanguageCtx } from "../../services/context/language-ctx";
+import { getLocalizedInstituteName } from "../../utils/front-end/institute-branding";
 import type { MenuProps } from "antd";
 
 function escapeForRegex(value: string) {
@@ -14,6 +16,7 @@ function escapeForRegex(value: string) {
 const InstituteSelector: FC = () => {
   const { instituteSelection, loading } = useContext(InstituteSelectorCtx);
   const { institute, setInstitute } = useSelectedInstitute();
+  const { en } = useContext(LanguageCtx);
   const router = useRouter();
 
   useEffect(() => {
@@ -70,8 +73,8 @@ const InstituteSelector: FC = () => {
     () =>
       instituteSelection
         .filter((m) => m.is_active)
-        .map((m) => ({ key: String(m.id), label: m.name })),
-    [instituteSelection]
+        .map((m) => ({ key: String(m.id), label: getLocalizedInstituteName(m, en) })),
+    [instituteSelection, en]
   );
   const menu: MenuProps = {
     items: filteredInstitutes,
@@ -81,7 +84,7 @@ const InstituteSelector: FC = () => {
   return (
     <Dropdown menu={menu} disabled={loading}>
       <Button>
-        {institute?.name || "Select Institute"} <DownOutlined />
+        {getLocalizedInstituteName(institute, en) || (en ? "Select Institute" : "Sélectionner un institut")} <DownOutlined />
       </Button>
     </Dropdown>
   );

@@ -9,6 +9,8 @@ import { ActiveAccountCtx } from "../../services/context/active-account-ctx";
 import Spin from "antd/lib/spin";
 import InstituteSelector from "./institute-selector";
 import { useSelectedInstitute } from "../../services/context/selected-institute-ctx";
+import { LanguageCtx } from "../../services/context/language-ctx";
+import { getLocalizedInstituteName } from "../../utils/front-end/institute-branding";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import PageRoutes from "../../routing/page-routes";
@@ -16,6 +18,7 @@ import PageRoutes from "../../routing/page-routes";
 const Navbar: FC = () => {
   const { loading } = useContext(ActiveAccountCtx);
   const { institute } = useSelectedInstitute();
+  const { en } = useContext(LanguageCtx);
   const urlIdentifier = institute?.urlIdentifier;
 
   const router = useRouter();
@@ -52,8 +55,9 @@ const Navbar: FC = () => {
     return "";
   }
   let prefix = getPrefix();
-  let title = institute?.name;
-  if (prefix) title = `${prefix} - ${institute?.name}`;
+  const instituteName = getLocalizedInstituteName(institute, en);
+  let title = instituteName;
+  if (prefix) title = `${prefix} - ${instituteName}`;
 
   return (
     <div className="navbar" style={{ display: "flex", alignItems: "center" }}>

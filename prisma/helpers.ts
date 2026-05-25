@@ -14,6 +14,7 @@ type CheckKeysAreValid<T, ValidProps> = Exclude<keyof T, keyof ValidProps> exten
 const _selectAllInstituteInfo = {
   id: true,
   name: true,
+  name_fr: true,
   urlIdentifier: true,
   description_en: true,
   description_fr: true,

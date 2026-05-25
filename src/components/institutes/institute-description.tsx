@@ -71,7 +71,10 @@ const InstituteDescription: FC<Props> = ({ institute }) => {
             : "Oui"
           : (en ? "No" : "Non")}
       </Item>
-      <Item label={en ? "Name" : "Nom"}>{institute.name}</Item>
+      <Item label={en ? "Name (English)" : "Nom (Anglais)"}>{institute.name}</Item>
+      <Item label={en ? "Name (French)" : "Nom (Français)"}>
+        {institute.name_fr || (en ? "(uses English name)" : "(utilise le nom anglais)")}
+      </Item>
       <Item label={en ? "URL Identifier" : "Identifiant URL"}>{institute.urlIdentifier}</Item>
       <Item label="Description (EN)">{institute.description_en}</Item>
       <Item label="Description (FR)">{institute.description_fr}</Item>

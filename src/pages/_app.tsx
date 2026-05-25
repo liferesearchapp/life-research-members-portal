@@ -34,6 +34,8 @@ function MyApp({ Component, pageProps }: AppProps) {
   let title = "LIFE";
   if (suffix) title += " - " + suffix;
 
+  const isInstitutesPage = router.pathname.startsWith("/institutes");
+
   return (
     <>
       <Head>
@@ -44,11 +46,17 @@ function MyApp({ Component, pageProps }: AppProps) {
           <AllContextProviders>
             <InstituteBrandingTheme />
             <Navbar />
-            <InstituteGuard>
+            {isInstitutesPage ? (
               <div className="next-page-container">
                 <Component {...pageProps} />
               </div>
-            </InstituteGuard>
+            ) : (
+              <InstituteGuard>
+                <div className="next-page-container">
+                  <Component {...pageProps} />
+                </div>
+              </InstituteGuard>
+            )}
           </AllContextProviders>
         </App>
       </MsalProvider>

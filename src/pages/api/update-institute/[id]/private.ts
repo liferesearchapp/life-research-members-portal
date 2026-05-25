@@ -10,6 +10,7 @@ import {
 
 export type UpdateInstituteParams = {
   name: string;
+  name_fr?: string | null;
   urlIdentifier: string;
   description_en?: string | null;
   description_fr?: string | null;
@@ -66,6 +67,7 @@ function buildUpdateData(
 ) {
   const data: Record<string, unknown> = {
     name: params.name.trim(),
+    name_fr: normalizeText(params.name_fr),
     description_en: normalizeText(params.description_en),
     description_fr: normalizeText(params.description_fr),
     largeLogo: normalizeLogo(params.largeLogo),

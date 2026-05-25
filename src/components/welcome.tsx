@@ -32,7 +32,7 @@ import {
   useAdminDetails,
   useSelectedInstitute,
 } from "../services/context/selected-institute-ctx";
-import { getInstituteLargeLogo } from "../utils/front-end/institute-branding";
+import { getInstituteLargeLogo, getLocalizedInstituteName } from "../utils/front-end/institute-branding";
 
 const { Title } = Typography;
 
@@ -100,8 +100,9 @@ const Welcome: FC = () => {
     </>
   );
 
+  const localizedName = getLocalizedInstituteName(institute, en);
   const grammerFr = () => {
-    var name = institute?.name.toLowerCase() || "";
+    var name = (institute?.name_fr || institute?.name || "").toLowerCase();
     const vowels = ['a', 'â', 'à', 'e', 'è', 'ê', 'é', 'i', 'î', 'y', 'o', 'ô', 'u', 'û', 'œ'];
     if (vowels.includes(name[0]))
       return `de l'${name.toUpperCase()}`;
@@ -112,7 +113,7 @@ const Welcome: FC = () => {
     <>
       <h1>
         {en
-          ? `Welcome to the ${institute?.name.toUpperCase()} Member Portal!`
+          ? `Welcome to the ${localizedName.toUpperCase()} Member Portal!`
           : `Bienvenue sur le portail des membres ${grammerFr()}!`}
       </h1>
       <h4>
@@ -135,7 +136,7 @@ const Welcome: FC = () => {
         </h3>
         <h1>
           {en
-            ? `Welcome to the ${institute?.name.toUpperCase()} Member Portal`
+            ? `Welcome to the ${localizedName.toUpperCase()} Member Portal`
             : `Bienvenue sur le portail des membres ${grammerFr()}`}
         </h1>
 
@@ -179,7 +180,7 @@ const Welcome: FC = () => {
             >
               <img
                 src={getInstituteLargeLogo(institute)}
-                alt={en ? `${institute?.name || "Institute"} logo` : `Logo ${institute?.name || "institut"}`}
+                alt={en ? `${localizedName || "Institute"} logo` : `Logo ${localizedName || "institut"}`}
                 width={530}
                 height={340}
                 loading="eager"
@@ -206,12 +207,12 @@ const Welcome: FC = () => {
           <Col xs={24} md={6}>
             <Title level={4}>
               {en
-                ? `${institute?.name.toUpperCase()} Portal at a glance`
+                ? `${localizedName.toUpperCase()} Portal at a glance`
                 : `Aperçu du portail ${grammerFr()}`}
             </Title>
             <p>
               {en
-                ? `The portal provides ${institute?.name.toUpperCase()} members with a comprehensive overview of our research, partnerships, and initiatives. Stay informed and engaged with our work by exploring the portal information today!`
+                ? `The portal provides ${localizedName.toUpperCase()} members with a comprehensive overview of our research, partnerships, and initiatives. Stay informed and engaged with our work by exploring the portal information today!`
                 : `Le portail fournit aux membres ${grammerFr()} un aperçu de nos recherches, partenariats et initiatives. Restez informé(e) et impliqué(e) dans notre travail en explorant l'information de ce portail dès aujourd'hui.`}
             </p>
           </Col>

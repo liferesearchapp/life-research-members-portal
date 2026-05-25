@@ -93,3 +93,16 @@ export function getInstituteSmallLogo(
 export function getInstituteLargeLogo(institute: InstituteBrandingSource) {
   return normalizeImageSource(institute?.largeLogo, DEFAULT_LARGE_LOGO);
 }
+
+/**
+ * Returns the French name if available and language is French,
+ * otherwise falls back to the English name.
+ */
+export function getLocalizedInstituteName(
+  institute: { name: string; name_fr?: string | null } | null | undefined,
+  en: boolean
+): string {
+  if (!institute) return "";
+  if (!en && institute.name_fr) return institute.name_fr;
+  return institute.name;
+}

@@ -17,6 +17,7 @@ import {
   useSelectedInstitute,
   useSuperAdminDetails,
 } from "../../services/context/selected-institute-ctx";
+import { getLocalizedInstituteName } from "../../utils/front-end/institute-branding";
 
 type Props = {
   id: number;
@@ -98,7 +99,7 @@ const InstituteProfile: FC<Props> = ({ id }) => {
           whiteSpace: "break-spaces",
         }}
       >
-        {institute?.name}
+        {getLocalizedInstituteName(institute, en)}
       </Title>
       {canManageInstitute ? (editMode ? doneButton : editButton) : null}
     </div>

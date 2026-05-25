@@ -30,9 +30,15 @@ const AllInstitutes: FC = () => {
 
   const columns: ColumnType<InstituteInfo>[] = [
     {
-      title: en ? "Name" : "Nom",
+      title: en ? "Name (EN)" : "Nom (EN)",
       dataIndex: "name",
       sorter: (a, b) => a.name.localeCompare(b.name),
+    },
+    {
+      title: en ? "Name (FR)" : "Nom (FR)",
+      dataIndex: "name_fr",
+      render: (text: string | null) => text || (en ? "—" : "—"),
+      sorter: (a, b) => ((a as any).name_fr || "").localeCompare((b as any).name_fr || ""),
     },
     {
       title: en ? "URL Identifier" : "Identifiant URL",

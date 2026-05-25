@@ -18,6 +18,7 @@ import {
 
 type Data = {
   name: string;
+  name_fr: string;
   urlIdentifier: string;
   description_en: string;
   description_fr: string;
@@ -42,6 +43,7 @@ const RegisterInstitute: FC = () => {
   async function handleRegister(data: Data) {
     const res = await registerInstitute({
       name: data.name,
+      name_fr: data.name_fr || undefined,
       urlIdentifier: data.urlIdentifier,
       description_en: data.description_en,
       description_fr: data.description_fr,
@@ -91,9 +93,16 @@ const RegisterInstitute: FC = () => {
         layout="vertical"
       >
         <Form.Item
-          label={en ? "Name" : "Nom"}
+          label={en ? "Name (English)" : "Nom (Anglais)"}
           name="name"
           rules={[{ required: true, message: en ? "Required" : "Requis" }]}
+        >
+          <Input />
+        </Form.Item>
+        <Form.Item
+          label={en ? "Name (French - Optional)" : "Nom (Français - Facultatif)"}
+          name="name_fr"
+          help={en ? "If not provided, the English name will be used in French mode." : "Si non fourni, le nom anglais sera utilisé en mode français."}
         >
           <Input />
         </Form.Item>

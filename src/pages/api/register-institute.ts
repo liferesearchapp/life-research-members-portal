@@ -5,6 +5,7 @@ import getAccountFromRequest from "../../utils/api/get-account-from-request";
 
 export type RegisterInstituteParams = {
   name: string;
+  name_fr?: string;
   urlIdentifier: string;
   description_en?: string;
   description_fr?: string;
@@ -25,6 +26,7 @@ function registerInstitute(params: RegisterInstituteParams) {
   return db.institute.create({
     data: {
       name: params.name,
+      name_fr: params.name_fr || null,
       urlIdentifier: params.urlIdentifier,
       description_en: params.description_en,
       description_fr: params.description_fr,

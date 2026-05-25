@@ -8,6 +8,7 @@ import getAccountFromRequest from "../../utils/api/get-account-from-request";
 export type InstituteSelectorRes = {
     id: number;
     name: string;
+    name_fr: string | null;
     urlIdentifier: string;
     description_en: string |null;
     description_fr: string | null;
@@ -25,6 +26,7 @@ export type InstituteSelectorRes = {
 const instituteSelectorSelect = {
   id: true,
   name: true,
+  name_fr: true,
   urlIdentifier: true,
   description_en: true,
   description_fr: true,
