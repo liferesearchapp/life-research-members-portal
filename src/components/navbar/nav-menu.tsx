@@ -35,11 +35,13 @@ const NavMenu: FC<{ urlIdentifier: string | undefined }> = ({
 
   if (!urlIdentifier && !hasInstituteAccess) return null;
 
+  const id = urlIdentifier || "";
+
   // Everyone
   const generalItems = [
     {
       label: en ? "Home" : "Accueil",
-      href: PageRoutes.instituteHome(urlIdentifier),
+      href: PageRoutes.instituteHome(id),
     },
   ];
 
@@ -47,15 +49,15 @@ const NavMenu: FC<{ urlIdentifier: string | undefined }> = ({
   const registeredItemsFirst = [
     {
       label: en ? "Members" : "Membres",
-      href: PageRoutes.allMembers(urlIdentifier),
+      href: PageRoutes.allMembers(id),
     },
     {
       label: en ? "Products" : "Produits",
-      href: PageRoutes.allProducts(urlIdentifier),
+      href: PageRoutes.allProducts(id),
     },
     {
       label: en ? "Partners" : "Partenaires",
-      href: PageRoutes.allPartners(urlIdentifier),
+      href: PageRoutes.allPartners(id),
     },
   ];
 
@@ -68,25 +70,25 @@ const NavMenu: FC<{ urlIdentifier: string | undefined }> = ({
   const adminItems = [
     {
       label: en ? "Grants" : "Subventions",
-      href: PageRoutes.allGrants(urlIdentifier),
+      href: PageRoutes.allGrants(id),
     },
     {
       label: en ? "Events" : "Événements",
-      href: PageRoutes.allEvents(urlIdentifier),
+      href: PageRoutes.allEvents(id),
     },
     {
       label: en ? "Supervisions" : "Supervisions",
-      href: PageRoutes.allSupervisions(urlIdentifier),
+      href: PageRoutes.allSupervisions(id),
     },
   ];
 
   const adminSuperAdminItems = {
     label: en ? "Accounts" : "Comptes",
-    href: PageRoutes.allAccounts(urlIdentifier),
+    href: PageRoutes.allAccounts(id),
     children: [
       {
         label: en ? "All accounts" : "Tous les comptes",
-        href: PageRoutes.allAccounts(urlIdentifier),
+        href: PageRoutes.allAccounts(id),
       },
       {
         label: en ? "Register an account" : "Enregistrer un compte",
