@@ -102,12 +102,15 @@ const Welcome: FC = () => {
 
   const localizedName = getLocalizedInstituteName(institute, en);
   const grammerFr = () => {
-    var name = (institute?.name_fr || institute?.name || "").toLowerCase();
+    // Keep the institute's French name in its stored (proper) case, and only
+    // pick the correct elision: "de l'" before a vowel, otherwise "du".
+    const name = institute?.name_fr || institute?.name || "";
+    const firstChar = name.charAt(0).toLowerCase();
     const vowels = ['a', 'â', 'à', 'e', 'è', 'ê', 'é', 'i', 'î', 'y', 'o', 'ô', 'u', 'û', 'œ'];
-    if (vowels.includes(name[0]))
-      return `de l'${name.toUpperCase()}`;
+    if (vowels.includes(firstChar))
+      return `de l'${name}`;
     else
-      return `du ${name.toUpperCase()}`;
+      return `du ${name}`;
   }
   const unauthenticatedGreeting = (
     <>

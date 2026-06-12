@@ -155,8 +155,8 @@ const AccountProfile: FC<Props> = ({ id }) => {
           <Text>
             {trueSymbol}
             {en
-              ? "This account is registered as a member"
-              : "Ce compte est enregistré en tant que membre"}
+              ? "This account has a member profile (see Institute Information below for per-institute membership)"
+              : "Ce compte possède un profil de membre (voir Informations sur l'institut ci-dessous pour l'adhésion par institut)"}
           </Text>
           <Button ghost type="primary">
             <SafeLink
@@ -172,8 +172,8 @@ const AccountProfile: FC<Props> = ({ id }) => {
           <Text>
             {falseSymbol}
             {en
-              ? "This account is not registered as a member"
-              : "Ce compte n'est pas enregistré en tant que membre"}
+              ? "This account does not have a member profile"
+              : "Ce compte ne possède pas de profil de membre"}
           </Text>
           <div style={{ width: "100%" }} />
           <Text type="secondary">

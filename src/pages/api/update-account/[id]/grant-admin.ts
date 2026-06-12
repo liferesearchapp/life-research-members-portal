@@ -19,19 +19,45 @@ async function updateAccountGrantAdmin(id: number, urlIdentifier: string) {
     where: {
       id,
     },
-    include: {
-      member: true,
-    },
+    select: { id: true, login_email: true, member: { select: { id: true } } },
   });
 
-  if (!institute || !account || !account.member) return null;
+  if (!institute || !account) return null;
 
-  return db.instituteAdmin.create({
-    data: {
-      accountId: id,
-      instituteId: institute.id,
-      memberId: account?.member.id,
-    },
+  return db.$transaction(async (prisma) => {
+    // An admin must also be a member, so create a member profile if missing.
+    let memberId = account.member?.id;
+    if (!memberId) {
+      const createdMember = await prisma.member.create({
+        data: {
+          account_id: id,
+          work_email: account.login_email,
+          date_joined: new Date(),
+        },
+      });
+      memberId = createdMember.id;
+    }
+
+    // Ensure the account is a member of the institute it administers.
+    await prisma.memberInstitute.upsert({
+      where: {
+        memberId_instituteId: { memberId, instituteId: institute.id },
+      },
+      create: { memberId, instituteId: institute.id },
+      update: {},
+    });
+
+    return prisma.instituteAdmin.upsert({
+      where: {
+        accountId_instituteId: { accountId: id, instituteId: institute.id },
+      },
+      create: {
+        accountId: id,
+        instituteId: institute.id,
+        memberId,
+      },
+      update: {},
+    });
   });
 }
 

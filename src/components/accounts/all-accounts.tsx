@@ -9,7 +9,6 @@ import { LanguageCtx } from "../../services/context/language-ctx";
 import { AllAccountsCtx } from "../../services/context/all-accounts-ctx";
 import { useSelectedInstitute } from "../../services/context/selected-institute-ctx";
 import type { AccountInfo } from "../../services/_types";
-import { isPendingInstituteMembershipInvitation } from "../../utils/institute-membership-invitations";
 
 const AllAccounts: FC = () => {
   const router = useRouter();
@@ -35,24 +34,12 @@ const AllAccounts: FC = () => {
     );
   };
 
-  const isInvitedToInstitute = (
-    account: AccountInfo,
-    instituteId: number | undefined
-  ) => {
-    return account.receivedInstituteMembershipInvitations.some(
-      (invitation) =>
-        invitation.instituteId === instituteId &&
-        isPendingInstituteMembershipInvitation(invitation.status)
-    );
-  };
-
   const keyedAccounts = allAccounts
     .filter((account) => {
       if (!institute?.id) return true;
       return (
         isAdminOfInstitute(account, institute.id) ||
-        isMemberOfInstitute(account, institute.id) ||
-        isInvitedToInstitute(account, institute.id)
+        isMemberOfInstitute(account, institute.id)
       );
     })
     .map((m) => ({ ...m, key: m.id }));

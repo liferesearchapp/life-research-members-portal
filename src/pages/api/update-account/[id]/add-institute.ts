@@ -7,65 +7,55 @@ import {
 import getAccountFromRequest from "../../../../utils/api/get-account-from-request";
 import db from "../../../../../prisma/prisma-client";
 import { includeAllAccountInfo } from "../../../../../prisma/helpers";
-import { instituteMembershipInvitationStatus } from "../../../../utils/institute-membership-invitations";
 
 export type addInstituteParams = {
   instituteId: number[];
-  note?: string | null;
 };
 
-async function addInstitute(
-  id: number,
-  params: addInstituteParams,
-  invitedByAccountId: number
-) {
-  const accountToInvite = await db.account.findUnique({
+// Adds the account directly to the given institutes as a member.
+// A member profile is created automatically if the account does not have one yet.
+async function addInstitute(id: number, params: addInstituteParams) {
+  const account = await db.account.findUnique({
     where: { id },
-    include: {
-      member: {
-        include: {
-          institutes: true,
-        },
-      },
-    },
+    select: { id: true, login_email: true, member: { select: { id: true } } },
   });
 
-  if (!accountToInvite) throw new Error("Account not found.");
+  if (!account) throw new Error("Account not found.");
 
-  const activeInstituteIds = new Set(
-    accountToInvite.member?.institutes.map((entry) => entry.instituteId) ?? []
-  );
-
-  await Promise.all(
-    params.instituteId.map(async (rawInstituteId) => {
-      const instituteId = Number(rawInstituteId);
-      if (!Number.isFinite(instituteId)) return;
-      if (activeInstituteIds.has(instituteId)) return;
-
-      await db.instituteMembershipInvitation.upsert({
-        where: {
-          accountId_instituteId: {
-            accountId: id,
-            instituteId,
-          },
-        },
-        create: {
-          accountId: id,
-          instituteId,
-          invitedByAccountId,
-          status: instituteMembershipInvitationStatus.pending,
-          note: params.note || null,
-          respondedAt: null,
-        },
-        update: {
-          invitedByAccountId,
-          status: instituteMembershipInvitationStatus.pending,
-          note: params.note || null,
-          respondedAt: null,
+  await db.$transaction(async (prisma) => {
+    let memberId = account.member?.id;
+    if (!memberId) {
+      const createdMember = await prisma.member.create({
+        data: {
+          account_id: id,
+          work_email: account.login_email,
+          date_joined: new Date(),
         },
       });
-    })
-  );
+      memberId = createdMember.id;
+    }
+
+    await Promise.all(
+      params.instituteId.map(async (rawInstituteId) => {
+        const instituteId = Number(rawInstituteId);
+        if (!Number.isFinite(instituteId)) return;
+
+        await prisma.memberInstitute.upsert({
+          where: {
+            memberId_instituteId: {
+              memberId: memberId!,
+              instituteId,
+            },
+          },
+          create: {
+            memberId: memberId!,
+            instituteId,
+          },
+          update: {},
+        });
+      })
+    );
+  });
 }
 
 export default async function handler(
@@ -92,7 +82,7 @@ export default async function handler(
     )
       return;
 
-    await addInstitute(id, params, currentAccount.id);
+    await addInstitute(id, params);
 
     const updatedAccount = await db.account.findUnique({
       where: { id },

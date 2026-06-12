@@ -23,8 +23,8 @@ const GrantAdminButton: FC<Props> = ({ account, setAccount }) => {
   }
 
   const confirmMessage = en
-    ? "Are you sure you want to grant this account admin privileges? This will grant admin access for current selected institute!"
-    : "Voulez-vous vraiment accorder des privilèges d'administrateur à ce compte ? Cela accordera l'accès administrateur pour l'institut actuellement sélectionné !";
+    ? "Are you sure you want to grant this account admin privileges for the currently selected institute? This will also add them as a member of this institute (a member profile is created if they don't have one)."
+    : "Voulez-vous vraiment accorder des privilèges d'administrateur à ce compte pour l'institut actuellement sélectionné ? Cela l'ajoutera également en tant que membre de cet institut (un profil de membre est créé s'il n'en a pas).";
 
   return (
     <>

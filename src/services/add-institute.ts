@@ -17,9 +17,7 @@ export default async function addInstitute(
   const notification = new Notification();
   try {
     notification.loading(
-      en
-        ? "Sending institute invitation..."
-        : "Envoi de l'invitation à l'institut..."
+      en ? "Adding to institute..." : "Ajout à l'institut..."
     );
     const res = await fetch(ApiRoutes.addInstitute(id), {
       headers: { ...authHeader, ...contentTypeJsonHeader },
@@ -28,9 +26,7 @@ export default async function addInstitute(
     });
     if (!res.ok) throw await res.text();
     notification.success(
-      en
-        ? "Institute invitation sent."
-        : "Invitation à l'institut envoyée."
+      en ? "Added to institute." : "Ajouté à l'institut."
     );
     return await res.json();
   } catch (e: any) {
