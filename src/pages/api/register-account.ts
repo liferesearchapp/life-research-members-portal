@@ -22,49 +22,78 @@ export type RegisterAccountRes = Awaited<ReturnType<typeof registerAccount>>;
 
 function registerAccount(params: RegisterAccountParams) {
   const transaction = db.$transaction(async (prisma) => {
-    const newAccount = await prisma.account.create({
-      data: {
-        login_email: params.login_email.toLocaleLowerCase(),
-        is_super_admin: params.is_super_admin,
-        first_name: params.first_name,
-        last_name: params.last_name,
-        member: params.is_member
-          ? { create: { work_email: params.login_email, date_joined: new Date() } }
-          : undefined,
-      },
+    const email = params.login_email.toLocaleLowerCase();
+
+    // If the account already exists (e.g. the person is already a member of
+    // another institute), we don't error out — we add them to the requested
+    // institute(s) instead. This lets an admin add an existing member from
+    // another institute to their own.
+    const existingAccount = await prisma.account.findUnique({
+      where: { login_email: email },
       include: { member: true },
     });
 
-    if (params.institute_id.length && newAccount.member != null) {
+    // Adding to an institute (or granting admin) requires a member profile.
+    const needsMember =
+      params.institute_id.length > 0 || !!params.is_member || !!params.is_admin;
+
+    let account = existingAccount;
+    if (!account) {
+      account = await prisma.account.create({
+        data: {
+          login_email: email,
+          is_super_admin: params.is_super_admin,
+          first_name: params.first_name,
+          last_name: params.last_name,
+          member: needsMember
+            ? { create: { work_email: email, date_joined: new Date() } }
+            : undefined,
+        },
+        include: { member: true },
+      });
+    }
+
+    let memberId = account.member?.id;
+    if (!memberId && needsMember) {
+      const createdMember = await prisma.member.create({
+        data: {
+          account_id: account.id,
+          work_email: account.login_email,
+          date_joined: new Date(),
+        },
+      });
+      memberId = createdMember.id;
+    }
+
+    if (memberId && params.institute_id.length) {
       await Promise.all(
         params.institute_id.map((instituteId) =>
-          prisma.memberInstitute.create({
-            data: {
-              instituteId: instituteId,
-              memberId: newAccount.member!.id,
+          prisma.memberInstitute.upsert({
+            where: {
+              memberId_instituteId: { memberId: memberId!, instituteId },
             },
+            create: { memberId: memberId!, instituteId },
+            update: {},
           })
         )
       );
 
-      if (params.is_admin && newAccount.member) {
+      if (params.is_admin) {
         await Promise.all(
-          params.institute_id.map(
-            (instituteId) =>
-              newAccount.member &&
-              prisma.instituteAdmin.create({
-                data: {
-                  accountId: newAccount.id,
-                  instituteId: instituteId,
-                  memberId: newAccount.member.id,
-                },
-              })
+          params.institute_id.map((instituteId) =>
+            prisma.instituteAdmin.upsert({
+              where: {
+                accountId_instituteId: { accountId: account!.id, instituteId },
+              },
+              create: { accountId: account!.id, instituteId, memberId: memberId! },
+              update: {},
+            })
           )
         );
       }
     }
 
-    return newAccount;
+    return account;
   });
 
   return transaction;
@@ -111,9 +140,6 @@ export default async function handler(
       return;
 
     const newUser = await registerAccount(params);
-
-    if (params.institute_id.length) {
-    }
 
     return res.status(200).send(newUser);
   } catch (e: any) {

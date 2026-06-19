@@ -10,11 +10,27 @@ import type { AccountDBRes } from "../account/[id]";
 
 function deleteAccount(id: number): Promise<AccountDBRes> {
   return db.$transaction(async (prisma) => {
+    const account = await prisma.account.findUnique({
+      where: { id },
+      select: { member: { select: { id: true } } },
+    });
+
     await prisma.instituteMembershipInvitation.deleteMany({
       where: {
         OR: [{ accountId: id }, { invitedByAccountId: id }],
       },
     });
+
+    // These junction tables reference the account/member without an
+    // ON DELETE CASCADE rule, so they must be removed before the account
+    // (and its cascaded member profile) can be deleted.
+    await prisma.instituteAdmin.deleteMany({ where: { accountId: id } });
+
+    if (account?.member) {
+      await prisma.memberInstitute.deleteMany({
+        where: { memberId: account.member.id },
+      });
+    }
 
     return prisma.account.delete({
       where: { id },

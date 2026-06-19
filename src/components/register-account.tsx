@@ -70,8 +70,8 @@ const RegisterAccount: FC = () => {
       <h1>{en ? "Create Member Account" : "Créer un compte de membre"}</h1>
       <h2 style={{ marginBottom: 24 }}>
         {en
-          ? "This form will create an account for the given email."
-          : "Ce formulaire créera un compte pour le courriel fourni."}
+          ? "This form creates an account for the given email. If the email already belongs to an existing account (for example, a member of another institute), that account will be added to the selected institute(s) instead."
+          : "Ce formulaire crée un compte pour le courriel fourni. Si le courriel appartient déjà à un compte existant (par exemple, un membre d'un autre institut), ce compte sera plutôt ajouté à l'institut ou aux instituts sélectionnés."}
       </h2>
       <Form
         form={form}
