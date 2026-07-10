@@ -121,6 +121,7 @@ const RegisterGrant: FC = () => {
           label={en ? "Submission Date" : "Date de soumission"}
           name="submission_date"
           className="date-picker"
+          rules={[{ required: true, message: en ? "Required" : "Requis" }]}
         >
           <DatePicker />
         </Form.Item>

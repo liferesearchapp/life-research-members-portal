@@ -91,6 +91,9 @@ export default async function handler(
     const id = parseInt(req.query.id);
     const params = req.body as UpdateGrantPublicParams;
 
+    if (!params.submission_date)
+      return res.status(400).send("Submission date is required.");
+
     const currentUser = await getAccountFromRequest(req, res);
     if (!currentUser) return;
 

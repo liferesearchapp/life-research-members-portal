@@ -69,6 +69,7 @@ export default async function handler(
     status_id,
     source_id,
     all_investigator,
+    submission_date,
   } = params;
 
   if (typeof title !== "string") return res.status(400).send("Please provide the title");
@@ -77,6 +78,7 @@ export default async function handler(
   if (isNaN(status_id)) return res.status(400).send("Status ID is required.");
   if (isNaN(source_id)) return res.status(400).send("Source ID is required.");
   if (typeof all_investigator !== "string") return res.status(400).send("All investigator is required.");
+  if (!submission_date) return res.status(400).send("Submission date is required.");
 
   try {
     const currentUser = await getAccountFromRequest(req, res);

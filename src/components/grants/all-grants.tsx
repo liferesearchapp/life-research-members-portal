@@ -409,6 +409,7 @@ const AllGrants: FC = () => {
       dataIndex: "submission_date",
       className: "submission-date-column",
       render: (value) => {
+        if (!value) return "";
         const date = new Date(value);
         return date.toISOString().split("T")[0];
       },

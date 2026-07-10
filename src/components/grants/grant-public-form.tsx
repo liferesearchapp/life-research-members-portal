@@ -344,6 +344,14 @@ const PublicGrantForm: FC<Props> = ({ grant, onSuccess }) => {
         <Form.Item
           label={en ? "Submission Date" : "Date de soumission"}
           name="submission_date"
+          rules={[
+            {
+              required: true,
+              message: en
+                ? "Please select the submission date!"
+                : "Veuillez sélectionner la date de soumission !",
+            },
+          ]}
         >
           <DatePicker />
         </Form.Item>
