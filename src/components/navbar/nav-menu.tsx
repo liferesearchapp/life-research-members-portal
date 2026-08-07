@@ -80,6 +80,10 @@ const NavMenu: FC<{ urlIdentifier: string | undefined }> = ({
       label: en ? "Supervisions" : "Supervisions",
       href: PageRoutes.allSupervisions(id),
     },
+    {
+      label: en ? "Grant Topics" : "Sujets de subvention",
+      href: PageRoutes.instituteTopics(id),
+    },
   ];
 
   const adminSuperAdminItems = {

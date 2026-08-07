@@ -29,7 +29,7 @@ export type UpdateGrantPublicParams = {
 function getGrantAccessInfo(id: number) {
   return db.grant.findUnique({
     where: { id },
-    select: { id: true, instituteId: true },
+    select: { id: true, instituteId: true, topic_id: true },
   });
 }
 
@@ -107,6 +107,19 @@ export default async function handler(
       )
     )
       return;
+
+    const instituteTopic = await db.instituteTopic.findUnique({
+      where: {
+        instituteId_topicId: {
+          instituteId: grant.instituteId,
+          topicId: params.topic_id,
+        },
+      },
+    });
+    if (params.topic_id !== grant.topic_id && !instituteTopic?.is_active)
+      return res
+        .status(400)
+        .send("Please select an active topic for the grant's institute.");
 
     const updated = await updateGrant(id, params);
 

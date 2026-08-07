@@ -15,6 +15,8 @@ import { FacultiesCtx } from "../../services/context/faculties-ctx";
 import { LevelsCtx } from "../../services/context/levels-ctx";
 import GetLanguage from "../../utils/front-end/get-language";
 import { useSelectedInstitute } from "../../services/context/selected-institute-ctx";
+import MemberSelector from "../members/member-selector";
+import type { MemberPublicInfo } from "../../services/_types";
 
 const { Option } = Select;
 const { RangePicker } = DatePicker;
@@ -27,6 +29,7 @@ type SupervisionData = {
   level_id: number | null;
   note: string | null;
   institute_id: number;
+  supervisor: Map<number, MemberPublicInfo>;
 };
 
 const RegisterSupervision: FC = () => {
@@ -43,8 +46,11 @@ const RegisterSupervision: FC = () => {
     faculty_id,
     level_id,
     note,
+    supervisor,
   }: SupervisionData) {
     if (!institute) return;
+    const supervisorMemberId = Array.from(supervisor.keys())[0];
+    if (!supervisorMemberId) return;
     const res = await registerSupervision({
       last_name,
       first_name,
@@ -54,6 +60,7 @@ const RegisterSupervision: FC = () => {
       level_id: level_id || null,
       note: note || null,
       institute_id: institute.id,
+      supervisor_member_id: supervisorMemberId,
     });
     if (res) form.resetFields();
   }
@@ -81,6 +88,33 @@ const RegisterSupervision: FC = () => {
           rules={[{ required: true, message: en ? "Required" : "Requis" }]}
         >
           <Input />
+        </Form.Item>
+
+        <Form.Item
+          label={en ? "Supervised by" : "Supervisé(e) par"}
+          name="supervisor"
+          rules={[
+            {
+              required: true,
+              validator: (_, value: Map<number, MemberPublicInfo> | undefined) =>
+                value?.size === 1
+                  ? Promise.resolve()
+                  : Promise.reject(
+                      new Error(
+                        en
+                          ? "Please select one supervising member."
+                          : "Veuillez sélectionner un membre superviseur."
+                      )
+                    ),
+            },
+          ]}
+        >
+          <MemberSelector
+            max={1}
+            setErrors={(errors) =>
+              form.setFields([{ name: "supervisor", errors }])
+            }
+          />
         </Form.Item>
 
         <Form.Item

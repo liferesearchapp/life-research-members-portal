@@ -16,6 +16,7 @@ export type RegisterSupervisionParams = {
   level_id: number | null;
   note: string | null;
   institute_id: number;
+  supervisor_member_id: number;
 };
 
 export type RegisterSupervisionRes = Awaited<
@@ -32,6 +33,9 @@ function registerSupervision(params: RegisterSupervisionParams) {
       faculty_id: params.faculty_id,
       level_id: params.level_id,
       note: params.note,
+      supervision_principal_supervisor: {
+        create: { member_id: params.supervisor_member_id },
+      },
       instituteId: params.institute_id,
     },
     select: {
@@ -48,12 +52,13 @@ export default async function handler(
   const {
     last_name,
     first_name,
-    faculty_id,
-    level_id,
+    supervisor_member_id,
   } = params;
 
   if (typeof last_name !== "string") return res.status(400).send("Please provide the last name");
   if (typeof first_name !== "string") return res.status(400).send("Please provide the first name");
+  if (!Number.isInteger(supervisor_member_id))
+    return res.status(400).send("Please select one supervising member.");
 
   try {
     const currentUser = await getAccountFromRequest(req, res);
@@ -66,6 +71,19 @@ export default async function handler(
       )
     )
       return;
+
+    const supervisorMembership = await db.memberInstitute.findUnique({
+      where: {
+        memberId_instituteId: {
+          memberId: supervisor_member_id,
+          instituteId: params.institute_id,
+        },
+      },
+    });
+    if (!supervisorMembership)
+      return res
+        .status(400)
+        .send("The supervising member must belong to the selected institute.");
 
     const newSupervision = await registerSupervision(params);
 

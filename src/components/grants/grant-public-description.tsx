@@ -16,6 +16,7 @@ import PageRoutes from "../../routing/page-routes";
 import colorFromString from "../../utils/front-end/color-from-string";
 import { useState, useEffect } from "react";
 import { Grid, Descriptions, Tag } from "antd";
+import { getThroughInstituteLabel } from "../../utils/front-end/institute-branding";
 const Item = Descriptions.Item;
 
 const { useBreakpoint } = Grid;
@@ -40,7 +41,7 @@ const PublicGrantDescription: FC<Props> = ({ grant }) => {
 
       <Item label={en ? "Amount" : "Montant"}>{grant.amount}</Item>
 
-      <Item label={en ? "Through Institute" : "Through Institut"}>
+      <Item label={getThroughInstituteLabel(grant.institute, en)}>
         {grant.throught_lri ? (en ? "Yes" : "Oui") : en ? "No" : "Non"}
       </Item>
 

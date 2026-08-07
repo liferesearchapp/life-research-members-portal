@@ -30,6 +30,7 @@ model institute {
   organizations  organizationInstitute[]
   products       productInstitute[]
   supervisions   supervision[]
+  topics         instituteTopic[]
   is_active      Boolean @default(true, map: "DF_institute_is_active")
 }
 
@@ -623,6 +624,17 @@ model topic {
   event_topic   event_topic[]
   grant         grant[]
   product_topic product_topic[]
+  institutes    instituteTopic[]
+}
+
+model instituteTopic {
+  instituteId Int
+  topicId     Int
+  is_active   Boolean   @default(true, map: "DF_instituteTopic_is_active")
+  institute   institute @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+  topic       topic     @relation(fields: [topicId], references: [id], onDelete: Cascade)
+
+  @@id([instituteId, topicId], map: "PK_instituteTopic")
 }
 
 model instituteAdmin {

@@ -1,15 +1,21 @@
-// Footer component for the LIFE Research Institute website
+// Footer component for the selected institute portal
 // Displayed at the bottom of every page
-// Shows the copyright information and a link to the privacy policy of the University of Ottawa (the parent organization of LIFE Research Institute)
+// Shows institute-aware copyright information and a link to the privacy policy
 // The language for the footer text is determined by the context from the LanguageCtx provider.
 
 import { Row, Col } from "antd";
 import SafeLink from "./link/safe-link";
 import { useContext } from "react";
 import { LanguageCtx } from "../services/context/language-ctx";
+import { useSelectedInstitute } from "../services/context/selected-institute-ctx";
+import { getLocalizedInstituteName } from "../utils/front-end/institute-branding";
 
 const Footer = () => {
   const { en } = useContext(LanguageCtx);
+  const { institute } = useSelectedInstitute();
+  const instituteName =
+    getLocalizedInstituteName(institute, en) ||
+    (en ? "Research Institute Portal" : "Portail des instituts de recherche");
 
   return (
     <footer>
@@ -17,7 +23,7 @@ const Footer = () => {
         <Col>
           <span>
             © {new Date().getFullYear()}{" "}
-            {en ? "LIFE Research Institute" : "Institut de recherche LIFE"}
+            {instituteName}
             {" - "}
             {en ? "All rights reserved." : "Tous droits réservés."}
           </span>

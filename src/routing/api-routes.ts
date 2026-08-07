@@ -81,6 +81,8 @@ const ApiRoutes = {
   allKeywords: "/api/all-keywords",
   allTargets: "/api/all-targets",
   allTopics: "/api/all-topics",
+  instituteTopics: "/api/institute-topics",
+  updateInstituteTopic: (id: number) => "/api/update-institute-topic/" + id,
   allOrganizations: "/api/all-organizations",
   allFaculties: "/api/all-faculties",
   allMemberTypes: "/api/all-member-types",

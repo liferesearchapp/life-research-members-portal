@@ -6,6 +6,7 @@ const PageRoutes = {
   allEvents: (urlIdentifier: string) => `/${urlIdentifier}/events`,
   allGrants: (urlIdentifier: string) => `/${urlIdentifier}/grants`,
   allSupervisions: (urlIdentifier: string) => `/${urlIdentifier}/supervisions`,
+  instituteTopics: (urlIdentifier: string) => `/${urlIdentifier}/topics`,
   allPartners: (urlIdentifier: string) => `/${urlIdentifier}/partners`,
   allAccounts: (urlIdentifier: string) => `/${urlIdentifier}/accounts`,
   allInstitutes: () => "/institutes",

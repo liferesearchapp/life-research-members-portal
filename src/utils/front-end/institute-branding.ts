@@ -106,3 +106,22 @@ export function getLocalizedInstituteName(
   if (!en && institute.name_fr) return institute.name_fr;
   return institute.name;
 }
+
+export function getInstituteAcronym(
+  institute: { urlIdentifier: string } | null | undefined
+): string {
+  return institute?.urlIdentifier.trim().toUpperCase() || "";
+}
+
+export function getThroughInstituteLabel(
+  institute: { urlIdentifier: string } | null | undefined,
+  en: boolean
+): string {
+  const acronym = getInstituteAcronym(institute);
+  const baseLabel = en
+    ? "Through the Institute"
+    : "Par l’intermédiaire de l’institut";
+
+  if (!acronym) return baseLabel;
+  return en ? `Through ${acronym}` : `Par l’intermédiaire de ${acronym}`;
+}

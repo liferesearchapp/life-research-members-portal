@@ -35,6 +35,7 @@ import GetLanguage from "../../utils/front-end/get-language";
 import { Switch } from "antd";
 import MemberSelector from "../members/member-selector";
 import toDayjsDate from "../../utils/front-end/to-dayjs-date";
+import { getThroughInstituteLabel } from "../../utils/front-end/institute-branding";
 
 const { Option } = Select;
 
@@ -86,7 +87,7 @@ const PublicGrantForm: FC<Props> = ({ grant, onSuccess }) => {
   const { grantStatuses } = useContext(GrantStatusCtx);
   const { topics } = useContext(AllTopicsCtx);
   const [loading, setLoading] = useState(false);
-  const [througth_lri_status, setThroughtLRI] = useState(false);
+  const [througth_lri_status, setThroughtLRI] = useState(grant.throught_lri);
   const { dirty, setDirty, setSubmit } = useContext(SaveChangesCtx);
   useResetDirtyOnUnmount();
 
@@ -306,15 +307,9 @@ const PublicGrantForm: FC<Props> = ({ grant, onSuccess }) => {
         <Form.Item
           name="throught_lri"
           valuePropName="checked"
-          label={
-            througth_lri_status
-              ? en
-                ? "Throught LRI	: Yes"
-                : "Via IRL : Oui"
-              : en
-              ? "Throught LRI	: No"
-              : "Via IRL : Non"
-          }
+          label={`${getThroughInstituteLabel(grant.institute, en)}: ${
+            througth_lri_status ? (en ? "Yes" : "Oui") : en ? "No" : "Non"
+          }`}
         >
           <Switch />
         </Form.Item>

@@ -1,6 +1,6 @@
 // This component provides a form for registering a grant.
 // It uses the Ant Design UI library to create a form with input fields for various details about the grant, including its title, amount, status, submission date, obtained date, completed date, source, all investigators, topic, and note.
-// The component also has a switch for marking whether the grant was obtained through the LRI.
+// The component also has a switch for marking whether the grant was obtained through the selected institute.
 // The form uses the context API to access language, grant sources, grant statuses, and all topics data from the global state.
 // The component uses the useForm hook from the Ant Design library to handle form submissions and reset the form after a successful submission.
 
@@ -19,6 +19,7 @@ import { AllTopicsCtx } from "../../services/context/all-topics-ctx";
 import GetLanguage from "../../utils/front-end/get-language";
 import { MemberInstituteCtx } from "../../services/context/member-institutes-ctx";
 import { useSelectedInstitute } from "../../services/context/selected-institute-ctx";
+import { getThroughInstituteLabel } from "../../utils/front-end/institute-branding";
 
 const { Option } = Select;
 
@@ -181,7 +182,7 @@ const RegisterGrant: FC = () => {
         </Form.Item>
 
         <Form.Item
-          label={en ? "Through LRI" : "Par l'intermédiaire du LRI"}
+          label={getThroughInstituteLabel(institute, en)}
           name="throught_lri"
           valuePropName="checked"
           initialValue={false}
