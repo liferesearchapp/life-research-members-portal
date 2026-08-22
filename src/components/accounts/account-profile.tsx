@@ -27,6 +27,7 @@ import AddInstituteButton from "./add-institute-button";
 import RemoveInstituteButton from "./remove-institute-button";
 import { ActiveAccountCtx } from "../../services/context/active-account-ctx";
 import { isPendingInstituteMembershipInvitation } from "../../utils/institute-membership-invitations";
+import GrantSuperAdminButton from "./grant-super-admin-button";
 
 const { Item } = Descriptions;
 
@@ -142,6 +143,35 @@ const AccountProfile: FC<Props> = ({ id }) => {
     </Item>
   );
 
+  const superAdminItem = localAccount?.is_super_admin ? (
+    <Item
+      label={
+        en
+          ? "Super Admin Privileges"
+          : "Privilèges de super administrateur"
+      }
+    >
+      {account.is_super_admin ? (
+        <Text>
+          {trueSymbol}
+          {en
+            ? "This account has super admin privileges."
+            : "Ce compte possède des privilèges de super administrateur."}
+        </Text>
+      ) : (
+        <>
+          <Text>
+            {falseSymbol}
+            {en
+              ? "This account does not have super admin privileges."
+              : "Ce compte ne possède pas de privilèges de super administrateur."}
+          </Text>
+          <GrantSuperAdminButton account={account} setAccount={setAccount} />
+        </>
+      )}
+    </Item>
+  ) : null;
+
   var memberProfile = "";
   if (hasPermission) memberProfile = PageRoutes.privateMemberProfile(account.member?.id || 0);
   else memberProfile = PageRoutes.publicMemberProfile(account.member?.id || 0);
@@ -253,6 +283,7 @@ const AccountProfile: FC<Props> = ({ id }) => {
         {lastLoginItem}
         {loginItem}
         {adminItem}
+        {superAdminItem}
         {memberItem}
         {addToMoreInstitutes}
       </Descriptions>
