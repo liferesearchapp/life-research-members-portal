@@ -51,6 +51,8 @@ const ApiRoutes = {
   updateAccountEmail: (id: number) => "/api/update-account/" + id + "/email",
   updateAccountGrantAdmin: (id: number) =>
     "/api/update-account/" + id + "/grant-admin",
+  updateAccountGrantSuperAdmin: (id: number) =>
+    "/api/update-account/" + id + "/grant-super-admin",
   updateAccountRemoveAdmin: (id: number) =>
     "/api/update-account/" + id + "/remove-admin",
   updateAccountRegisterMember: (id: number) =>
