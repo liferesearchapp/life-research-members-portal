@@ -12,12 +12,7 @@ import {
   CalendarOutlined,
   SolutionOutlined,
 } from "@ant-design/icons";
-import { AllMembersCtx } from "../services/context/all-members-ctx";
-import { AllGrantsCtx } from "../services/context/all-grants-ctx";
-import { AllEventsCtx } from "../services/context/all-events-ctx";
-import { AllSupervisionsCtx } from "../services/context/all-supervisions-ctx";
-import { AllProductsCtx } from "../services/context/all-products-ctx";
-import { AllPartnersCtx } from "../services/context/all-partners-ctx";
+import usePublicCounts from "../services/use-public-counts";
 import {
   AuthenticatedTemplate,
   UnauthenticatedTemplate,
@@ -42,23 +37,16 @@ const Welcome: FC = () => {
   const { institute } = useSelectedInstitute();
   const { en } = useContext(LanguageCtx);
 
-  const { allMembers } = useContext(AllMembersCtx);
-  const activeMembersCount = allMembers.length;
-
-  const { allGrants } = useContext(AllGrantsCtx);
-  const activeGrantsCount = allGrants.length;
-
-  const { allEvents } = useContext(AllEventsCtx);
-  const activeEventsCount = allEvents.length;
-
-  const { allSupervisions } = useContext(AllSupervisionsCtx);
-  const activeSupervisionsCount = allSupervisions.length;
-
-  const { allProducts } = useContext(AllProductsCtx);
-  const activeProductsCount = allProducts.length;
-
-  const { allPartners } = useContext(AllPartnersCtx);
-  const activePartnersCount = allPartners.length;
+  // Counts come from the anonymous, PII-free /api/public-counts, not from the full list
+  // endpoints. Those list endpoints return rows and now require authentication; the landing
+  // page only needs the tallies, and shows them to logged-out visitors too.
+  const counts = usePublicCounts(institute?.urlIdentifier);
+  const activeMembersCount = counts.members;
+  const activeGrantsCount = counts.grants;
+  const activeEventsCount = counts.events;
+  const activeSupervisionsCount = counts.supervisions;
+  const activeProductsCount = counts.products;
+  const activePartnersCount = counts.partners;
 
   const adminGreeting = (
     <h4 style={{ color: "var(--brand-primary-dark)" }}>

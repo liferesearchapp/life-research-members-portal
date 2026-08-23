@@ -95,6 +95,7 @@ const ApiRoutes = {
   allEventTypes: "/api/all-event-types",
   allSupervisions: "/api/all-supervisions",
   allLevels: "/api/all-levels",
+  publicCounts: "/api/public-counts",
 } as const;
 
 export default ApiRoutes;
