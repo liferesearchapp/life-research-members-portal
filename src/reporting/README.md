@@ -1,7 +1,13 @@
 # RIMS reporting
 
 Replaces the 2024 Power BI dashboard (`LRI Dashboard v2.4.1.pbix`) with reports served from the
-portal itself. Two audiences, two reports, one engine:
+portal itself. Two audiences, two reports, one engine.
+
+> Integrated onto portal `main` (React 19 / antd 5 / Next 15 / TypeScript 5.9; Prisma 4). The
+> module was first built on `generic-portal`; the move to `main` needed only the metric/seed
+> changes for the `instituteAdmin`-vs-member split and the new `instituteTopic` /
+> `instituteMembershipInvitation` tables — the spec and engine layers were untouched by the
+> schema change, which is the point of the split below.
 
 | Report | Audience | Route | API |
 |---|---|---|---|
@@ -18,9 +24,20 @@ auth/         who may read what.
 scripts/      validate, seed, and verify.
 ```
 
-Changing a report is a **spec edit**. Changing what a number means is a **metric edit**. If the
-schema moves — for instance onto the newer repo that supersedes `generic-portal` — `metrics/` is
-the only directory that should need touching.
+Changing a report is a **spec edit**. Changing what a number means is a **metric edit**. When the
+schema moves, `metrics/` (and the seed) is the only directory that should need touching — as the
+`main` integration bore out.
+
+**Institute admins need not be members** (since `f03e5d7`). `instituteAdmin` is keyed on
+`(accountId, instituteId)` with no member row; do not assume admin ⊆ member. `auth/scope.ts` was
+already correct (it reads `instituteAdmin.institute.urlIdentifier`), and the admin counts read
+`instituteAdmin` directly, so both hold. The seed deliberately makes the sign-in admin a
+non-member so this stays tested.
+
+**Topics are institute-scoped** via `instituteTopic` (with `is_active`). This is a *curation*
+layer — which topics an institute offers — separate from the topics already attached to records
+through `product_topic` / `event_topic`, which are unchanged. "By topic" reports still count what
+records actually carry, so they were unaffected.
 
 ## Rules that are load-bearing
 
