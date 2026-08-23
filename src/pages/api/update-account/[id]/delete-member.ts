@@ -43,10 +43,6 @@ export default async function handler(
       where: { memberId: account?.member?.id },
     });
 
-    await db.instituteAdmin.deleteMany({
-      where: { memberId: account?.member?.id },
-    });
-
     await deleteMember(account?.member?.id);
 
     const updated = await db.account.findUnique({

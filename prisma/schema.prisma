@@ -382,7 +382,6 @@ model member {
   grant_member_involved            grant_member_involved[]
   has_keyword                      has_keyword[]
   insight                          insight?
-  instituteAdmin                   instituteAdmin[]
   account                          account                            @relation(fields: [account_id], references: [id], onDelete: Cascade, map: "FK_member_account_id")
   faculty                          faculty?                           @relation(fields: [faculty_id], references: [id], map: "FK_member_faculty_id")
   member_type                      member_type?                       @relation(fields: [type_id], references: [id], map: "FK_member_type_id")
@@ -638,12 +637,10 @@ model instituteTopic {
 }
 
 model instituteAdmin {
-  memberId    Int
   instituteId Int
   accountId   Int
   account     account   @relation(fields: [accountId], references: [id], onUpdate: NoAction, map: "FK_instituteAdmin_accountId")
   institute   institute @relation(fields: [instituteId], references: [id], onUpdate: NoAction, map: "FK_instituteAdmin_instituteId")
-  member      member    @relation(fields: [memberId], references: [id], onUpdate: NoAction, map: "FK_instituteAdmin_memberId")
 
   @@id([accountId, instituteId], map: "PK_instituteAdmin")
 }

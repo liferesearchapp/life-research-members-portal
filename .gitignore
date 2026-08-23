@@ -41,7 +41,3 @@ next-env.d.ts
 
 # Scratch Page
 src/pages/scratch.tsx
-
-# Migration scripts (contain credentials)
-scripts/migrate-data.js
-scripts/verify-migration.js

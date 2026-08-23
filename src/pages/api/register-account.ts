@@ -33,9 +33,8 @@ function registerAccount(params: RegisterAccountParams) {
       include: { member: true },
     });
 
-    // Adding to an institute (or granting admin) requires a member profile.
-    const needsMember =
-      params.institute_id.length > 0 || !!params.is_member || !!params.is_admin;
+    // Administrative access and institute membership are independent roles.
+    const needsMember = !!params.is_member;
 
     let account = existingAccount;
     if (!account) {
@@ -65,7 +64,7 @@ function registerAccount(params: RegisterAccountParams) {
       memberId = createdMember.id;
     }
 
-    if (memberId && params.institute_id.length) {
+    if (params.is_member && memberId && params.institute_id.length) {
       await Promise.all(
         params.institute_id.map((instituteId) =>
           prisma.memberInstitute.upsert({
@@ -78,19 +77,20 @@ function registerAccount(params: RegisterAccountParams) {
         )
       );
 
-      if (params.is_admin) {
-        await Promise.all(
-          params.institute_id.map((instituteId) =>
-            prisma.instituteAdmin.upsert({
-              where: {
-                accountId_instituteId: { accountId: account!.id, instituteId },
-              },
-              create: { accountId: account!.id, instituteId, memberId: memberId! },
-              update: {},
-            })
-          )
-        );
-      }
+    }
+
+    if (params.is_admin && params.institute_id.length) {
+      await Promise.all(
+        params.institute_id.map((instituteId) =>
+          prisma.instituteAdmin.upsert({
+            where: {
+              accountId_instituteId: { accountId: account!.id, instituteId },
+            },
+            create: { accountId: account!.id, instituteId },
+            update: {},
+          })
+        )
+      );
     }
 
     return account;
@@ -113,6 +113,8 @@ export default async function handler(
     return res.status(400).send("Last Name is required.");
   if (!["boolean", "undefined"].includes(typeof is_admin))
     return res.status(400).send("is_admin may only be boolean or undefined.");
+  if (!["boolean", "undefined"].includes(typeof params.is_member))
+    return res.status(400).send("is_member may only be boolean or undefined.");
   if (params.institute_id === undefined) {
     return res.status(400).send("Please provide at least one institute");
   }

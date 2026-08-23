@@ -34,12 +34,6 @@ async function removeInstitute(id: number, params: RemoveInstituteParams) {
           },
         },
       });
-      await db.instituteAdmin.deleteMany({
-        where: {
-          accountId: accountToRemoveFrom.id,
-          instituteId: Number(instituteId),
-        },
-      });
     }
   }
 }

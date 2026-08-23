@@ -5,7 +5,7 @@ import { assertAuthorized } from "../../../../utils/api/authorization";
 import getAccountFromRequest from "../../../../utils/api/get-account-from-request";
 import type { AccountDBRes } from "../../account/[id]";
 
-async function updateAccountGrantAdmin(id: number, urlIdentifier: string) {
+export async function updateAccountGrantAdmin(id: number, urlIdentifier: string) {
   const institute = await db.institute.findUnique({
     where: {
       urlIdentifier: urlIdentifier,
@@ -19,45 +19,20 @@ async function updateAccountGrantAdmin(id: number, urlIdentifier: string) {
     where: {
       id,
     },
-    select: { id: true, login_email: true, member: { select: { id: true } } },
+    select: { id: true },
   });
 
   if (!institute || !account) return null;
 
-  return db.$transaction(async (prisma) => {
-    // An admin must also be a member, so create a member profile if missing.
-    let memberId = account.member?.id;
-    if (!memberId) {
-      const createdMember = await prisma.member.create({
-        data: {
-          account_id: id,
-          work_email: account.login_email,
-          date_joined: new Date(),
-        },
-      });
-      memberId = createdMember.id;
-    }
-
-    // Ensure the account is a member of the institute it administers.
-    await prisma.memberInstitute.upsert({
-      where: {
-        memberId_instituteId: { memberId, instituteId: institute.id },
-      },
-      create: { memberId, instituteId: institute.id },
-      update: {},
-    });
-
-    return prisma.instituteAdmin.upsert({
-      where: {
-        accountId_instituteId: { accountId: id, instituteId: institute.id },
-      },
-      create: {
-        accountId: id,
-        instituteId: institute.id,
-        memberId,
-      },
-      update: {},
-    });
+  return db.instituteAdmin.upsert({
+    where: {
+      accountId_instituteId: { accountId: id, instituteId: institute.id },
+    },
+    create: {
+      accountId: id,
+      instituteId: institute.id,
+    },
+    update: {},
   });
 }
 
