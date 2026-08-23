@@ -17,7 +17,7 @@
     "@ant-design/v5-patch-for-react-19": "^1.0.3",
     "@azure/msal-browser": "^5.4.0",
     "@azure/msal-react": "^5.0.6",
-    "@prisma/client": "^4.10.1",
+    "@prisma/client": "4.16.2",
     "antd": "^5.29.3",
     "moment": "~2.29.4",
     "next": "15.2.9",
@@ -33,7 +33,7 @@
     "eslint": "^8.57.1",
     "eslint-config-next": "15.2.9",
     "mssql": "^12.5.4",
-    "prisma": "^4.10.0",
+    "prisma": "4.16.2",
     "sass": "~1.55.0",
     "typescript": "^5.9.3",
     "vitest": "^3.2.6"
