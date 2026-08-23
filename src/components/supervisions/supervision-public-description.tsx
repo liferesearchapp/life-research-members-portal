@@ -3,16 +3,14 @@
 // The component uses the `LanguageCtx` context to determine the language to display the text.
 // SafeLink is used to make the links to the member profiles safe.
 
-import Grid from "antd/lib/grid";
-import Descriptions from "antd/lib/descriptions";
-import Item from "antd/lib/descriptions/Item";
-import { FC, useContext } from "react";
+import { type FC, useContext } from "react";
 import type { SupervisionPublicInfo } from "../../services/_types";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import React from "react";
 import SafeLink from "../link/safe-link";
-import { Tag } from "antd";
+import { Tag, Grid, Descriptions } from "antd";
 import PageRoutes from "../../routing/page-routes";
+const Item = Descriptions.Item;
 const { useBreakpoint } = Grid;
 
 type Props = {
@@ -28,7 +26,7 @@ const PublicSupervisionDescription: FC<Props> = ({ supervision }) => {
       size="small"
       bordered
       column={1}
-      labelStyle={{ whiteSpace: "nowrap", width: 0 }}
+      styles={{ label: { whiteSpace: "nowrap", width: 0 } }}
       layout={screens.xs ? "vertical" : "horizontal"}
     >
       <Item label={en ? "First Name" : "Prénom"}>{supervision.first_name}</Item>
@@ -105,7 +103,13 @@ const PublicSupervisionDescription: FC<Props> = ({ supervision }) => {
           </SafeLink>
         ))}
       </Item>
-
+      {supervision.institute && (
+        <Item label={en ? "Institute" : "L'institut"}>
+          <Tag
+            key={supervision.institute.id}
+          >{`${supervision.institute.name} - ${supervision.institute.urlIdentifier}`}</Tag>
+        </Item>
+      )}
       <Item label={en ? "Committee Members" : "Membres du comité"}>
         {supervision.supervision_committee.map((entry, i) => (
           <SafeLink

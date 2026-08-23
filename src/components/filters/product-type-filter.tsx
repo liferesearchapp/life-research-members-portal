@@ -6,7 +6,7 @@
 
 
 import Select, { SelectProps } from "antd/lib/select";
-import { FC, useContext, useMemo } from "react";
+import { type FC, useContext, useMemo } from "react";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import { ProductTypesCtx } from "../../services/context/products-types-ctx";
 import GetLanguage from "../../utils/front-end/get-language";
@@ -59,7 +59,6 @@ const ProductTypeFilter: FC<Props> = ({
       options={options}
       allowClear
       showSearch={false}
-      showArrow
       onSelect={onSelect}
       onDeselect={onDelete}
       getPopupContainer={getPopupContainer}

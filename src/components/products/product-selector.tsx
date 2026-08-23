@@ -5,7 +5,7 @@ import type { product } from "@prisma/client";
 import { ProductsCtx } from "../../services/context/products-ctx";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import AutoComplete from "antd/lib/auto-complete";
-import { ProductPublicInfo } from "../../services/_types";
+import type { ProductPublicInfo } from "../../services/_types";
 import ProductTag from "./product-tag";
 import { Card } from "antd";
 

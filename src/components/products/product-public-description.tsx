@@ -15,6 +15,7 @@ import ProductTypeLink from "../link/product-type-link";
 import type { PublicMemberRes } from "../../pages/api/member/[id]/public";
 import { useState, useEffect } from "react";
 import getMemberAuthor from "../getters/product-member-author-getter";
+import { MemberInstituteCtx } from "../../services/context/member-institutes-ctx";
 
 const { useBreakpoint } = Grid;
 
@@ -43,7 +44,7 @@ const PublicProductDescription: FC<Props> = ({ product }) => {
       size="small"
       bordered
       column={1}
-      labelStyle={{ whiteSpace: "nowrap", width: 0 }}
+      styles={{ label: { whiteSpace: "nowrap", width: 0 } }}
       layout={screens.xs ? "vertical" : "horizontal"}
     >
       <Item
@@ -82,6 +83,16 @@ const PublicProductDescription: FC<Props> = ({ product }) => {
           <Tag key={entry.target.id} color="blue">
             {en ? entry.target.name_en : entry.target.name_fr}
           </Tag>
+        ))}
+      </Item>
+
+      <Item label={en ? "Institute" : "L'institut"}>
+        {product.institutes
+          .filter((entry) => entry.institute.is_active)
+          .map((entry, i) => (
+          <Tag
+            key={entry.institute.id}
+          >{`${entry.institute.name} - ${entry.institute.urlIdentifier}`}</Tag>
         ))}
       </Item>
 

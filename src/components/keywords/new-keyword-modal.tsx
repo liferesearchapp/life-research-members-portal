@@ -1,17 +1,13 @@
-import { Divider } from "antd";
-import Button from "antd/lib/button/button";
-import Form from "antd/lib/form";
-import { useForm } from "antd/lib/form/Form";
-import Input from "antd/lib/input/Input";
-import Modal from "antd/lib/modal";
-import { FC, PropsWithChildren, useState, useContext, useEffect } from "react";
+import { Divider, Button, Form, Input, Modal, Typography } from "antd";
+import { type FC, type PropsWithChildren, useState, useContext, useEffect } from "react";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import type { KeywordInfo } from "../../services/_types";
 import type { keyword } from "@prisma/client";
 import registerKeyword from "../../services/register-keyword";
-import Title from "antd/lib/typography/Title";
-import Text from "antd/lib/typography/Text";
 import KeywordPreview from "./keyword-preview";
+const { useForm } = Form;
+const Title = Typography.Title;
+const Text = Typography.Text;
 
 type Props = {
   open: boolean;

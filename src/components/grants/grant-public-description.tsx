@@ -5,20 +5,19 @@ The component uses Ant Design's Descriptions component to render the grant's inf
 It takes the grant's information from the grant object passed as a prop.
 */
 
-import Grid from "antd/lib/grid";
-import Descriptions from "antd/lib/descriptions";
-import Item from "antd/lib/descriptions/Item";
-import { FC, useContext } from "react";
+import { type FC, useContext } from "react";
 import type { GrantPublicInfo } from "../../services/_types";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import React from "react";
-import Tag from "antd/lib/tag";
 import SafeLink from "../link/safe-link";
 //import GrantSatusLink from "../link/grant-status-link";
 //import GrantSourceLink from "../link/grant-source-link";
 import PageRoutes from "../../routing/page-routes";
 import colorFromString from "../../utils/front-end/color-from-string";
 import { useState, useEffect } from "react";
+import { Grid, Descriptions, Tag } from "antd";
+import { getThroughInstituteLabel } from "../../utils/front-end/institute-branding";
+const Item = Descriptions.Item;
 
 const { useBreakpoint } = Grid;
 
@@ -35,14 +34,14 @@ const PublicGrantDescription: FC<Props> = ({ grant }) => {
       size="small"
       bordered
       column={1}
-      labelStyle={{ whiteSpace: "nowrap", width: 0 }}
+      styles={{ label: { whiteSpace: "nowrap", width: 0 } }}
       layout={screens.xs ? "vertical" : "horizontal"}
     >
       <Item label={en ? "Title" : "Titre"}>{grant.title}</Item>
 
       <Item label={en ? "Amount" : "Montant"}>{grant.amount}</Item>
 
-      <Item label={en ? "Throught LRI" : "Throught LRI"}>
+      <Item label={getThroughInstituteLabel(grant.institute, en)}>
         {grant.throught_lri ? (en ? "Yes" : "Oui") : en ? "No" : "Non"}
       </Item>
 
@@ -100,6 +99,12 @@ const PublicGrantDescription: FC<Props> = ({ grant }) => {
 
       <Item label={en ? "Topic" : "Sujet"}>
         {grant.topic ? (en ? grant.topic.name_en : grant.topic.name_fr) : ""}
+      </Item>
+
+      <Item label={en ? "Institute" : "L'institut"}>
+        <Tag
+          key={grant.institute.id}
+        >{`${grant.institute.name} - ${grant.institute.urlIdentifier}`}</Tag>
       </Item>
 
       <Item label={en ? "Note" : "Note"} style={{ whiteSpace: "break-spaces" }}>

@@ -13,7 +13,7 @@ import TextArea from "antd/lib/input/TextArea";
 import Button from "antd/lib/button";
 import Select from "antd/lib/select";
 import DatePicker from "antd/lib/date-picker";
-import type { Moment } from "moment";
+import type { Dayjs } from "dayjs";
 
 import Divider from "antd/lib/divider";
 import Notification from "../../services/notifications/notification";
@@ -31,10 +31,11 @@ import { GrantStatusCtx } from "../../services/context/grant-statuses-ctx";
 import { AllTopicsCtx } from "../../services/context/all-topics-ctx";
 import type { UpdateGrantPublicParams } from "../../pages/api/update-grant/[id]/public";
 import updateGrantPublic from "../../services/update-grant-public";
-import moment from "moment";
 import GetLanguage from "../../utils/front-end/get-language";
 import { Switch } from "antd";
 import MemberSelector from "../members/member-selector";
+import toDayjsDate from "../../utils/front-end/to-dayjs-date";
+import { getThroughInstituteLabel } from "../../utils/front-end/institute-branding";
 
 const { Option } = Select;
 
@@ -68,9 +69,9 @@ type GrantData = {
   amount: string;
   status_id: number;
   throught_lri: boolean;
-  submission_date: Moment | null;
-  obtained_date: Moment | null;
-  completed_date: Moment | null;
+  submission_date: Dayjs | null;
+  obtained_date: Dayjs | null;
+  completed_date: Dayjs | null;
   source_id: number;
   all_investigator: string;
   topic_id: number;
@@ -86,7 +87,7 @@ const PublicGrantForm: FC<Props> = ({ grant, onSuccess }) => {
   const { grantStatuses } = useContext(GrantStatusCtx);
   const { topics } = useContext(AllTopicsCtx);
   const [loading, setLoading] = useState(false);
-  const [througth_lri_status, setThroughtLRI] = useState(false);
+  const [througth_lri_status, setThroughtLRI] = useState(grant.throught_lri);
   const { dirty, setDirty, setSubmit } = useContext(SaveChangesCtx);
   useResetDirtyOnUnmount();
 
@@ -247,27 +248,9 @@ const PublicGrantForm: FC<Props> = ({ grant, onSuccess }) => {
     amount: grant.amount.toString(),
     status_id: grant.status?.id || 0,
     throught_lri: grant.throught_lri,
-    submission_date: grant.submission_date
-      ? moment(
-          grant.submission_date instanceof Date
-            ? grant.submission_date.toISOString().split("T")[0]
-            : (grant.submission_date as string).split("T")[0]
-        )
-      : null,
-    obtained_date: grant.obtained_date
-      ? moment(
-          grant.obtained_date instanceof Date
-            ? grant.obtained_date.toISOString().split("T")[0]
-            : (grant.obtained_date as string).split("T")[0]
-        )
-      : null,
-    completed_date: grant.completed_date
-      ? moment(
-          grant.completed_date instanceof Date
-            ? grant.completed_date.toISOString().split("T")[0]
-            : (grant.completed_date as string).split("T")[0]
-        )
-      : null,
+    submission_date: toDayjsDate(grant.submission_date),
+    obtained_date: toDayjsDate(grant.obtained_date),
+    completed_date: toDayjsDate(grant.completed_date),
     source_id: grant.source?.id || 0,
     all_investigator: grant.all_investigator || "",
     topic_id: grant.topic?.id || 0,
@@ -324,15 +307,9 @@ const PublicGrantForm: FC<Props> = ({ grant, onSuccess }) => {
         <Form.Item
           name="throught_lri"
           valuePropName="checked"
-          label={
-            througth_lri_status
-              ? en
-                ? "Throught LRI	: Yes"
-                : "Via IRL : Oui"
-              : en
-              ? "Throught LRI	: No"
-              : "Via IRL : Non"
-          }
+          label={`${getThroughInstituteLabel(grant.institute, en)}: ${
+            througth_lri_status ? (en ? "Yes" : "Oui") : en ? "No" : "Non"
+          }`}
         >
           <Switch />
         </Form.Item>
@@ -362,6 +339,14 @@ const PublicGrantForm: FC<Props> = ({ grant, onSuccess }) => {
         <Form.Item
           label={en ? "Submission Date" : "Date de soumission"}
           name="submission_date"
+          rules={[
+            {
+              required: true,
+              message: en
+                ? "Please select the submission date!"
+                : "Veuillez sélectionner la date de soumission !",
+            },
+          ]}
         >
           <DatePicker />
         </Form.Item>

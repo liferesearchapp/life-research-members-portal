@@ -2,7 +2,7 @@
 // This component uses the OrgScopeCtx and LanguageCtx context and the GetLanguage utility.
 
 import Select, { SelectProps } from "antd/lib/select";
-import { FC, useContext, useMemo } from "react";
+import { type FC, useContext, useMemo } from "react";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import { OrgScopeCtx } from "../../services/context/org-scopes-ctx";
 import GetLanguage from "../../utils/front-end/get-language";
@@ -55,7 +55,6 @@ const OrgScopeFilter: FC<Props> = ({
       options={options}
       allowClear
       showSearch={false}
-      showArrow
       onSelect={onSelect}
       onDeselect={onDelete}
       getPopupContainer={getPopupContainer}

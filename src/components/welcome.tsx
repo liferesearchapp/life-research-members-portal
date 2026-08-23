@@ -1,9 +1,10 @@
+/* eslint-disable @next/next/no-img-element */
 // This component is the main landing page of the LRI Member Portal.
 // The component displays a personalized greeting to the user based on their authentication status and role
 // The component also  provides an overview of the portal information and displays a banner image, a tagline, and quick links to key sections of the portal
 // The information displayed is dynamic and changes based on the user's authentication status, language preference and profile information.
 
-import { Row, Col, Typography, Divider, Space } from "antd";
+import { Row, Col, Typography, Space } from "antd";
 import {
   TeamOutlined,
   AppstoreOutlined,
@@ -20,22 +21,25 @@ import { AllPartnersCtx } from "../services/context/all-partners-ctx";
 import {
   AuthenticatedTemplate,
   UnauthenticatedTemplate,
-  useMsal,
 } from "@azure/msal-react";
 import Spin from "antd/lib/spin";
-import { FC, useContext } from "react";
+import { type FC, useContext } from "react";
 import { ActiveAccountCtx } from "../services/context/active-account-ctx";
-import { blue, green } from "@ant-design/colors";
 import { LanguageCtx } from "../services/context/language-ctx";
-import Image from "next/image";
-import life from "../../public/life-home2.png";
 import PageRoutes from "../routing/page-routes";
 import Link from "next/link";
+import {
+  useAdminDetails,
+  useSelectedInstitute,
+} from "../services/context/selected-institute-ctx";
+import { getInstituteLargeLogo, getLocalizedInstituteName } from "../utils/front-end/institute-branding";
 
 const { Title } = Typography;
 
 const Welcome: FC = () => {
   const { localAccount, loading } = useContext(ActiveAccountCtx);
+  const isAdmin = useAdminDetails();
+  const { institute } = useSelectedInstitute();
   const { en } = useContext(LanguageCtx);
 
   const { allMembers } = useContext(AllMembersCtx);
@@ -57,7 +61,7 @@ const Welcome: FC = () => {
   const activePartnersCount = allPartners.length;
 
   const adminGreeting = (
-    <h4 style={{ color: green[6] }}>
+    <h4 style={{ color: "var(--brand-primary-dark)" }}>
       {en
         ? "You are logged in as an administrator"
         : "Vous êtes connecté(e) en tant qu'administrateur"}
@@ -95,12 +99,25 @@ const Welcome: FC = () => {
       </h4>
     </>
   );
+
+  const localizedName = getLocalizedInstituteName(institute, en);
+  const grammerFr = () => {
+    // Keep the institute's French name in its stored (proper) case, and only
+    // pick the correct elision: "de l'" before a vowel, otherwise "du".
+    const name = institute?.name_fr || institute?.name || "";
+    const firstChar = name.charAt(0).toLowerCase();
+    const vowels = ['a', 'â', 'à', 'e', 'è', 'ê', 'é', 'i', 'î', 'y', 'o', 'ô', 'u', 'û', 'œ'];
+    if (vowels.includes(firstChar))
+      return `de l'${name}`;
+    else
+      return `du ${name}`;
+  }
   const unauthenticatedGreeting = (
     <>
       <h1>
         {en
-          ? "Welcome to the LIFE Research Institute Member Portal!"
-          : "Bienvenue sur le portail des membres de l'Institut de recherche LIFE!"}
+          ? `Welcome to the ${localizedName.toUpperCase()} Member Portal!`
+          : `Bienvenue sur le portail des membres ${grammerFr()}!`}
       </h1>
       <h4>
         {en
@@ -122,11 +139,11 @@ const Welcome: FC = () => {
         </h3>
         <h1>
           {en
-            ? "Welcome to the LIFE Research Institute Member Portal"
-            : "Bienvenue sur le portail des membres de l'Institut de recherche LIFE"}
+            ? `Welcome to the ${localizedName.toUpperCase()} Member Portal`
+            : `Bienvenue sur le portail des membres ${grammerFr()}`}
         </h1>
 
-        {localAccount.is_admin
+        {isAdmin
           ? adminGreeting
           : localAccount.member
           ? memberGreeting
@@ -164,11 +181,19 @@ const Welcome: FC = () => {
                 alignItems: "center",
               }}
             >
-              <Image
-                src={life}
-                alt="LIFE Research Institute Home"
-                width={530} // Set the width and height to the desired values
+              <img
+                src={getInstituteLargeLogo(institute)}
+                alt={en ? `${localizedName || "Institute"} logo` : `Logo ${localizedName || "institut"}`}
+                width={530}
                 height={340}
+                loading="eager"
+                style={{
+                  display: "block",
+                  maxWidth: "100%",
+                  height: "auto",
+                  maxHeight: 340,
+                  objectFit: "contain",
+                }}
               />
             </Col>
           </Row>
@@ -176,9 +201,7 @@ const Welcome: FC = () => {
       </div>
       <div className="center-title">
         <Title level={2}>
-          {en
-            ? "Live well. Live long. Live with voice and choice."
-            : "Bien vivre. Vivre longtemps. Vivre avec des choix et une voix."}
+          {en ? institute?.description_en : institute?.description_fr}
         </Title>
       </div>
 
@@ -186,27 +209,30 @@ const Welcome: FC = () => {
         <Row gutter={[16, 16]}>
           <Col xs={24} md={6}>
             <Title level={4}>
-              {en ? "LRI Portal at a glance" : "Aperçu du portail de l'IRL"}
+              {en
+                ? `${localizedName.toUpperCase()} Portal at a glance`
+                : `Aperçu du portail ${grammerFr()}`}
             </Title>
             <p>
               {en
-                ? "The portal provides LRI members with a comprehensive overview of our research, partnerships, and initiatives. Stay informed and engaged with our work by exploring the portal information today!"
-                : "Le portail fournit aux membres de l'IRL un aperçu de nos recherches, partenariats et initiatives. Restez informé(e) et impliqué(e) dans notre travail en explorant l'information de ce portail dès aujourd'hui."}
+                ? `The portal provides ${localizedName.toUpperCase()} members with a comprehensive overview of our research, partnerships, and initiatives. Stay informed and engaged with our work by exploring the portal information today!`
+                : `Le portail fournit aux membres ${grammerFr()} un aperçu de nos recherches, partenariats et initiatives. Restez informé(e) et impliqué(e) dans notre travail en explorant l'information de ce portail dès aujourd'hui.`}
             </p>
           </Col>
           <Col xs={24} md={6}>
             <Space direction="vertical">
-              {localAccount ? (
-                <Link href={PageRoutes.allMembers}>
-                  <a>
-                    <div className="rounded-box rounded-box-gradient-1">
-                      <TeamOutlined className="icon-gradient" />
-                      <span className="count">{activeMembersCount}</span>
-                      <span className="title">
-                        {en ? "Active Members" : "Membres actifs"}
-                      </span>
-                    </div>
-                  </a>
+              {localAccount && institute?.urlIdentifier ? (
+                <Link
+                  href={PageRoutes.allMembers(institute?.urlIdentifier)}
+                  className="rounded-box-link"
+                >
+                  <div className="rounded-box rounded-box-gradient-1">
+                    <TeamOutlined className="icon-gradient" />
+                    <span className="count">{activeMembersCount}</span>
+                    <span className="title">
+                      {en ? "Active Members" : "Membres actifs"}
+                    </span>
+                  </div>
                 </Link>
               ) : (
                 <div className="rounded-box rounded-box-gradient-1">
@@ -217,17 +243,18 @@ const Welcome: FC = () => {
                   </span>
                 </div>
               )}
-              {localAccount?.is_admin ? (
-                <Link href={PageRoutes.allGrants}>
-                  <a>
-                    <div className="rounded-box rounded-box-gradient-3">
-                      <FundOutlined className="icon-gradient" />
-                      <span className="count">{activeGrantsCount}</span>
-                      <span className="title">
-                        {en ? "Grants" : "Subventions"}
-                      </span>
-                    </div>
-                  </a>
+              {isAdmin && institute?.urlIdentifier ? (
+                <Link
+                  href={PageRoutes.allGrants(institute?.urlIdentifier)}
+                  className="rounded-box-link"
+                >
+                  <div className="rounded-box rounded-box-gradient-3">
+                    <FundOutlined className="icon-gradient" />
+                    <span className="count">{activeGrantsCount}</span>
+                    <span className="title">
+                      {en ? "Grants" : "Subventions"}
+                    </span>
+                  </div>
                 </Link>
               ) : (
                 <div className="rounded-box rounded-box-gradient-3">
@@ -240,17 +267,18 @@ const Welcome: FC = () => {
           </Col>
           <Col xs={24} md={6}>
             <Space direction="vertical">
-              {localAccount ? (
-                <Link href={PageRoutes.allProducts}>
-                  <a>
-                    <div className="rounded-box rounded-box-gradient-2">
-                      <AppstoreOutlined className="icon-gradient" />
-                      <span className="count">{activeProductsCount}</span>
-                      <span className="title">
-                        {en ? "Products" : "Produits"}
-                      </span>
-                    </div>
-                  </a>
+              {localAccount && institute?.urlIdentifier ? (
+                <Link
+                  href={PageRoutes.allProducts(institute?.urlIdentifier)}
+                  className="rounded-box-link"
+                >
+                  <div className="rounded-box rounded-box-gradient-2">
+                    <AppstoreOutlined className="icon-gradient" />
+                    <span className="count">{activeProductsCount}</span>
+                    <span className="title">
+                      {en ? "Products" : "Produits"}
+                    </span>
+                  </div>
                 </Link>
               ) : (
                 <div className="rounded-box rounded-box-gradient-2">
@@ -260,17 +288,18 @@ const Welcome: FC = () => {
                 </div>
               )}
 
-              {localAccount && localAccount.is_admin ? (
-                <Link href={PageRoutes.allEvents}>
-                  <a>
-                    <div className="rounded-box rounded-box-gradient-4">
-                      <CalendarOutlined className="icon-gradient" />
-                      <span className="count">{activeEventsCount}</span>
-                      <span className="title">
-                        {en ? "Events" : "Événements"}
-                      </span>
-                    </div>
-                  </a>
+              {localAccount && isAdmin && institute?.urlIdentifier ? (
+                <Link
+                  href={PageRoutes.allEvents(institute?.urlIdentifier)}
+                  className="rounded-box-link"
+                >
+                  <div className="rounded-box rounded-box-gradient-4">
+                    <CalendarOutlined className="icon-gradient" />
+                    <span className="count">{activeEventsCount}</span>
+                    <span className="title">
+                      {en ? "Events" : "Événements"}
+                    </span>
+                  </div>
                 </Link>
               ) : (
                 <div className="rounded-box rounded-box-gradient-4">
@@ -283,17 +312,18 @@ const Welcome: FC = () => {
           </Col>
           <Col xs={24} md={6}>
             <Space direction="vertical">
-              {localAccount ? (
-                <Link href={PageRoutes.allPartners}>
-                  <a>
-                    <div className="rounded-box rounded-box-gradient-6">
-                      <TeamOutlined className="icon-gradient" />
-                      <span className="count">{activePartnersCount}</span>
-                      <span className="title">
-                        {en ? "Partners" : "Partenaires"}
-                      </span>
-                    </div>
-                  </a>
+              {localAccount && institute?.urlIdentifier ? (
+                <Link
+                  href={PageRoutes.allPartners(institute?.urlIdentifier)}
+                  className="rounded-box-link"
+                >
+                  <div className="rounded-box rounded-box-gradient-6">
+                    <TeamOutlined className="icon-gradient" />
+                    <span className="count">{activePartnersCount}</span>
+                    <span className="title">
+                      {en ? "Partners" : "Partenaires"}
+                    </span>
+                  </div>
                 </Link>
               ) : (
                 <div className="rounded-box rounded-box-gradient-6">
@@ -305,17 +335,18 @@ const Welcome: FC = () => {
                 </div>
               )}
 
-              {localAccount?.is_admin ? (
-                <Link href={PageRoutes.allSupervisions}>
-                  <a>
-                    <div className="rounded-box rounded-box-gradient-5">
-                      <SolutionOutlined className="icon-gradient" />
-                      <span className="count">{activeSupervisionsCount}</span>
-                      <span className="title">
-                        {en ? "Supervisions" : "Supervisions"}
-                      </span>
-                    </div>
-                  </a>
+              {isAdmin && institute?.urlIdentifier ? (
+                <Link
+                  href={PageRoutes.allSupervisions(institute?.urlIdentifier)}
+                  className="rounded-box-link"
+                >
+                  <div className="rounded-box rounded-box-gradient-5">
+                    <SolutionOutlined className="icon-gradient" />
+                    <span className="count">{activeSupervisionsCount}</span>
+                    <span className="title">
+                      {en ? "Supervisions" : "Supervisions"}
+                    </span>
+                  </div>
                 </Link>
               ) : (
                 <div className="rounded-box rounded-box-gradient-5">

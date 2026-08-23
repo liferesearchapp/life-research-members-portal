@@ -6,9 +6,7 @@ import Button from "antd/lib/button";
 import Table, { ColumnType } from "antd/lib/table";
 import Title from "antd/lib/typography/Title";
 import {
-  FC,
-  Fragment,
-  useCallback,
+  type FC,
   useContext,
   useEffect,
   useMemo,
@@ -16,8 +14,6 @@ import {
 } from "react";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import PageRoutes from "../../routing/page-routes";
-import Descriptions from "antd/lib/descriptions";
-import Item from "antd/lib/descriptions/Item";
 import SafeLink from "../link/safe-link";
 import Router, { useRouter } from "next/router";
 import Form from "antd/lib/form";
@@ -32,6 +28,10 @@ import { AllGrantsCtx } from "../../services/context/all-grants-ctx";
 import type { GrantPublicInfo } from "../../services/_types";
 import getMemberInvolved from "../getters/grant-member-involved-getter";
 import getInvestigatorMember from "../getters/grant-investigator-member-getter";
+import {
+  useAdminDetails,
+  useSelectedInstitute,
+} from "../../services/context/selected-institute-ctx";
 
 function nameSorter(a: { title: string }, b: { title: string }) {
   return a.title.localeCompare(b.title);
@@ -182,8 +182,14 @@ function handleShowInvestigatorMemberChange(value: boolean) {
   Router.push({ query }, undefined, { scroll: false });
 }
 
-function clearQueries() {
-  Router.push({ query: null }, undefined, { scroll: false });
+function clearQueries(institute: { urlIdentifier: string | null }) {
+  if (institute?.urlIdentifier) {
+    const url = PageRoutes.allGrants(institute.urlIdentifier);
+    Router.push(url);
+  } else {
+    console.error("Unable to reset filters: Institute ID is missing.");
+    alert("Unable to reset filters: Institute ID is missing.");
+  }
 }
 
 function getIdsFromQueryParams(key: string): Set<number> {
@@ -208,6 +214,7 @@ function getPopupContainer(): HTMLElement {
 
 const AllGrants: FC = () => {
   const { en } = useContext(LanguageCtx);
+  const { institute } = useSelectedInstitute();
 
   const {
     allGrants,
@@ -216,9 +223,15 @@ const AllGrants: FC = () => {
   } = useContext(AllGrantsCtx);
 
   const { localAccount } = useContext(ActiveAccountCtx);
+  const isAdmin = useAdminDetails();
 
   const handleCreateGrant = () => {
-    router.push("grants/register");
+    if (institute) {
+      router.push({
+        pathname: "/[instituteId]/grants/register",
+        query: { instituteId: institute.urlIdentifier },
+      });
+    }
   };
 
   useEffect(() => {
@@ -314,8 +327,13 @@ const AllGrants: FC = () => {
   }, [sourceQuery]);
 
   function refreshAndClearFilters() {
-    clearQueries();
-    refreshGrants();
+    const instituteUrlIdentifier = institute?.urlIdentifier; 
+    if (instituteUrlIdentifier) {
+      clearQueries({ urlIdentifier: instituteUrlIdentifier }); 
+       refreshGrants();
+    }else {
+      console.error("Cannot reset filters: Institute ID is missing.");
+    }
   }
 
   const filteredGrants = useMemo(
@@ -391,6 +409,7 @@ const AllGrants: FC = () => {
       dataIndex: "submission_date",
       className: "submission-date-column",
       render: (value) => {
+        if (!value) return "";
         const date = new Date(value);
         return date.toISOString().split("T")[0];
       },
@@ -547,7 +566,7 @@ const AllGrants: FC = () => {
         <Button type="primary" onClick={refreshAndClearFilters} size="large">
           {en ? "Reset the filter" : "Réinitialiser le filtre"}
         </Button>{" "}
-        {localAccount && localAccount.is_admin && (
+        {localAccount && isAdmin && (
           <Button
             type="primary"
             size="large"

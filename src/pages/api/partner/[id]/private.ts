@@ -2,6 +2,10 @@ import type { organization } from "@prisma/client";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { selectAllPartnerInfo, selectPublicPartnerInfo } from "../../../../../prisma/helpers";
 import db from "../../../../../prisma/prisma-client";
+import {
+  assertAuthorized,
+  hasAnyInstituteAccess,
+} from "../../../../utils/api/authorization";
 import getAccountFromRequest from "../../../../utils/api/get-account-from-request";
 
 export type PrivatePartnerDBRes = Awaited<ReturnType<typeof getPrivatePartnerInfo>>;
@@ -34,16 +38,19 @@ export default async function handler(
     const currentAccount = await getAccountFromRequest(req, res);
     if (!currentAccount) return;
 
-    const authorized =
-      currentAccount.is_admin || (currentAccount.member && currentAccount.member.id === id);
-
-    if (!authorized)
-      return res
-        .status(401)
-        .send("You are not authorized to view this partner's private information.");
-
     const partner = await getPrivatePartnerInfo(id);
     if (!partner) return res.status(400).send("Partner not found. ID: " + id);
+    if (
+      !assertAuthorized(
+        res,
+        hasAnyInstituteAccess(
+          currentAccount,
+          partner.organizationInstitute.map((entry) => entry.instituteId)
+        ),
+        "You are not authorized to view this partner's private information."
+      )
+    )
+      return;
 
     return res.status(200).send(partner);
   } catch (e: any) {

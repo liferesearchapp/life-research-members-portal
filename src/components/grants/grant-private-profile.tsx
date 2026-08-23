@@ -7,7 +7,7 @@ import Empty from "antd/lib/empty";
 import Button from "antd/lib/button";
 import Card from "antd/lib/card/Card";
 import Title from "antd/lib/typography/Title";
-import { FC, ReactNode, useCallback, useContext, useState } from "react";
+import { type FC, ReactNode, useCallback, useContext, useState } from "react";
 import CardSkeleton from "../loading/card-skeleton";
 
 import usePrivateGrantInfo from "../../services/use-private-grant-info";
@@ -137,7 +137,7 @@ const PrivateGrantProfile: FC<Props> = ({ id }) => {
   ];
 
   return (
-    <Card title={header} bodyStyle={{ paddingTop: 0 }}>
+    <Card title={header} styles={{ body: { paddingTop: 0 } }}>
       <Tabs
         items={editMode ? forms : descriptions}
         // items={descriptions}
@@ -145,7 +145,7 @@ const PrivateGrantProfile: FC<Props> = ({ id }) => {
         onChange={onChange}
         // Very important to destroy inactive forms,
         // so they register their submit function to the save changes context when navigated back
-        destroyInactiveTabPane
+        destroyOnHidden
       />
       <DeleteGrantButton
         grant={grant}

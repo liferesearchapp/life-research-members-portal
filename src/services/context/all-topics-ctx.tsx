@@ -1,8 +1,9 @@
 import type { topic } from "@prisma/client";
 import {
   createContext,
-  FC,
-  PropsWithChildren,
+  type FC,
+  type PropsWithChildren,
+  useCallback,
   useContext,
   useEffect,
   useState,
@@ -10,10 +11,12 @@ import {
 import ApiRoutes from "../../routing/api-routes";
 import Notification from "../notifications/notification";
 import { LanguageCtx } from "./language-ctx";
+import { useSelectedInstitute } from "./selected-institute-ctx";
 
-async function fetchAllTopics(): Promise<topic[]> {
+async function fetchAllTopics(urlIdentifier: string): Promise<topic[]> {
   try {
-    const res = await fetch(ApiRoutes.allTopics);
+    const query = new URLSearchParams({ instituteId: urlIdentifier });
+    const res = await fetch(`${ApiRoutes.allTopics}?${query}`);
     if (!res.ok) throw await res.text();
     return await res.json();
   } catch (e: any) {
@@ -45,24 +48,27 @@ export const AllTopicsCtxProvider: FC<PropsWithChildren> = ({ children }) => {
   const [topics, setTopics] = useState<topic[]>([]);
   const [topicMap, setTargetMap] = useState(new Map<number, topic>());
   const { en } = useContext(LanguageCtx);
+  const { institute } = useSelectedInstitute();
 
-  async function getTopics() {
-    const topics = await fetchAllTopics();
-    setTopics(topics.sort(en ? enSorter : frSorter));
-    setTargetMap(new Map(topics.map((k) => [k.id, k])));
-  }
+  const getTopics = useCallback(async () => {
+    if (!institute) {
+      setTopics([]);
+      setTargetMap(new Map());
+      return;
+    }
+
+    const fetchedTopics = await fetchAllTopics(institute.urlIdentifier);
+    const sortedTopics = [...fetchedTopics].sort(en ? enSorter : frSorter);
+    setTopics(sortedTopics);
+    setTargetMap(new Map(sortedTopics.map((topic) => [topic.id, topic])));
+  }, [en, institute]);
 
   useEffect(() => {
-    getTopics();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    setTopics((prev) => prev.sort(en ? enSorter : frSorter));
-  }, [en]);
+    void getTopics();
+  }, [getTopics]);
 
   function refresh() {
-    getTopics();
+    void getTopics();
   }
 
   function set(keyword: topic) {

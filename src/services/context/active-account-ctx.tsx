@@ -1,33 +1,19 @@
 import { useMsal } from "@azure/msal-react";
+import { InteractionStatus } from "@azure/msal-browser";
 import {
   createContext,
-  Dispatch,
-  FC,
-  PropsWithChildren,
-  SetStateAction,
+  type Dispatch,
+  type FC,
+  type PropsWithChildren,
+  type SetStateAction,
   useEffect,
   useState,
 } from "react";
-import { loginRequest, msalInstance } from "../../../auth-config";
+import { ensureMsalInitialized, loginRequest } from "../../../auth-config";
 import ApiRoutes from "../../routing/api-routes";
 import getAuthHeader from "../headers/auth-header";
-import type { AuthenticationResult } from "@azure/msal-common/dist/response/AuthenticationResult";
 import type { AccountInfo } from "../_types";
 import Notification from "../notifications/notification";
-
-// See https://learn.microsoft.com/en-us/azure/active-directory/develop/scenario-spa-acquire-token?tabs=javascript2
-function handleResponse(response: AuthenticationResult | null) {
-  if (!response) return;
-  msalInstance.setActiveAccount(response.account);
-}
-
-/** Await this promise to make sure active account is loaded on redirecting from login screen*/
-async function onRedirect() {
-  return msalInstance
-    .handleRedirectPromise()
-    .then(handleResponse)
-    .catch((e: any) => console.error("Error after redirect:", e));
-}
 
 export const ActiveAccountCtx = createContext<{
   localAccount: AccountInfo | null;
@@ -39,12 +25,31 @@ export const ActiveAccountCtx = createContext<{
   setLocalAccount: Dispatch<SetStateAction<AccountInfo | null>>;
 }>(null as any);
 
-export const ActiveAccountCtxProvider: FC<PropsWithChildren> = ({ children }) => {
-  const { instance } = useMsal();
+export const ActiveAccountCtxProvider: FC<PropsWithChildren> = ({
+  children,
+}) => {
+  const { instance, inProgress, accounts } = useMsal();
 
   const [localAccount, setLocalAccount] = useState<AccountInfo | null>(null);
   const [loading, setLoading] = useState(true); // Start true so loading icons are served first
   const [refreshing, setRefreshing] = useState(false);
+
+  async function withTimeout<T>(promise: Promise<T>, ms = 10000): Promise<T> {
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
+
+    try {
+      return await Promise.race([
+        promise,
+        new Promise<T>((_, reject) => {
+          timeoutId = setTimeout(() => {
+            reject(new Error("Timed out while loading your account."));
+          }, ms);
+        }),
+      ]);
+    } finally {
+      if (timeoutId) clearTimeout(timeoutId);
+    }
+  }
 
   /** Gets the current user's account from the database */
   async function fetchLocalAccount() {
@@ -75,17 +80,28 @@ export const ActiveAccountCtxProvider: FC<PropsWithChildren> = ({ children }) =>
   }
 
   useEffect(() => {
+    if (inProgress !== InteractionStatus.None) return;
+
+    if (accounts.length > 0 && !instance.getActiveAccount()) {
+      instance.setActiveAccount(accounts[0]);
+    }
+
     async function firstLoad() {
-      await onRedirect();
       if (!instance.getActiveAccount()) return setLoading(false);
       const notification = new Notification("bottom-right");
       notification.loading("Loading your account...");
-      await fetchAccountUpdateLastLogin();
-      setLoading(false);
-      notification.close();
+      try {
+        await withTimeout(fetchAccountUpdateLastLogin());
+      } catch (e: any) {
+        new Notification().error(e);
+      } finally {
+        setLoading(false);
+        notification.close();
+      }
     }
+
     firstLoad();
-  }, [instance]);
+  }, [instance, inProgress, accounts]);
 
   async function refresh() {
     if (loading || refreshing) return;
@@ -97,23 +113,32 @@ export const ActiveAccountCtxProvider: FC<PropsWithChildren> = ({ children }) =>
     notification.close();
   }
 
-  function login() {
+  async function login() {
+    await ensureMsalInitialized();
     instance.loginRedirect(loginRequest).catch((e: any) => {
       new Notification().error(e);
     });
   }
 
-  function logout() {
+  async function logout() {
     setLocalAccount(null);
-    // returning false stops redirect but still clears the cache and active user
-    instance.logoutRedirect({ onRedirectNavigate: () => false }).catch((e: any) => {
+    await ensureMsalInitialized();
+    instance.clearCache().catch((e: any) => {
       new Notification().error(e);
     });
   }
 
   return (
     <ActiveAccountCtx.Provider
-      value={{ localAccount, loading, login, logout, refresh, refreshing, setLocalAccount }}
+      value={{
+        localAccount,
+        loading,
+        refresh,
+        login,
+        logout,
+        refreshing,
+        setLocalAccount,
+      }}
     >
       {children}
     </ActiveAccountCtx.Provider>

@@ -28,7 +28,7 @@
     align-items: center;
     justify-content: center;
     border-radius: 50%;
-    background-color: var(--blue-6);
+    background-color: var(--brand-secondary-dark);
     font-size: 1.5rem;
     width: 3.25rem;
     height: 3.25rem;
@@ -50,6 +50,17 @@
       top: 8px;
     }
   }
+}
+
+.navbar .login-button.ant-btn-primary {
+  background-color: var(--brand-secondary-dark);
+  border-color: var(--brand-secondary-dark);
+}
+
+.navbar .login-button.ant-btn-primary:hover,
+.navbar .login-button.ant-btn-primary:focus {
+  background-color: var(--brand-secondary);
+  border-color: var(--brand-secondary);
 }
 
 @media screen and (min-width: 600px) {

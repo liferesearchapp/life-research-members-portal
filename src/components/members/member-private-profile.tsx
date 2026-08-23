@@ -17,6 +17,8 @@ import MemberInsightForm from "./member-insight-form";
 import { SaveChangesCtx } from "../../services/context/save-changes-ctx";
 import router from "next/router";
 import { ActiveAccountCtx } from "../../services/context/active-account-ctx";
+import { useAdminDetails } from "../../services/context/selected-institute-ctx";
+import PageRoutes from "../../routing/page-routes";
 
 type Tab = { label: string; key: string; children: ReactNode };
 
@@ -38,6 +40,17 @@ const PrivateMemberProfile: FC<Props> = ({ id }) => {
   };
 
   const { localAccount } = useContext(ActiveAccountCtx);
+  const isAdmin = useAdminDetails();
+
+  /** Institute admins can only access private member profiles within institutes they manage. */
+  if (isAdmin && !localAccount?.is_super_admin) {
+    var adminInstituteIds = localAccount?.instituteAdmin.map((admin) => admin.institute.id) || [];
+    var memberInstituteIds = member?.institutes.map((institute) => institute.instituteId) || [];
+    var hasPermission = false;
+    for (var a of adminInstituteIds) if (memberInstituteIds.includes(a)) hasPermission = true;
+    if (!hasPermission)
+      router.replace(PageRoutes.publicMemberProfile(id));
+  }
 
   /** After saving changes via submit button - dependency of form's submit */
   const onSuccess = useCallback(
@@ -121,7 +134,7 @@ const PrivateMemberProfile: FC<Props> = ({ id }) => {
       key: keys.private,
       children: <PrivateMemberDescription member={member} />,
     },
-    ...(localAccount && localAccount.is_admin
+    ...(localAccount && isAdmin
       ? [
           {
             label: en ? "Insight" : "Aperçu",
@@ -143,7 +156,7 @@ const PrivateMemberProfile: FC<Props> = ({ id }) => {
       key: keys.private,
       children: <PrivateMemberForm member={member} onSuccess={onSuccess} />,
     },
-    ...(localAccount && localAccount.is_admin
+    ...(localAccount && isAdmin
       ? [
           {
             label: en ? "Insight" : "Aperçu",
@@ -155,16 +168,15 @@ const PrivateMemberProfile: FC<Props> = ({ id }) => {
         ]
       : []),
   ];
-
   return (
-    <Card title={header} bodyStyle={{ paddingTop: 0 }}>
+    <Card title={header} styles={{ body: { paddingTop: 0 } }}>
       <Tabs
         items={editMode ? forms : descriptions}
         activeKey={activeTabKey}
         onChange={onChange}
         // Very important to destroy inactive forms,
         // so they register their submit function to the save changes context when navigated back
-        destroyInactiveTabPane
+        destroyOnHidden
       />
     </Card>
   );

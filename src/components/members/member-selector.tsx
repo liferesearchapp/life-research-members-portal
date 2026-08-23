@@ -1,12 +1,10 @@
-import PlusOutlined from "@ant-design/icons/lib/icons/PlusOutlined";
 import type { MemberPublicInfo } from "../../services/_types";
-import AutoComplete from "antd/lib/auto-complete";
-import Button from "antd/lib/button/button";
-import Card from "antd/lib/card";
-import { FC, useContext, useEffect, useState } from "react";
+import { type FC, useContext, useEffect, useState } from "react";
 import { AllMembersSelectorCtx } from "../../services/context/all-members-selector-ctx";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import MemberTag from "./member-tag";
+import { AutoComplete, Button, Card } from "antd";
+import { PlusOutlined } from "@ant-design/icons";
 
 type Props = {
   id?: string;

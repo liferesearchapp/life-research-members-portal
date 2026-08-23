@@ -5,18 +5,19 @@
 // The component stores the selected date range in its state (dateRange)
 // The component can receive additional props, such as an ID and a getPopupContainer function, to customize the DatePicker component
 
-import { FC, useContext, useState } from "react";
+import { type FC, useContext, useState } from "react";
 import { AllEventsCtx } from "../../services/context/all-events-ctx";
 import type { EventPublicInfo } from "../../services/_types";
-import moment, { Moment } from "moment";
 import { DatePicker } from "antd";
 import type { RangePickerProps } from "antd/lib/date-picker";
-import type { RangeValue } from "rc-picker/lib/interface";
+import dayjs, { type Dayjs } from "dayjs";
+
+type EventDateRange = RangePickerProps["value"];
 
 type Props = {
   id?: string;
   onChange?: (
-    value: RangeValue<Moment>,
+    value: EventDateRange,
     filteredEvents: EventPublicInfo[]
   ) => void;
   getPopupContainer?: RangePickerProps["getPopupContainer"];
@@ -28,9 +29,9 @@ const EventDateFilter: FC<Props> = ({
   getPopupContainer,
 }) => {
   const { allEvents } = useContext(AllEventsCtx);
-  const [dateRange, setDateRange] = useState<RangeValue<Moment>>([null, null]);
+  const [dateRange, setDateRange] = useState<EventDateRange>([null, null]);
 
-  function onDateChange(values: RangeValue<Moment>, _: [string, string]) {
+  function onDateChange(values: EventDateRange, _: [string, string]) {
     if (!values || values[0] === null || values[1] === null) {
       onChange(null, allEvents);
       setDateRange([null, null]);
@@ -39,15 +40,19 @@ const EventDateFilter: FC<Props> = ({
 
     const filteredEvents = allEvents.filter((event) => {
       if (!event.start_date) return false;
-      const startDate = moment(event.start_date);
-      const endDate = event.end_date ? moment(event.end_date) : startDate;
+      const startDate = dayjs(event.start_date);
+      const endDate = event.end_date ? dayjs(event.end_date) : startDate;
 
-      const selectedStartDate = values[0]?.startOf("day");
-      const selectedEndDate = values[1]?.endOf("day");
+      const selectedStartDate = values[0]
+        ? dayjs(values[0].toDate()).startOf("day")
+        : null;
+      const selectedEndDate = values[1]
+        ? dayjs(values[1].toDate()).endOf("day")
+        : null;
 
       return (
-        (!selectedStartDate || endDate.isSameOrAfter(selectedStartDate)) &&
-        (!selectedEndDate || startDate.isSameOrBefore(selectedEndDate))
+        (!selectedStartDate || !endDate.isBefore(selectedStartDate)) &&
+        (!selectedEndDate || !startDate.isAfter(selectedEndDate))
       );
     });
 

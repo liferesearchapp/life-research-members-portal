@@ -7,54 +7,60 @@ import { Button, Col, DatePicker, Row, Switch } from "antd";
 import Select from "antd/lib/select";
 import Form from "antd/lib/form";
 import Input from "antd/lib/input";
-import React, { FC, useContext, useState } from "react";
+import React, { FC, useContext } from "react";
 import { useForm } from "antd/lib/form/Form";
-import moment from "moment";
-import type { Moment } from "moment";
+import type { Dayjs } from "dayjs";
 import registerProduct from "../../services/register-product";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import { ProductTypesCtx } from "../../services/context/products-types-ctx";
 import GetLanguage from "../../utils/front-end/get-language";
+import { MemberInstituteCtx } from "../../services/context/member-institutes-ctx";
+import { useSelectedInstitute } from "../../services/context/selected-institute-ctx";
 
 const { Option } = Select;
 
 type Data = {
   title_en: string;
   title_fr: string;
-  publish_date: Moment | null;
+  publish_date: Dayjs | null;
   doi: string;
   all_author: string;
   on_going: boolean;
   peer_reviewed: boolean;
   product_type_id: number;
+  institute_id: number[];
   note: string;
 };
 
 const RegisterProduct: FC = () => {
   const [form] = useForm<Data>();
   const { en } = useContext(LanguageCtx);
+  const { institutes } = useContext(MemberInstituteCtx);
+  const { institute } = useSelectedInstitute();
   const { productTypes } = useContext(ProductTypesCtx);
-  const [onGoing, setOnGoing] = useState(false);
-  const [peerReviewed, setPeerReviewed] = useState(false);
 
   async function handleRegister({
     title_en,
     title_fr,
     publish_date,
-    doi,
-    all_author,
-    product_type_id,
+      doi,
+      all_author,
+      on_going,
+      peer_reviewed,
+      product_type_id,
+    institute_id,
     note,
-  }: Omit<Data, "on_going" | "peer_reviewed">) {
+  }: Data) {
     const res = await registerProduct({
       title_en,
       title_fr,
       publish_date: publish_date ? publish_date.toDate() : null,
       doi,
       all_author,
-      on_going: onGoing,
-      peer_reviewed: peerReviewed,
+      on_going,
+      peer_reviewed,
       product_type_id,
+      institute_id,
       note,
     });
     if (res) form.resetFields();
@@ -106,6 +112,7 @@ const RegisterProduct: FC = () => {
         <Form.Item
           label={en ? "Product Type" : "Type de produit"}
           name="product_type_id"
+          rules={[{ required: true, message: en ? "Required" : "Requis" }]}
         >
           <Select>
             <Option value="">{""}</Option>
@@ -116,33 +123,42 @@ const RegisterProduct: FC = () => {
             ))}
           </Select>
         </Form.Item>
+        {institute && (
+          <Form.Item
+            label={en ? "Select Institute" : "Sélectionnez l'institut"}
+            name="institute_id"
+            initialValue={[institute.id]}
+          >
+            <Select mode="multiple">
+              <Option value="">{""}</Option>
+              {institutes.map((f) => (
+                <Option key={f.id} value={f.id}>
+                  {`${f.name} - ${f.urlIdentifier}`}
+                </Option>
+              ))}
+            </Select>
+          </Form.Item>
+        )}
 
         <Row gutter={16}>
           <Col span={12}>
             <Form.Item
+              label={en ? "On Going" : "En cours"}
               name="on_going"
               valuePropName="checked"
-              style={{ display: "inline-block" }}
+              initialValue={false}
             >
-              {en ? "On Going: " : "En cours: "}
-
-              <Switch checked={onGoing} onChange={() => setOnGoing(!onGoing)} />
-              {onGoing ? " Yes" : " No"}
+              <Switch />
             </Form.Item>
           </Col>
           <Col span={12}>
             <Form.Item
+              label={en ? "Peer Reviewed" : "Examiné par les pairs"}
               name="peer_reviewed"
               valuePropName="checked"
-              style={{ display: "inline-block" }}
+              initialValue={false}
             >
-              {en ? "Peer Reviewed: " : "Examiné par les pairs: "}
-              <Switch
-                checked={peerReviewed}
-                onChange={() => setPeerReviewed(!peerReviewed)}
-              />
-
-              {peerReviewed ? " Yes" : " No"}
+              <Switch />
             </Form.Item>
           </Col>
         </Row>

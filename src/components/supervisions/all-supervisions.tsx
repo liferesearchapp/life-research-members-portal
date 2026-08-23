@@ -31,6 +31,10 @@ import FacultyFilter from "../filters/faculty-filter";
 import SupervisionNameFilter from "../filters/supervision-name-filter";
 import type { ParsedUrlQueryInput } from "querystring";
 import { ActiveAccountCtx } from "../../services/context/active-account-ctx";
+import {
+  useAdminDetails,
+  useSelectedInstitute,
+} from "../../services/context/selected-institute-ctx";
 
 function nameSorter(a: { name: string }, b: { name: string }) {
   return a.name.localeCompare(b.name);
@@ -157,10 +161,15 @@ function handleShowEndDateChange(value: boolean) {
   Router.push({ query }, undefined, { scroll: false });
 }
 
-function clearQueries() {
-  Router.push({ query: null }, undefined, { scroll: false });
+function clearQueries(institute: { urlIdentifier: string | null }) {
+  if (institute?.urlIdentifier) {
+    const url = PageRoutes.allSupervisions(institute.urlIdentifier);
+    Router.push(url);
+  } else {
+    console.error("Unable to reset filters: Institute ID is missing.");
+    alert("Unable to reset filters: Institute ID is missing.");
+  }
 }
-
 function getIdsFromQueryParams(key: string): Set<number> {
   const res = new Set<number>();
   const query = Router.query[key];
@@ -185,6 +194,7 @@ function getPopupContainer(): HTMLElement {
 
 const AllSupervisions: FC = () => {
   const { en } = useContext(LanguageCtx);
+  const { institute } = useSelectedInstitute();
 
   const {
     allSupervisions,
@@ -193,7 +203,12 @@ const AllSupervisions: FC = () => {
   } = useContext(AllSupervisionsCtx);
 
   const handleCreateEvent = () => {
-    router.push("supervisions/register");
+    if (institute) {
+      router.push({
+        pathname: "/[instituteId]/supervisions/register",
+        query: { instituteId: institute.urlIdentifier },
+      });
+    }
   };
 
   const { localAccount } = useContext(ActiveAccountCtx);
@@ -270,8 +285,13 @@ const AllSupervisions: FC = () => {
   }, [levelsQuery]);
 
   function refreshAndClearFilters() {
-    clearQueries();
-    refreshSupervisions();
+    const instituteUrlIdentifier = institute?.urlIdentifier; 
+    if (instituteUrlIdentifier) {
+      clearQueries({ urlIdentifier: instituteUrlIdentifier }); 
+    refreshSupervisions();}
+    else {
+      console.error("Cannot reset filters: Institute ID is missing.");
+    }
   }
   const filteredSupervisions = useMemo(
     () =>
@@ -439,6 +459,8 @@ const AllSupervisions: FC = () => {
     </Form>
   );
 
+  const isAdmin = useAdminDetails();
+
   const Header = () => (
     <>
       <div className="header-title-row">
@@ -448,7 +470,7 @@ const AllSupervisions: FC = () => {
         <Button type="primary" onClick={refreshAndClearFilters} size="large">
           {en ? "Reset the filter" : "Réinitialiser le filtre"}
         </Button>{" "}
-        {localAccount && localAccount.is_admin && (
+        {localAccount && isAdmin && (
           <Button
             type="primary"
             size="large"

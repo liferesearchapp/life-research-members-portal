@@ -1,7 +1,7 @@
 import Empty from "antd/lib/empty";
 import Card from "antd/lib/card/Card";
 import Title from "antd/lib/typography/Title";
-import { FC, useContext, useEffect } from "react";
+import { type FC, useContext, useEffect } from "react";
 import CardSkeleton from "../loading/card-skeleton";
 import useAccount from "../../services/use-account";
 import { LanguageCtx } from "../../services/context/language-ctx";
@@ -20,6 +20,14 @@ import GrantAdminButton from "./grant-admin-button";
 import DeleteMemberButton from "./delete-member-button";
 import RegisterMemberButton from "./register-member-button";
 import DeleteAccountButton from "./delete-account-button";
+import { useSelectedInstitute } from "../../services/context/selected-institute-ctx";
+import type { AccountInfo } from "../../services/_types";
+import { Tag } from "antd";
+import AddInstituteButton from "./add-institute-button";
+import RemoveInstituteButton from "./remove-institute-button";
+import { ActiveAccountCtx } from "../../services/context/active-account-ctx";
+import { isPendingInstituteMembershipInvitation } from "../../utils/institute-membership-invitations";
+import GrantSuperAdminButton from "./grant-super-admin-button";
 
 const { Item } = Descriptions;
 
@@ -30,6 +38,28 @@ type Props = {
 const AccountProfile: FC<Props> = ({ id }) => {
   const { en } = useContext(LanguageCtx);
   const { account, setAccount, loading, refresh } = useAccount(id);
+  const { institute } = useSelectedInstitute();
+  const { localAccount } = useContext(ActiveAccountCtx);
+  var hasPermission = false;
+
+  if (localAccount?.is_super_admin) hasPermission = true;
+  var permissions = localAccount?.instituteAdmin.map((admin) => admin.instituteId) || [];
+  var memberInstituteIds = account?.member?.institutes.map((institute) => institute.instituteId) || [];
+  for (var a of permissions) {
+    if (memberInstituteIds.includes(a)) {
+      hasPermission = true;
+      break;
+    }
+  }
+
+  const isAdminOfInstitute = (
+    account: AccountInfo,
+    instituteId: number | undefined
+  ) => {
+    return account.instituteAdmin.some(
+      (admin) => admin.instituteId === instituteId
+    );
+  };
 
   useEffect(() => {
     refresh();
@@ -53,14 +83,14 @@ const AccountProfile: FC<Props> = ({ id }) => {
       <Title level={2} style={{ display: "inline-block", margin: 0 }}>
         {account.first_name + " " + account.last_name}
       </Title>
-      <UpdateNameButton account={account} setAccount={setAccount} />
+      {hasPermission && (<UpdateNameButton account={account} setAccount={setAccount} />)}
     </div>
   );
 
   const loginItem = (
     <Item label={<>{en ? "Login Email" : "Compte courriel"}</>}>
       <a href={"mailto:" + account.login_email}>{account.login_email}</a>
-      <UpdateEmailButton account={account} setAccount={setAccount} />
+      {hasPermission && (<UpdateEmailButton account={account} setAccount={setAccount} />)}
     </Item>
   );
 
@@ -85,13 +115,15 @@ const AccountProfile: FC<Props> = ({ id }) => {
 
   const adminItem = (
     <Item label={en ? "Administrator Privileges" : "Privilèges administratifs"}>
-      {account.is_admin ? (
+      {isAdminOfInstitute(account, institute?.id) ? (
         <>
           <Text>
             {trueSymbol}
             {en
-              ? "This account has administrative privileges"
-              : "Ce compte a des privilèges administratifs"}
+              ? "This account has administrative privileges for " +
+                institute?.name
+              : "Ce compte a des privilèges administratifs pour " +
+                institute?.name}
           </Text>
           <RemoveAdminButton account={account} setAccount={setAccount} />
         </>
@@ -100,8 +132,10 @@ const AccountProfile: FC<Props> = ({ id }) => {
           <Text>
             {falseSymbol}
             {en
-              ? "This account does not have administrative privileges"
-              : "Ce compte n'a pas de privilèges administratifs"}
+              ? "This account does not have administrative privileges for " +
+                institute?.name
+              : "Ce compte n'a pas de privilèges administratifs pour " +
+                institute?.name}
           </Text>
           <GrantAdminButton account={account} setAccount={setAccount} />
         </>
@@ -109,6 +143,41 @@ const AccountProfile: FC<Props> = ({ id }) => {
     </Item>
   );
 
+  const superAdminItem = localAccount?.is_super_admin ? (
+    <Item
+      label={
+        en
+          ? "Super Admin Privileges"
+          : "Privilèges de super administrateur"
+      }
+    >
+      {account.is_super_admin ? (
+        <Text>
+          {trueSymbol}
+          {en
+            ? "This account has super admin privileges."
+            : "Ce compte possède des privilèges de super administrateur."}
+        </Text>
+      ) : (
+        <>
+          <Text>
+            {falseSymbol}
+            {en
+              ? "This account does not have super admin privileges."
+              : "Ce compte ne possède pas de privilèges de super administrateur."}
+          </Text>
+          <GrantSuperAdminButton account={account} setAccount={setAccount} />
+        </>
+      )}
+    </Item>
+  ) : null;
+
+  var memberProfile = "";
+  if (hasPermission) memberProfile = PageRoutes.privateMemberProfile(account.member?.id || 0);
+  else memberProfile = PageRoutes.publicMemberProfile(account.member?.id || 0);
+  const pendingInvitations = account.receivedInstituteMembershipInvitations.filter(
+    (invitation) => isPendingInstituteMembershipInvitation(invitation.status)
+  );
   const memberItem = (
     <Item label={en ? "Member Information" : "Informations sur les membres"}>
       {account.member ? (
@@ -116,29 +185,82 @@ const AccountProfile: FC<Props> = ({ id }) => {
           <Text>
             {trueSymbol}
             {en
-              ? "This account is registered as a member"
-              : "Ce compte est enregistré en tant que membre"}
+              ? "This account has a member profile (see Institute Information below for per-institute membership)"
+              : "Ce compte possède un profil de membre (voir Informations sur l'institut ci-dessous pour l'adhésion par institut)"}
           </Text>
           <Button ghost type="primary">
             <SafeLink
-              href={PageRoutes.privateMemberProfile(account.member?.id || 0)}
+              href={memberProfile}
             >
               {en ? "Go to member profile" : "Accéder au profil du membre"}
             </SafeLink>
           </Button>
-          <DeleteMemberButton account={account} setAccount={setAccount} />
+          {hasPermission && (<DeleteMemberButton account={account} setAccount={setAccount} />)}
         </>
       ) : (
         <>
           <Text>
             {falseSymbol}
             {en
-              ? "This account is not registered as a member"
-              : "Ce compte n'est pas enregistré en tant que membre"}
+              ? "This account does not have a member profile"
+              : "Ce compte ne possède pas de profil de membre"}
           </Text>
-          <RegisterMemberButton account={account} setAccount={setAccount} />
+          <div style={{ width: "100%" }} />
+          <Text type="secondary">
+            {en
+              ? "They can create their own member profile from My Profile, or become a member by accepting an institute invitation."
+              : "Ils peuvent créer leur propre profil de membre depuis Mon profil, ou devenir membre en acceptant une invitation d'institut."}
+          </Text>
+          {localAccount?.is_super_admin ? (
+            <RegisterMemberButton account={account} setAccount={setAccount} />
+          ) : null}
         </>
       )}
+    </Item>
+  );
+
+  const addToMoreInstitutes = (
+    <Item label={en ? "Institute Information" : "Informations sur l'institut"}>
+      <>
+        <Text>
+          {account.member?.institutes.length ? trueSymbol : falseSymbol}
+          {account.member?.institutes.length
+            ? en
+              ? "This account is part of the following institutes"
+              : "Ce compte fait partie des instituts suivants"
+            : en
+            ? "This account is not yet a member of any institute"
+            : "Ce compte ne fait encore partie d'aucun institut"}
+        </Text>
+        {account.member?.institutes.length
+          ? account.member.institutes.map((institute) => (
+              <Tag key={institute.instituteId}>
+                {institute.institute.name} - {institute.institute.urlIdentifier}
+              </Tag>
+            ))
+          : null}
+
+        {pendingInvitations.length ? (
+          <>
+            <div style={{ width: "100%", height: 8 }} />
+            <Text strong>
+              {en ? "Pending invitations" : "Invitations en attente"}
+            </Text>
+            <div style={{ width: "100%", height: 4 }} />
+            {pendingInvitations.map((invitation) => (
+              <Tag color="gold" key={invitation.id}>
+                {invitation.institute.name} - {invitation.institute.urlIdentifier}
+              </Tag>
+            ))}
+          </>
+        ) : null}
+
+        <div style={{ width: "100%", height: 12 }} />
+        <AddInstituteButton account={account} setAccount={setAccount} />
+        {account.member?.institutes.length ? (
+          <RemoveInstituteButton account={account} setAccount={setAccount} />
+        ) : null}
+      </>
     </Item>
   );
 
@@ -148,25 +270,29 @@ const AccountProfile: FC<Props> = ({ id }) => {
         layout="vertical"
         bordered
         column={1}
-        contentStyle={{
-          display: "flex",
-          columnGap: 16,
-          rowGap: 16,
-          flexWrap: "wrap",
-          alignItems: "center",
+        styles={{
+          content: {
+            display: "flex",
+            columnGap: 16,
+            rowGap: 16,
+            flexWrap: "wrap",
+            alignItems: "center",
+          },
         }}
       >
         {lastLoginItem}
         {loginItem}
         {adminItem}
+        {superAdminItem}
         {memberItem}
+        {addToMoreInstitutes}
       </Descriptions>
       <div style={{ display: "block", height: 24 }}></div>
-      <DeleteAccountButton
+      {hasPermission && (<DeleteAccountButton
         account={account}
         setAccount={setAccount}
         style={{ marginLeft: "auto", display: "block" }}
-      />
+      />)}
     </Card>
   );
 };

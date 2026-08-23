@@ -2,19 +2,18 @@
 // The selected keywords are displayed as tags and can be deleted by the user.
 
 import type { keyword } from "@prisma/client";
-import Select, { SelectProps } from "antd/lib/select";
 import {
-  FC,
+  type FC,
   useCallback,
   useContext,
-  useEffect,
   useMemo,
-  useState,
 } from "react";
 import { AllKeywordsCtx } from "../../services/context/all-keywords-ctx";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import fuzzyIncludes from "../../utils/front-end/fuzzy-includes";
 import KeywordTag from "../keywords/keyword-tag";
+import { Select } from "antd";
+import type { SelectProps } from "antd";
 
 type Props = {
   id?: string;

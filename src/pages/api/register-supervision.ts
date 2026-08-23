@@ -1,6 +1,10 @@
 import { Prisma } from "@prisma/client";
 import type { NextApiRequest, NextApiResponse } from "next";
 import db from "../../../prisma/prisma-client";
+import {
+  assertAuthorized,
+  hasAnyInstituteAccess,
+} from "../../utils/api/authorization";
 import getAccountFromRequest from "../../utils/api/get-account-from-request";
 
 export type RegisterSupervisionParams = {
@@ -11,9 +15,13 @@ export type RegisterSupervisionParams = {
   faculty_id: number | null;
   level_id: number | null;
   note: string | null;
+  institute_id: number;
+  supervisor_member_id: number;
 };
 
-export type RegisterSupervisionRes = Awaited<ReturnType<typeof registerSupervision>>;
+export type RegisterSupervisionRes = Awaited<
+  ReturnType<typeof registerSupervision>
+>;
 
 function registerSupervision(params: RegisterSupervisionParams) {
   return db.supervision.create({
@@ -25,6 +33,10 @@ function registerSupervision(params: RegisterSupervisionParams) {
       faculty_id: params.faculty_id,
       level_id: params.level_id,
       note: params.note,
+      supervision_principal_supervisor: {
+        create: { member_id: params.supervisor_member_id },
+      },
+      instituteId: params.institute_id,
     },
     select: {
       id: true,
@@ -40,19 +52,38 @@ export default async function handler(
   const {
     last_name,
     first_name,
-    faculty_id,
-    level_id,
+    supervisor_member_id,
   } = params;
 
   if (typeof last_name !== "string") return res.status(400).send("Please provide the last name");
   if (typeof first_name !== "string") return res.status(400).send("Please provide the first name");
+  if (!Number.isInteger(supervisor_member_id))
+    return res.status(400).send("Please select one supervising member.");
 
   try {
     const currentUser = await getAccountFromRequest(req, res);
     if (!currentUser) return;
+    if (
+      !assertAuthorized(
+        res,
+        hasAnyInstituteAccess(currentUser, [params.institute_id]),
+        "You are not authorized to register a supervision."
+      )
+    )
+      return;
 
-    if (!currentUser.is_admin)
-      return res.status(401).send("You are not authorized to register a supervision");
+    const supervisorMembership = await db.memberInstitute.findUnique({
+      where: {
+        memberId_instituteId: {
+          memberId: supervisor_member_id,
+          instituteId: params.institute_id,
+        },
+      },
+    });
+    if (!supervisorMembership)
+      return res
+        .status(400)
+        .send("The supervising member must belong to the selected institute.");
 
     const newSupervision = await registerSupervision(params);
 

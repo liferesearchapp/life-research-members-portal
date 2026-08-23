@@ -20,6 +20,7 @@ import PrivateProductDescription from "./product-private-description";
 import PrivateProductForm from "./product-private-form";
 import DeleteProductButton from "./delete-product-button";
 import { ActiveAccountCtx } from "../../services/context/active-account-ctx";
+import { useAdminDetails } from "../../services/context/selected-institute-ctx";
 
 type Tab = { label: string; key: string; children: ReactNode };
 
@@ -36,6 +37,7 @@ const PrivateProductProfile: FC<Props> = ({ id }) => {
   const [activeTabKey, setActiveTabKey] = useState(keys.public);
   const { saveChangesPrompt } = useContext(SaveChangesCtx);
   const { localAccount } = useContext(ActiveAccountCtx);
+  const isAdmin = useAdminDetails();
   /** After saving changes via submit button - dependency of form's submit */
   const onSuccess = useCallback(
     (updatedProduct: ProductPrivateInfo) => setProduct(updatedProduct),
@@ -106,7 +108,7 @@ const PrivateProductProfile: FC<Props> = ({ id }) => {
       key: keys.private,
       children: <PrivateProductDescription product={product} />,
     },
-    ...(localAccount && localAccount.is_admin
+    ...(localAccount && isAdmin
       ? [
           {
             label: en ? "Admin" : "Admin",
@@ -128,7 +130,7 @@ const PrivateProductProfile: FC<Props> = ({ id }) => {
       key: keys.private,
       children: <PrivateProductForm product={product} onSuccess={onSuccess} />,
     },
-    ...(localAccount && localAccount.is_admin
+    ...(localAccount && isAdmin
       ? [
           {
             label: en ? "Admin" : "Admin",
@@ -142,7 +144,7 @@ const PrivateProductProfile: FC<Props> = ({ id }) => {
   ];
 
   return (
-    <Card title={header} bodyStyle={{ paddingTop: 0 }}>
+    <Card title={header} styles={{ body: { paddingTop: 0 } }}>
       <Tabs
         items={editMode ? forms : descriptions}
         // items={descriptions}
@@ -150,7 +152,7 @@ const PrivateProductProfile: FC<Props> = ({ id }) => {
         onChange={onChange}
         // Very important to destroy inactive forms,
         // so they register their submit function to the save changes context when navigated back
-        destroyInactiveTabPane
+        destroyOnHidden
       />
 
       <DeleteProductButton

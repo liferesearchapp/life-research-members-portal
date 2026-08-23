@@ -1,5 +1,6 @@
 import type { keyword, problem, target, topic, organization, member } from "@prisma/client";
 import type { AccountRes } from "../pages/api/account/[id]";
+import type { InstituteRes } from "../pages/api/institute/[id]";
 import type { PrivateMemberRes } from "../pages/api/member/[id]/private";
 import type { PublicMemberRes } from "../pages/api/member/[id]/public";
 import type { PublicPartnerRes } from "../pages/api/partner/[id]/public";
@@ -12,9 +13,29 @@ import type { PrivateProductRes } from "../pages/api/product/[id]/private";
 import type { PublicEventRes } from "../pages/api/event/[id]/public";
 import type { PublicSupervisionRes } from "../pages/api/supervision/[id]/public";
 import type { PrivateSupervisionRes } from "../pages/api/supervision/[id]/private";
-
+import type { MemberInstitutesRes } from "../pages/api/member-institute";
+import type { InstituteSelectorRes } from "../pages/api/institute-selector";
 
 export type AccountInfo = NonNullable<AccountRes>;
+export type InstituteInfo = NonNullable<InstituteRes>;
+export type InstituteSelectorInfo = NonNullable<InstituteSelectorRes>;
+export type SelectedInstituteInfo = {
+  id: number;
+  name: string;
+  name_fr?: string | null;
+  urlIdentifier: string;
+  description_en: string | null;
+  description_fr: string | null;
+  is_active: boolean;
+  largeLogo?: string | null;
+  smallLogoEn?: string | null;
+  smallLogoFr?: string | null;
+  primaryColor?: string | null;
+  primaryColorDark?: string | null;
+  secondaryColor?: string | null;
+  secondaryColorDark?: string | null;
+  accentColor?: string | null;
+};
 export type MemberPublicInfo = NonNullable<PublicMemberRes>;
 export type PartnerPublicInfo = NonNullable<PublicPartnerRes>;
 export type PartnerPrivateInfo = NonNullable<PrivatePartnerRes>;
@@ -27,9 +48,9 @@ export type EventPrivateInfo = NonNullable<PrivateEventRes>;
 export type EventPublicInfo = NonNullable<PublicEventRes>;
 export type SupervisionPublicInfo = NonNullable<PublicSupervisionRes>;
 export type SupervisionPrivateInfo = NonNullable<PrivateSupervisionRes>;
+export type MemberInstitutesInfo = NonNullable<MemberInstitutesRes>;
 export type ProblemInfo = Omit<problem, "id" | "member_id">;
 export type KeywordInfo = Omit<keyword, "id">;
 export type TargetInfo = Omit<target, "id">;
 export type TopicInfo = Omit<topic, "id">;
 export type OrganizationInfo = Omit<organization, "id">;
-

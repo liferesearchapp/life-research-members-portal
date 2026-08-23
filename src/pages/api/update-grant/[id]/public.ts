@@ -1,6 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import db from "../../../../../prisma/prisma-client";
 import getAccountFromRequest from "../../../../utils/api/get-account-from-request";
+import {
+  assertAuthorized,
+  hasAnyInstituteAccess,
+} from "../../../../utils/api/authorization";
 import type { PrivateGrantDBRes } from "../../grant/[id]/private";
 import { selectAllGrantInfo } from "../../../../../prisma/helpers";
 
@@ -21,6 +25,13 @@ export type UpdateGrantPublicParams = {
   deleteInvolvedMembers: number[];
   addInvolvedMembers: number[];
 };
+
+function getGrantAccessInfo(id: number) {
+  return db.grant.findUnique({
+    where: { id },
+    select: { id: true, instituteId: true, topic_id: true },
+  });
+}
 
 function updateGrant(
   id: number,
@@ -80,12 +91,35 @@ export default async function handler(
     const id = parseInt(req.query.id);
     const params = req.body as UpdateGrantPublicParams;
 
+    if (!params.submission_date)
+      return res.status(400).send("Submission date is required.");
+
     const currentUser = await getAccountFromRequest(req, res);
     if (!currentUser) return;
 
-    const authorized = currentUser.is_admin || currentUser.member?.id === id;
-    if (!authorized)
-      return res.status(401).send("You are not authorized to edit this grant information.");
+    const grant = await getGrantAccessInfo(id);
+    if (!grant) return res.status(400).send("Grant not found. ID: " + id);
+    if (
+      !assertAuthorized(
+        res,
+        hasAnyInstituteAccess(currentUser, [grant.instituteId]),
+        "You are not authorized to edit this grant information."
+      )
+    )
+      return;
+
+    const instituteTopic = await db.instituteTopic.findUnique({
+      where: {
+        instituteId_topicId: {
+          instituteId: grant.instituteId,
+          topicId: params.topic_id,
+        },
+      },
+    });
+    if (params.topic_id !== grant.topic_id && !instituteTopic?.is_active)
+      return res
+        .status(400)
+        .send("Please select an active topic for the grant's institute.");
 
     const updated = await updateGrant(id, params);
 

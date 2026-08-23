@@ -47,7 +47,26 @@ export default async function handler(
     const currentUser = await getAccountFromRequest(req, res);
     if (!currentUser) return;
 
-    const authorized = currentUser.is_admin || currentUser.member?.id === id;
+    const productInstitutes = await db.productInstitute.findMany({
+      where: { productId: id },
+      select: {
+        instituteId: true,
+      },
+    });
+
+    //check if user is admin of any product institutes:
+    const isUserAdmin = currentUser.instituteAdmin.some((admin) =>
+      productInstitutes.some(
+        (institute) => institute.instituteId === admin.instituteId
+      )
+    );
+
+    const isUsersProduct = currentUser.member?.product_member_author.some(
+      (product) => product.product_id === id
+    );
+
+    const authorized =
+      currentUser.is_super_admin || isUserAdmin || isUsersProduct;
     if (!authorized)
       return res.status(401).send("You are not authorized to edit this product information.");
 

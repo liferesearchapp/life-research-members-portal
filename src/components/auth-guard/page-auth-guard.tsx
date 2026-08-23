@@ -1,8 +1,10 @@
-import { FC, PropsWithChildren, ReactElement, useContext } from "react";
+import { type FC, type PropsWithChildren, ReactElement, useContext } from "react";
 import { ActiveAccountCtx } from "../../services/context/active-account-ctx";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import CenteredSpinner from "../loading/centered-spinner";
 import Authorizations from "./authorizations";
+import { useAdminDetails, useMemberDetails } from "../../services/context/selected-institute-ctx";
+//import { auth } from "googleapis/build/src/apis/abusiveexperiencereport";
 
 type Props = {
   auths: Authorizations[];
@@ -10,9 +12,17 @@ type Props = {
   loadingIcon?: ReactElement;
 };
 
-const PageAuthGuard: FC<PropsWithChildren<Props>> = ({ auths, id, loadingIcon, children }) => {
+const PageAuthGuard: FC<PropsWithChildren<Props>> = ({
+  auths,
+  id,
+  loadingIcon,
+  children,
+}) => {
   const { localAccount, loading } = useContext(ActiveAccountCtx);
+  const isAdmin = useAdminDetails();
+  const isMember = useMemberDetails();
   const { en } = useContext(LanguageCtx);
+  const isSuperAdmin = !!localAccount?.is_super_admin;
 
   if (loading) return loadingIcon || <CenteredSpinner />;
 
@@ -28,10 +38,20 @@ const PageAuthGuard: FC<PropsWithChildren<Props>> = ({ auths, id, loadingIcon, c
 
   if (!localAccount) return notAuthorized;
   if (auths.includes(Authorizations.registered)) return c;
-  if (auths.includes(Authorizations.admin) && localAccount.is_admin) return c;
-  if (auths.includes(Authorizations.matchAccountId) && localAccount.id === id) return c;
+  if (auths.includes(Authorizations.member) && (isMember || isAdmin || isSuperAdmin))
+    return c;
+  if (auths.includes(Authorizations.admin) && (isAdmin || isSuperAdmin))
+    return c;
+  if (auths.includes(Authorizations.superAdmin) && isSuperAdmin)
+    return c;
+  if (auths.includes(Authorizations.matchAccountId) && localAccount.id === id)
+    return c;
   if (!localAccount.member) return notAuthorized;
-  if (auths.includes(Authorizations.matchMemberId) && localAccount.member.id === id) return c;
+  if (
+    auths.includes(Authorizations.matchMemberId) &&
+    localAccount.member.id === id
+  )
+    return c;
   return notAuthorized;
 };
 

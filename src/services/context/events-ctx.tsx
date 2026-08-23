@@ -3,6 +3,7 @@ import {
   createContext,
   FC,
   PropsWithChildren,
+  useCallback,
   useContext,
   useEffect,
   useState,
@@ -10,17 +11,7 @@ import {
 import ApiRoutes from "../../routing/api-routes";
 import Notification from "../notifications/notification";
 import { LanguageCtx } from "./language-ctx";
-
-async function fetchAllEvents(): Promise<event[]> {
-  try {
-    const res = await fetch(ApiRoutes.allEvents);
-    if (!res.ok) throw await res.text();
-    return await res.json();
-  } catch (e: any) {
-    new Notification().error(e);
-    return [];
-  }
-}
+import { useSelectedInstitute } from "./selected-institute-ctx";
 
 function enSorter(a: event, b: event): number {
   return (a.name_en || a.name_fr || "").localeCompare(
@@ -33,7 +24,6 @@ function frSorter(a: event, b: event): number {
     b.name_fr || b.name_en || ""
   );
 }
-
 export const EventsCtx = createContext<{
   events: event[];
   eventMap: Map<number, event>;
@@ -44,22 +34,35 @@ export const EventsCtx = createContext<{
 export const EventsCtxProvider: FC<PropsWithChildren> = ({ children }) => {
   const [events, setEvents] = useState<event[]>([]);
   const [eventMap, setEventMap] = useState(new Map<number, event>());
+  const { institute } = useSelectedInstitute();
   const { en } = useContext(LanguageCtx);
 
-  async function getEvents() {
+  const fetchAllEvents = useCallback(async () => {
+    if (!institute) {
+      return [];
+    }
+
+    try {
+      const queryParam = `?instituteId=${institute.urlIdentifier}`;
+      const res = await fetch(`${ApiRoutes.allEvents}${queryParam}`);
+      if (!res.ok) throw await res.text();
+      return await res.json();
+    } catch (e: any) {
+      new Notification().error(e.message);
+      return [];
+    }
+  }, [institute]);
+
+  const getEvents = useCallback(async () => {
     const events = await fetchAllEvents();
-    setEvents(events.sort(en ? enSorter : frSorter));
-    setEventMap(new Map(events.map((k) => [k.id, k])));
-  }
+    const sorter = en ? enSorter : frSorter;
+    setEvents(events.sort(sorter));
+    setEventMap(new Map(events.map((e: event) => [e.id, e])));
+  }, [fetchAllEvents, en]);
 
   useEffect(() => {
     getEvents();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    setEvents((prev) => prev.sort(en ? enSorter : frSorter));
-  }, [en]);
+  }, [getEvents]);
 
   function refresh() {
     getEvents();
@@ -67,7 +70,7 @@ export const EventsCtxProvider: FC<PropsWithChildren> = ({ children }) => {
 
   function set(eventItem: event) {
     setEvents((prev) => {
-      const curr = prev.filter((k) => k.id !== eventItem.id);
+      const curr = prev.filter((e) => e.id !== eventItem.id);
       curr.push(eventItem);
       return curr.sort(en ? enSorter : frSorter);
     });

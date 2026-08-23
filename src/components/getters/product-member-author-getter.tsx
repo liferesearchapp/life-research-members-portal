@@ -5,8 +5,8 @@
 import React from "react";
 import PageRoutes from "../../routing/page-routes";
 import SafeLink from "../link/safe-link";
-import Tag from "antd/lib/tag";
 import colorFromString from "../../utils/front-end/color-from-string";
+import { Tag } from "antd";
 
 const getMemberAuthor = (
   product_member_author: Array<{

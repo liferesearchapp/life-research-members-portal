@@ -35,6 +35,7 @@ import {
   useResetDirtyOnUnmount,
 } from "../../services/context/save-changes-ctx";
 import PartnerSelector from "../partners/partner-selector";
+import { useAdminDetails } from "../../services/context/selected-institute-ctx";
 
 const { Option } = Select;
 
@@ -70,6 +71,7 @@ const PublicMemberForm: FC<Props> = ({ member, onSuccess }) => {
   const { faculties } = useContext(FacultiesCtx);
   const [loading, setLoading] = useState(false);
   const { dirty, setDirty, setSubmit } = useContext(SaveChangesCtx);
+  const isAdmin = useAdminDetails();
   useResetDirtyOnUnmount();
 
   const diffProblems = useCallback(
@@ -293,7 +295,7 @@ const PublicMemberForm: FC<Props> = ({ member, onSuccess }) => {
           >
             <Input />
           </Form.Item>
-          <Form.Item
+          {isAdmin && (<Form.Item
             label={en ? "Member Type" : "Type de Membre"}
             name="type_id"
           >
@@ -306,7 +308,7 @@ const PublicMemberForm: FC<Props> = ({ member, onSuccess }) => {
               ))}
             </Select>
           </Form.Item>
-
+          )}
           <Form.Item
             className="faculty"
             label={en ? "Faculty" : "Faculté"}

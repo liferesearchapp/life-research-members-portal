@@ -4,7 +4,7 @@ import Empty from "antd/lib/empty";
 import Button from "antd/lib/button";
 import Card from "antd/lib/card/Card";
 import Title from "antd/lib/typography/Title";
-import { FC, ReactNode, useCallback, useContext, useState } from "react";
+import { type FC, type ReactNode, useCallback, useContext, useState } from "react";
 import CardSkeleton from "../loading/card-skeleton";
 import PublicEventDescription from "./event-public-description";
 import usePrivateEventInfo from "../../services/use-private-event-info";
@@ -108,12 +108,12 @@ const PrivateEventProfile: FC<Props> = ({ id }) => {
   ];
 
   return (
-    <Card title={header} bodyStyle={{ paddingTop: 0 }}>
+    <Card title={header} styles={{ body: { paddingTop: 0 } }}>
       <Tabs
         items={editMode ? forms : descriptions}
         activeKey={activeTabKey}
         onChange={onChange}
-        destroyInactiveTabPane
+        destroyOnHidden
       />
       <DeleteEventButton
         event={event}

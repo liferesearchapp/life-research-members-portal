@@ -1,15 +1,14 @@
 // This component displays the public profile of a supervision.
 // It shows the first and last name of the supervision, and the description.
 
-import Empty from "antd/lib/empty";
-import Card from "antd/lib/card/Card";
-import Title from "antd/lib/typography/Title";
-import { FC, useContext } from "react";
+import { type FC, useContext } from "react";
 import usePublicSupervisionInfo from "../../services/use-public-supervision-info";
 import CardSkeleton from "../loading/card-skeleton";
 import PublicSupervisionDescription from "./supervision-public-description";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import DeleteSupervisionButton from "./delete-supervision-button";
+import { Empty, Card, Typography } from "antd";
+const Title = Typography.Title;
 
 type Props = {
   id: number;

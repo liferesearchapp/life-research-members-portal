@@ -2,6 +2,10 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { selectAllEventInfo } from "../../../../../prisma/helpers";
 import db from "../../../../../prisma/prisma-client";
 import getAccountFromRequest from "../../../../utils/api/get-account-from-request";
+import {
+  assertAuthorized,
+  hasAnyInstituteAccess,
+} from "../../../../utils/api/authorization";
 import type { PrivateEventDBRes } from "../../event/[id]/private";
 
 export type UpdateEventPublicParams = {
@@ -28,6 +32,13 @@ export type UpdateEventPublicParams = {
   deleteNextEvents: number[];
 
 };
+
+function getEventAccessInfo(id: number) {
+  return db.event.findUnique({
+    where: { id },
+    select: { id: true, instituteId: true },
+  });
+}
 
 function updateEvent(
   id: number,
@@ -178,10 +189,16 @@ export default async function handler(
 
     const currentUser = await getAccountFromRequest(req, res);
     if (!currentUser) return;
-
-    const authorized = currentUser.is_admin || currentUser.member?.id === id;
-    if (!authorized)
-      return res.status(401).send("You are not authorized to edit this event information.");
+    const event = await getEventAccessInfo(id);
+    if (!event) return res.status(400).send("Event not found. ID: " + id);
+    if (
+      !assertAuthorized(
+        res,
+        hasAnyInstituteAccess(currentUser, [event.instituteId]),
+        "You are not authorized to edit this event information."
+      )
+    )
+      return;
 
     const updated = await updateEvent(id, params);
 

@@ -10,11 +10,12 @@ import Text from "antd/lib/typography/Text";
 import type { UpdateMemberPrivateParams } from "../../pages/api/update-member/[id]/private";
 import updateMemberPrivate from "../../services/update-member-private";
 import DatePicker from "antd/lib/date-picker";
-import moment, { Moment } from "moment";
+import type { Dayjs } from "dayjs";
 import { red } from "@ant-design/colors";
 import Switch from "antd/lib/switch";
 import Notification from "../../services/notifications/notification";
 import { SaveChangesCtx, useResetDirtyOnUnmount } from "../../services/context/save-changes-ctx";
+import toDayjsDate from "../../utils/front-end/to-dayjs-date";
 
 type Props = {
   member: MemberPrivateInfo;
@@ -28,7 +29,7 @@ type Data = {
   country: string;
   postal_code: string;
   mobile_phone: string;
-  date_joined: Moment | null;
+  date_joined: Dayjs | null;
   is_active: boolean;
 };
 
@@ -100,7 +101,7 @@ const PrivateMemberForm: FC<Props> = ({ member, onSuccess }) => {
     country: member.country || "",
     postal_code: member.postal_code || "",
     mobile_phone: member.mobile_phone || "",
-    date_joined: member.date_joined ? moment(member.date_joined.split("T")[0]) : null,
+    date_joined: toDayjsDate(member.date_joined),
     is_active: member.is_active,
   };
 

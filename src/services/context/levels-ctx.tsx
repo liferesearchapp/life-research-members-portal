@@ -1,8 +1,8 @@
 import type { level } from "@prisma/client";
 import {
   createContext,
-  FC,
-  PropsWithChildren,
+  type FC,
+  type PropsWithChildren,
   useContext,
   useEffect,
   useState,

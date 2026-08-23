@@ -1,7 +1,8 @@
-@import "antd/dist/antd.css";
+// antd v5 uses CSS-in-JS; no global CSS import needed
 @import "./antd-colors.scss";
 @import "./navbar.scss";
 @import "./all-members.scss";
+@import "./all-products.scss";
 @import "./all-partners.scss";
 @import "./all-accounts.scss";
 @import "./all-grants.scss";
@@ -24,6 +25,14 @@
 
 
 @import url(https://fonts.googleapis.com/css2?family=Work+Sans); // Work Sans font
+
+:root {
+  --brand-primary: #6DE195;
+  --brand-primary-dark: #41C7AF;
+  --brand-secondary: #41D8DD;
+  --brand-secondary-dark: #5583EE;
+  --brand-accent: #C4E759;
+}
 
 html,
 body {
@@ -81,7 +90,7 @@ body {
   font-weight: 400;
   font-size: 1.5em;
   line-height: 1.4em;
-  color: #0750a3;
+  color: var(--brand-secondary-dark);
 
 }
 
@@ -90,7 +99,7 @@ body {
   font-weight: 400;
   font-size: 1.2em;
   line-height: 1.8em;
-  color: seagreen;
+  color: var(--brand-primary-dark);
 
 }
 
@@ -139,9 +148,15 @@ body {
   color: white;
 }
 
+.rounded-box-link {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+
 .rounded-box:hover {
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
-  color: #0750a3;
+  color: var(--brand-secondary-dark);
 }
 
 
@@ -159,62 +174,112 @@ body {
 
 
 .rounded-box-gradient-1 {
-  background-image: linear-gradient(to right, #41D8DD, #5583EE);
+  background-image: linear-gradient(
+    to right,
+    var(--brand-secondary),
+    var(--brand-secondary-dark)
+  );
 
 }
 
 .rounded-box-gradient-1:hover {
-  background-image: linear-gradient(to right, #5583EE, #41D8DD);
+  background-image: linear-gradient(
+    to right,
+    var(--brand-secondary-dark),
+    var(--brand-secondary)
+  );
 
 }
 
 .rounded-box-gradient-3 {
-  background-image: linear-gradient(to right, #6CACFF, #8DEBFF);
+  background-image: linear-gradient(
+    to right,
+    var(--brand-primary),
+    var(--brand-primary-dark)
+  );
 }
 
 .rounded-box-gradient-3:hover {
-  background-image: linear-gradient(to right, #8DEBFF, #6CACFF);
+  background-image: linear-gradient(
+    to right,
+    var(--brand-primary-dark),
+    var(--brand-primary)
+  );
 }
 
 .rounded-box-gradient-5 {
-  background-image: linear-gradient(to right, #ABC7FF, #C1E3FF);
+  background-image: linear-gradient(
+    to right,
+    var(--brand-secondary-dark),
+    var(--brand-accent)
+  );
 }
 
 .rounded-box-gradient-5:hover {
-  background-image: linear-gradient(to right, #C1E3FF, #ABC7FF);
+  background-image: linear-gradient(
+    to right,
+    var(--brand-accent),
+    var(--brand-secondary-dark)
+  );
 }
 
 .rounded-box-gradient-2 {
-  background-image: linear-gradient(to right, #41C7AF, #54E38E);
+  background-image: linear-gradient(
+    to right,
+    var(--brand-primary-dark),
+    var(--brand-primary)
+  );
 
 }
 
 .rounded-box-gradient-2:hover {
-  background-image: linear-gradient(to right, #54E38E, #41C7AF);
+  background-image: linear-gradient(
+    to right,
+    var(--brand-primary),
+    var(--brand-primary-dark)
+  );
 }
 
 .rounded-box-gradient-4 {
-  background-image: linear-gradient(to right, #6DE195, #C4E759);
+  background-image: linear-gradient(
+    to right,
+    var(--brand-primary),
+    var(--brand-accent)
+  );
 
 }
 
 .rounded-box-gradient-4:hover {
-  background-image: linear-gradient(to right, #C4E759, #6DE195);
+  background-image: linear-gradient(
+    to right,
+    var(--brand-accent),
+    var(--brand-primary)
+  );
 }
 
 .rounded-box-gradient-6 {
-  background-image: linear-gradient(to right, #95ba3f, #99E5A2, #41C7AF);
+  background-image: linear-gradient(
+    to right,
+    var(--brand-primary-dark),
+    var(--brand-accent),
+    var(--brand-secondary)
+  );
 
 
 }
 
 .rounded-box-gradient-6:hover {
-  background-image: linear-gradient(to right, #41C7AF, #99E5A2, #D4FC78);
+  background-image: linear-gradient(
+    to right,
+    var(--brand-secondary),
+    var(--brand-accent),
+    var(--brand-primary)
+  );
 }
 
 .icon-gradient {
   background: white;
-  color: #0e5898;
+  color: var(--brand-secondary-dark);
   padding: 8px;
   border-radius: 6px;
   font-size: 20px;

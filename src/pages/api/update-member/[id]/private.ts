@@ -55,9 +55,29 @@ export default async function handler(
     const currentUser = await getAccountFromRequest(req, res);
     if (!currentUser) return;
 
-    const authorized = currentUser.is_admin || currentUser.member?.id === id;
+    const memberInstitutes = await db.memberInstitute.findMany({
+      where: { memberId: id },
+      select: {
+        instituteId: true,
+      },
+    });
+
+    //check if user is admin of any member institutes:
+    const isUserAdmin = currentUser.instituteAdmin.some((admin) =>
+      memberInstitutes.some(
+        (institute) => institute.instituteId === admin.instituteId
+      )
+    );
+
+    const isUsersMember = currentUser.member?.id === id;
+
+    const authorized =
+      currentUser.is_super_admin || isUserAdmin || isUsersMember;
+
     if (!authorized)
-      return res.status(401).send("You are not authorized to edit this member information.");
+      return res
+        .status(401)
+        .send("You are not authorized to update that member.");
 
     const updated = await updateMember(id, params);
 

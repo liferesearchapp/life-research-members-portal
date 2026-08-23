@@ -3,14 +3,13 @@
 // The grant information is displayed within a Card component with a header containing the grant title.
 // The grant description is displayed using the PublicGrantDescription component.
 
-import Empty from "antd/lib/empty";
-import Card from "antd/lib/card/Card";
-import Title from "antd/lib/typography/Title";
-import { FC, useContext } from "react";
+import { type FC, useContext } from "react";
 import usePublicGrantInfo from "../../services/use-public-grant-info";
 import CardSkeleton from "../loading/card-skeleton";
 import PublicGrantDescription from "./grant-public-description";
 import { LanguageCtx } from "../../services/context/language-ctx";
+import { Empty, Card, Typography } from "antd";
+const Title = Typography.Title;
 
 type Props = {
   id: number;

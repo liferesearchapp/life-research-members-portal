@@ -3,6 +3,7 @@ import {
   createContext,
   FC,
   PropsWithChildren,
+  useCallback,
   useContext,
   useEffect,
   useState,
@@ -10,17 +11,7 @@ import {
 import ApiRoutes from "../../routing/api-routes";
 import Notification from "../notifications/notification";
 import { LanguageCtx } from "./language-ctx";
-
-async function fetchAllGrants(): Promise<grant[]> {
-  try {
-    const res = await fetch(ApiRoutes.allGrants);
-    if (!res.ok) throw await res.text();
-    return await res.json();
-  } catch (e: any) {
-    new Notification().error(e);
-    return [];
-  }
-}
+import { useSelectedInstitute } from "./selected-institute-ctx";
 
 function enSorter(a: grant, b: grant): number {
   return a.title.localeCompare(b.title);
@@ -40,22 +31,35 @@ export const GrantsCtx = createContext<{
 export const GrantsCtxProvider: FC<PropsWithChildren> = ({ children }) => {
   const [grants, setGrants] = useState<grant[]>([]);
   const [grantMap, setGrantMap] = useState(new Map<number, grant>());
+  const { institute } = useSelectedInstitute();
   const { en } = useContext(LanguageCtx);
 
-  async function getGrants() {
+  const fetchAllGrants = useCallback(async () => {
+    if (!institute) {
+      return [];
+    }
+
+    try {
+      const queryParam = `?instituteId=${institute.urlIdentifier}`;
+      const res = await fetch(`${ApiRoutes.allGrants}${queryParam}`);
+      if (!res.ok) throw await res.text();
+      return await res.json();
+    } catch (e: any) {
+      new Notification().error(e.message);
+      return [];
+    }
+  }, [institute]);
+
+  const getGrants = useCallback(async () => {
     const grants = await fetchAllGrants();
-    setGrants(grants.sort(en ? enSorter : frSorter));
-    setGrantMap(new Map(grants.map((g) => [g.id, g])));
-  }
+    const sorter = en ? enSorter : frSorter;
+    setGrants(grants.sort(sorter));
+    setGrantMap(new Map(grants.map((g: grant) => [g.id, g])));
+  }, [fetchAllGrants, en]);
 
   useEffect(() => {
     getGrants();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    setGrants((prev) => prev.sort(en ? enSorter : frSorter));
-  }, [en]);
+  }, [getGrants]);
 
   function refresh() {
     getGrants();

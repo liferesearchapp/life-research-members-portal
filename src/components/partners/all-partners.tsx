@@ -30,6 +30,10 @@ import { AllPartnersCtx } from "../../services/context/all-partners-ctx";
 import OrgTypeFilter from "../filters/org-type-filter";
 import OrgScopeFilter from "../filters/org-scope-filter";
 import OrgNameFilter from "../filters/org-name-filter";
+import {
+  useAdminDetails,
+  useSelectedInstitute,
+} from "../../services/context/selected-institute-ctx";
 
 function nameSorter(en: boolean) {
   return (
@@ -141,8 +145,14 @@ function handleShowTypeChange(value: boolean) {
   Router.push({ query }, undefined, { scroll: false });
 }
 
-function clearQueries() {
-  Router.push({ query: null }, undefined, { scroll: false });
+function clearQueries(institute: { urlIdentifier: string | null }) {
+  if (institute?.urlIdentifier) {
+    const url = PageRoutes.allPartners(institute.urlIdentifier);
+    Router.push(url);
+  } else {
+    console.error("Unable to reset filters: Institute ID is missing.");
+    alert("Unable to reset filters: Institute ID is missing.");
+  }
 }
 
 function getIdsFromQueryParams(key: string): Set<number> {
@@ -169,6 +179,7 @@ function getPopupContainer(): HTMLElement {
 
 const AllPartners: FC = () => {
   const { en } = useContext(LanguageCtx);
+  const { institute } = useSelectedInstitute();
 
   const {
     allPartners,
@@ -179,7 +190,12 @@ const AllPartners: FC = () => {
   const { localAccount } = useContext(ActiveAccountCtx);
 
   const handleRegisterPartner = () => {
-    router.push("partners/register");
+    if (institute) {
+      router.push({
+        pathname: "/[instituteId]/partners/register",
+        query: { instituteId: institute.urlIdentifier },
+      });
+    }
   };
 
   useEffect(() => {
@@ -226,8 +242,13 @@ const AllPartners: FC = () => {
   }, [scopeQuery]);
 
   function refreshAndClearFilters() {
-    clearQueries();
-    refreshOrganizations();
+    const instituteUrlIdentifier = institute?.urlIdentifier; // Retrieve urlIdentifier instead of id
+    if (instituteUrlIdentifier) {
+      clearQueries({ urlIdentifier: instituteUrlIdentifier }); // Pass as an object
+      refreshOrganizations();
+    } else {
+      console.error("Cannot reset filters: Institute ID is missing.");
+    }
   }
 
   const filteredOrganisation = useMemo(
@@ -366,6 +387,8 @@ const AllPartners: FC = () => {
     </Form>
   );
 
+  const isAdmin = useAdminDetails();
+
   const Header = () => (
     <>
       <div className="header-title-row">
@@ -373,7 +396,7 @@ const AllPartners: FC = () => {
         <Button type="primary" onClick={refreshAndClearFilters} size="large">
           {en ? "Reset the filter" : "Réinitialiser le filtre"}
         </Button>{" "}
-        {localAccount && localAccount.is_admin && (
+        {localAccount && isAdmin && (
           <Button
             type="primary"
             size="large"

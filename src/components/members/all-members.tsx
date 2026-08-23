@@ -23,13 +23,18 @@ import Form from "antd/lib/form";
 import type { keyword } from "@prisma/client";
 import KeywordFilter from "../filters/keyword-filter";
 import blurActiveElement from "../../utils/front-end/blur-active-element";
-import { Checkbox } from "antd";
+import { Checkbox, Input } from "antd";
 import type { MemberPublicInfo } from "../../services/_types";
 import MemberTypeFilter from "../filters/member-type-filter";
 import FacultyFilter from "../filters/faculty-filter";
 import MemberNameFilter from "../filters/member-name-filter";
 import { AllKeywordsCtx } from "../../services/context/all-keywords-ctx";
 import type { ParsedUrlQueryInput } from "querystring";
+import {
+  useAdminDetails,
+  useSelectedInstitute,
+} from "../../services/context/selected-institute-ctx";
+import matchesPartialMemberSearch from "../../utils/member-search";
 
 function nameSorter(a: { name: string }, b: { name: string }) {
   return a.name.localeCompare(b.name);
@@ -46,7 +51,8 @@ function filterFn(
     facultyFilter: Set<number>;
     memberTypeFilter: Set<number>;
     keywordFilter: Set<number>;
-  }
+  },
+  searchTerm: string
 ): boolean {
   const { nameFilter, facultyFilter, memberTypeFilter, keywordFilter } =
     filters;
@@ -63,6 +69,7 @@ function filterFn(
     if (!m.has_keyword.some(({ keyword }) => keywordFilter.has(keyword.id)))
       return false;
   }
+  if (searchTerm && !matchesPartialMemberSearch(m, searchTerm)) return false;
   return true;
 }
 
@@ -162,8 +169,14 @@ function handleKeywordFilterChange(next: Set<number>) {
   );
 }
 
-function clearQueries() {
-  Router.push({ query: null }, undefined, { scroll: false });
+function clearQueries(institute: { urlIdentifier: string | null }) {
+  if (institute?.urlIdentifier) {
+    const url = PageRoutes.allMembers(institute.urlIdentifier);
+    Router.push(url);
+  } else {
+    console.error("Unable to reset filters: Institute ID is missing.");
+    alert("Unable to reset filters: Institute ID is missing.");
+  }
 }
 
 function getIdsFromQueryParams(key: string): Set<number> {
@@ -188,11 +201,14 @@ function getPopupContainer(): HTMLElement {
 
 const AllMembers: FC = () => {
   const { en } = useContext(LanguageCtx);
+  const { institute } = useSelectedInstitute();
+  
   const {
     allMembers,
     loading,
     refresh: refreshMembers,
   } = useContext(AllMembersCtx);
+
   const { refresh: refreshKeywords } = useContext(AllKeywordsCtx);
 
   useEffect(() => {
@@ -215,6 +231,7 @@ const AllMembers: FC = () => {
   const [facultyFilter, setFacultyFilter] = useState(new Set<number>());
   const [memberTypeFilter, setMemberTypeFilter] = useState(new Set<number>());
   const [keywordFilter, setKeywordFilter] = useState(new Set<number>());
+  const [searchTerm, setSearchTerm] = useState("");
 
   const router = useRouter();
   const showFacultyQuery = router.query[queryKeys.showFaculty];
@@ -260,8 +277,14 @@ const AllMembers: FC = () => {
   }, [keywordsQuery]);
 
   function refreshAndClearFilters() {
-    clearQueries();
-    refreshMembers();
+    setSearchTerm("");
+    const instituteUrlIdentifier = institute?.urlIdentifier; // Retrieve urlIdentifier instead of id
+    if (instituteUrlIdentifier) {
+      clearQueries({ urlIdentifier: instituteUrlIdentifier }); // Pass as an object
+    refreshMembers();}
+    else {
+      console.error("Cannot reset filters: Institute ID is missing.");
+    }
     refreshKeywords();
   }
 
@@ -277,17 +300,28 @@ const AllMembers: FC = () => {
       allMembers
         .map((m) => ({ ...m, key: m.id, name: getName(m) }))
         .filter((m) =>
-          filterFn(m, {
-            nameFilter,
-            facultyFilter,
-            memberTypeFilter,
-            keywordFilter,
-          })
+          filterFn(
+            m,
+            {
+              nameFilter,
+              facultyFilter,
+              memberTypeFilter,
+              keywordFilter,
+            },
+            searchTerm
+          )
         ),
-    [allMembers, facultyFilter, keywordFilter, memberTypeFilter, nameFilter]
+    [
+      allMembers,
+      facultyFilter,
+      keywordFilter,
+      memberTypeFilter,
+      nameFilter,
+      searchTerm,
+    ]
   );
 
-  type MemberColumnType = ColumnType<typeof filteredMembers[number]>;
+  type MemberColumnType = ColumnType<(typeof filteredMembers)[number]>;
 
   const nameColumn: MemberColumnType = useMemo(
     () => ({
@@ -405,6 +439,18 @@ const AllMembers: FC = () => {
           value={keywordFilter}
           onChange={handleKeywordFilterChange}
           getPopupContainer={getPopupContainer}
+        />
+      </Form.Item>
+      <Form.Item
+        label={en ? "Search" : "Rechercher"}
+        htmlFor="search-input"
+        className="search-input"
+      >
+        <Input
+          id="search-input"
+          value={searchTerm}
+          onChange={(event) => setSearchTerm(event.target.value)}
+          allowClear
         />
       </Form.Item>
       <label htmlFor="show-column-checkboxes">

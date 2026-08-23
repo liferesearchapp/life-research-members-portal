@@ -1,10 +1,9 @@
-import Grid from "antd/lib/grid";
-import Descriptions from "antd/lib/descriptions";
-import Item from "antd/lib/descriptions/Item";
-import { FC, useContext } from "react";
+import { type FC, useContext } from "react";
 import type { MemberPrivateInfo } from "../../services/_types";
 import React from "react";
 import { LanguageCtx } from "../../services/context/language-ctx";
+import { Grid, Descriptions } from "antd";
+const Item = Descriptions.Item;
 
 const { useBreakpoint } = Grid;
 
@@ -22,8 +21,10 @@ const MemberInsightDescription: FC<Props> = ({ member }) => {
       size="small"
       bordered
       column={1}
-      labelStyle={{ whiteSpace: "break-spaces", width: "8rem" }}
-      contentStyle={{ whiteSpace: "break-spaces" }}
+      styles={{
+        label: { whiteSpace: "break-spaces", width: "8rem" },
+        content: { whiteSpace: "break-spaces" },
+      }}
       layout={screens.xs ? "vertical" : "horizontal"}
     >
       <Item label={en ? "Interview Date" : "Date de l'entretien"}>

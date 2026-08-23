@@ -5,18 +5,9 @@
 import Button from "antd/lib/button";
 import Table, { ColumnType } from "antd/lib/table";
 import Title from "antd/lib/typography/Title";
-import {
-  FC,
-  Fragment,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { FC, useContext, useEffect, useMemo, useState } from "react";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import type { ProductPublicInfo } from "../../services/_types";
-import type { MemberPublicInfo } from "../../services/_types";
 import PageRoutes from "../../routing/page-routes";
 import Descriptions from "antd/lib/descriptions";
 import Item from "antd/lib/descriptions/Item";
@@ -24,16 +15,17 @@ import SafeLink from "../link/safe-link";
 import Router, { useRouter } from "next/router";
 import Form from "antd/lib/form";
 import blurActiveElement from "../../utils/front-end/blur-active-element";
-import { Checkbox, Tag } from "antd";
+import { Checkbox, DatePicker } from "antd";
 import ProductTitleFilter from "../filters/product-title-filter";
 import ProductTypeFilter from "../filters/product-type-filter";
 import type { ParsedUrlQueryInput } from "querystring";
 import { AllProductsCtx } from "../../services/context/all-products-ctx";
 import { ActiveAccountCtx } from "../../services/context/active-account-ctx";
-import type { PublicMemberRes } from "../../pages/api/member/[id]/public";
-import colorFromString from "../../utils/front-end/color-from-string";
 import ProductAllAuthorFilter from "../filters/product-all-author-filter";
 import getMemberAuthor from "../getters/product-member-author-getter";
+import { useSelectedInstitute } from "../../services/context/selected-institute-ctx";
+import dayjs, { type Dayjs } from "dayjs";
+import type { RangePickerProps } from "antd/lib/date-picker";
 
 function getTitle(product: ProductPublicInfo, en: boolean) {
   return en ? product.title_en : product.title_fr;
@@ -45,10 +37,17 @@ function filterFn(
     productTitleFilter: Set<number>;
     productTypesFilter: Set<number>;
     productAllAuthorsFilter: Set<string>;
+    publishStartDateFilter: Dayjs | null;
+    publishEndDateFilter: Dayjs | null;
   }
 ): boolean {
-  const { productTitleFilter, productTypesFilter, productAllAuthorsFilter } =
-    filters;
+  const {
+    productTitleFilter,
+    productTypesFilter,
+    productAllAuthorsFilter,
+    publishStartDateFilter,
+    publishEndDateFilter,
+  } = filters;
 
   if (productTitleFilter.size > 0 && !productTitleFilter.has(m.id))
     return false;
@@ -60,15 +59,29 @@ function filterFn(
   }
 
   if (productAllAuthorsFilter.size > 0) {
+    if (!m.all_author) return false;
+
     const authorNames = productAllAuthorsFilter;
     const allAuthorNames = new Set(
-      m.all_author!.split(/(?:,|;|&)(?!\s\w\.)/).map((author) => author.trim())
+      m.all_author
+        .split(/(?:,|;|&)(?!\s\w\.)/)
+        .map((author: string) => author.trim())
     );
     const intersection = new Set(
       [...authorNames].filter((name) => allAuthorNames.has(name))
     );
 
     if (intersection.size === 0) return false;
+  }
+
+  if (publishStartDateFilter || publishEndDateFilter) {
+    if (!m.publish_date) return false;
+
+    const publishDate = dayjs(m.publish_date);
+    if (publishStartDateFilter && publishDate.isBefore(publishStartDateFilter, "day"))
+      return false;
+    if (publishEndDateFilter && publishDate.isAfter(publishEndDateFilter, "day"))
+      return false;
   }
 
   return true;
@@ -80,9 +93,12 @@ export const queryKeys = {
   showAllAuthor: "showAllAuthor",
   showMemberAuthor: "showMemberAuthor",
   showDoi: "showDoi",
+  showPublishDate: "showPublishDate",
   productTitle: "productTitle",
   productAllAuthor: "productAllAuthor",
   productTypes: "productTypes",
+  publishStartDate: "publishStartDate",
+  publishEndDate: "publishEndDate",
   targets: "targets",
 } as const;
 
@@ -90,6 +106,7 @@ export const queryKeys = {
 const defaultQueries = {
   showDoi: true,
   showType: true,
+  showPublishDate: false,
   showMemberAuthor: true,
   showAllAuthor: false,
 } as const;
@@ -132,6 +149,16 @@ function handleShowTypeChange(value: boolean) {
   Router.push({ query }, undefined, { scroll: false });
 }
 
+function handleShowPublishDateChange(value: boolean) {
+  const query: ParsedUrlQueryInput = {
+    ...Router.query,
+    [queryKeys.showPublishDate]: value,
+  };
+  if (value === defaultQueries.showPublishDate)
+    delete query[queryKeys.showPublishDate];
+  Router.push({ query }, undefined, { scroll: false });
+}
+
 function handleProductTitleFilterChange(next: Set<number>) {
   Router.push(
     {
@@ -170,8 +197,33 @@ function handleProductAllAuthorFilterChange(next: Set<string>) {
   );
 }
 
-function clearQueries() {
-  Router.push({ query: null }, undefined, { scroll: false });
+function handleProductDateFilterChange(value: RangePickerProps["value"]) {
+  const query: ParsedUrlQueryInput = { ...Router.query };
+
+  if (value?.[0]) query[queryKeys.publishStartDate] = value[0].format("YYYY-MM-DD");
+  else delete query[queryKeys.publishStartDate];
+
+  if (value?.[1]) query[queryKeys.publishEndDate] = value[1].format("YYYY-MM-DD");
+  else delete query[queryKeys.publishEndDate];
+
+  Router.push({ query }, undefined, { scroll: false });
+}
+
+function clearQueries(institute: { urlIdentifier: string | null }) {
+  if (institute?.urlIdentifier) {
+    const url = PageRoutes.allProducts(institute.urlIdentifier);
+    Router.push(url);
+  } else {
+    console.error("Unable to reset filters: Institute ID is missing.");
+    alert("Unable to reset filters: Institute ID is missing.");
+  }
+}
+
+function getDateFromQueryParam(
+  query: string | string[] | undefined
+): string | null {
+  if (!query) return null;
+  return Array.isArray(query) ? query[0] || null : query;
 }
 
 function getIdsFromQueryParams(key: string): Set<number> {
@@ -205,13 +257,12 @@ function getIdsFromQueryParams2(key: string): Set<string> {
 }
 
 function getPopupContainer(): HTMLElement {
-  return (
-    document.querySelector(".all-products-table .filters") || document.body
-  );
+  return document.querySelector(".all-products-table .filters") || document.body;
 }
 
 const AllProducts: FC = () => {
   const { en } = useContext(LanguageCtx);
+  const { institute } = useSelectedInstitute();
   const {
     allProducts,
     loading,
@@ -219,7 +270,12 @@ const AllProducts: FC = () => {
   } = useContext(AllProductsCtx);
 
   const handleRegisterProduct = () => {
-    router.push("products/register");
+    if (institute) {
+      router.push({
+         pathname: "/[instituteId]/products/register",
+         query: { instituteId: institute.urlIdentifier },
+      });
+    }
   };
 
   useEffect(() => {
@@ -230,6 +286,9 @@ const AllProducts: FC = () => {
 
   const [showDoi, setShowDoi] = useState<boolean>(defaultQueries.showDoi);
   const [showType, setShowType] = useState<boolean>(defaultQueries.showType);
+  const [showPublishDate, setShowPublishDate] = useState<boolean>(
+    defaultQueries.showPublishDate
+  );
 
   const [showAllAuthor, setShowAllAuthor] = useState<boolean>(
     defaultQueries.showAllAuthor
@@ -250,6 +309,10 @@ const AllProducts: FC = () => {
   const [productTypesFilter, setProductTypesFilter] = useState(
     new Set<number>()
   );
+  const [publishStartDateFilter, setPublishStartDateFilter] =
+    useState<Dayjs | null>(null);
+  const [publishEndDateFilter, setPublishEndDateFilter] =
+    useState<Dayjs | null>(null);
 
   const router = useRouter();
 
@@ -257,9 +320,12 @@ const AllProducts: FC = () => {
   const showAllAuthorQuery = router.query[queryKeys.showAllAuthor];
   const showMemberAuthorQuery = router.query[queryKeys.showMemberAuthor];
   const showDoiQuery = router.query[queryKeys.showDoi];
+  const showPublishDateQuery = router.query[queryKeys.showPublishDate];
   const productTitleQuery = router.query[queryKeys.productTitle];
   const productAuthorQuery = router.query[queryKeys.productAllAuthor];
   const productTypesQuery = router.query[queryKeys.productTypes];
+  const publishStartDateQuery = router.query[queryKeys.publishStartDate];
+  const publishEndDateQuery = router.query[queryKeys.publishEndDate];
 
   useEffect(() => {
     if (!showTypeQuery) setShowType(defaultQueries.showType);
@@ -272,6 +338,13 @@ const AllProducts: FC = () => {
     if (showDoiQuery === "true") setShowDoi(true);
     if (showDoiQuery === "false") setShowDoi(false);
   }, [showDoiQuery]);
+
+  useEffect(() => {
+    if (!showPublishDateQuery)
+      setShowPublishDate(defaultQueries.showPublishDate);
+    if (showPublishDateQuery === "true") setShowPublishDate(true);
+    if (showPublishDateQuery === "false") setShowPublishDate(false);
+  }, [showPublishDateQuery]);
 
   useEffect(() => {
     if (!showAllAuthorQuery) setShowAllAuthor(defaultQueries.showAllAuthor);
@@ -300,24 +373,32 @@ const AllProducts: FC = () => {
     setProductTypesFilter(getIdsFromQueryParams(queryKeys.productTypes));
   }, [productTypesQuery]);
 
-  function refreshAndClearFilters() {
-    clearQueries();
-    refreshProducts();
-  }
-
-  const [members, setAccounts] = useState<PublicMemberRes[]>([]);
+  useEffect(() => {
+    const next = getDateFromQueryParam(publishStartDateQuery);
+    if (!next) setPublishStartDateFilter(null);
+    else setPublishStartDateFilter(dayjs(next));
+  }, [publishStartDateQuery]);
 
   useEffect(() => {
-    const fetchAccounts = async () => {
-      const res = await fetch("api/all-members");
-      const data = await res.json();
-      setAccounts(data);
+    const next = getDateFromQueryParam(publishEndDateQuery);
+    if (!next) setPublishEndDateFilter(null);
+    else setPublishEndDateFilter(dayjs(next));
+  }, [publishEndDateQuery]);
 
-      //console.log(data);
-    };
+  function refreshAndClearFilters() {
+    const instituteUrlIdentifier = institute?.urlIdentifier; // Retrieve urlIdentifier instead of id
+    if (instituteUrlIdentifier) {
+      clearQueries({ urlIdentifier: instituteUrlIdentifier }); // Pass as an object
+      refreshProducts();
+    } else {
+      console.error("Cannot reset filters: Institute ID is missing.");
+    }
+  }
 
-    fetchAccounts();
-  }, []);
+  const publishDateRange = useMemo<RangePickerProps["value"]>(
+    () => [publishStartDateFilter, publishEndDateFilter],
+    [publishStartDateFilter, publishEndDateFilter]
+  );
 
   const filteredProducts = useMemo(
     () =>
@@ -328,6 +409,8 @@ const AllProducts: FC = () => {
             productTitleFilter,
             productTypesFilter,
             productAllAuthorsFilter,
+            publishStartDateFilter,
+            publishEndDateFilter,
           })
         ),
     [
@@ -335,6 +418,8 @@ const AllProducts: FC = () => {
       productTitleFilter,
       productAllAuthorsFilter,
       productTypesFilter,
+      publishStartDateFilter,
+      publishEndDateFilter,
 
       en,
     ]
@@ -347,6 +432,8 @@ const AllProducts: FC = () => {
       title: en ? "Title" : "Titre",
       dataIndex: "product",
       className: "title-column",
+      width: 280,
+      ellipsis: true,
 
       render: (value, product) => (
         <SafeLink href={PageRoutes.productProfile(product.id)}>
@@ -361,12 +448,17 @@ const AllProducts: FC = () => {
     () => ({
       title: en ? "DOI" : "DOI",
       dataIndex: "doi",
-      className: "name-column",
-      render: (doi: string) => (
-        <SafeLink href={`https://doi.org/${doi}`} external>
-          {doi}
-        </SafeLink>
-      ),
+      className: "doi-column",
+      width: 200,
+      ellipsis: true,
+      render: (doi: string | null) =>
+        doi ? (
+          <SafeLink href={`https://doi.org/${doi}`} external>
+            {doi}
+          </SafeLink>
+        ) : (
+          ""
+        ),
     }),
     [en]
   );
@@ -376,6 +468,8 @@ const AllProducts: FC = () => {
       title: en ? "Product Type" : "Type de produit",
       dataIndex: ["product_type", en ? "name_en" : "name_fr"],
       className: "type-column",
+      width: 200,
+      ellipsis: true,
       sorter: en
         ? (a, b) =>
             (a.product_type?.name_en || "").localeCompare(
@@ -393,8 +487,31 @@ const AllProducts: FC = () => {
     () => ({
       title: en ? "All Authors" : "Tous les auteurs",
       dataIndex: "all_author",
-      className: "name-column",
-      render: (all_author: string) => <span>{all_author}</span>,
+      className: "all-authors-column",
+      width: 280,
+      ellipsis: true,
+      render: (all_author: string | null) => <span>{all_author || ""}</span>,
+    }),
+    [en]
+  );
+
+  const publishDateColumn: ProductColumnType = useMemo(
+    () => ({
+      title: en ? "Published Date" : "Date de publication",
+      dataIndex: "publish_date",
+      className: "publish-date-column",
+      width: 180,
+      sorter: (a, b) => {
+        const timeA = a.publish_date
+          ? new Date(a.publish_date).getTime()
+          : Number.POSITIVE_INFINITY;
+        const timeB = b.publish_date
+          ? new Date(b.publish_date).getTime()
+          : Number.POSITIVE_INFINITY;
+        return timeA - timeB;
+      },
+      render: (value: ProductPublicInfo["publish_date"]) =>
+        value ? dayjs(value).format("YYYY-MM-DD") : "",
     }),
     [en]
   );
@@ -404,6 +521,8 @@ const AllProducts: FC = () => {
       title: en ? "Authors Member" : "Auteurs membres",
       dataIndex: "product_member_author",
       key: "product_member_author",
+      className: "member-authors-column",
+      width: 220,
       render: (
         product_member_author: Array<{
           member: {
@@ -420,6 +539,7 @@ const AllProducts: FC = () => {
   const columns: ProductColumnType[] = [nameColumn];
   if (showDoi) columns.push(doiColumn);
   if (showType) columns.push(productTypeColumn);
+  if (showPublishDate) columns.push(publishDateColumn);
   if (showMemberAuthor) columns.push(productMemberAuthorColumn);
   if (showAllAuthor) columns.push(productAllAuthorColumn);
 
@@ -466,6 +586,18 @@ const AllProducts: FC = () => {
         />
       </Form.Item>
 
+      <Form.Item
+        label={en ? "Filter by published date" : "Filtrer par date de publication"}
+        htmlFor="product-date-filter"
+      >
+        <DatePicker.RangePicker
+          id="product-date-filter"
+          value={publishDateRange}
+          onChange={handleProductDateFilterChange}
+          getPopupContainer={getPopupContainer}
+        />
+      </Form.Item>
+
       <label htmlFor="show-column-checkboxes">
         {en ? "Show Columns:" : "Afficher les colonnes:"}
       </label>
@@ -482,6 +614,13 @@ const AllProducts: FC = () => {
           onChange={(e) => handleShowTypeChange(e.target.checked)}
         >
           {en ? "Show Product Type" : "Afficher le type de produit"}
+        </Checkbox>
+
+        <Checkbox
+          checked={showPublishDate}
+          onChange={(e) => handleShowPublishDateChange(e.target.checked)}
+        >
+          {en ? "Show Published Date" : "Afficher la date de publication"}
         </Checkbox>
 
         <Checkbox
@@ -530,7 +669,7 @@ const AllProducts: FC = () => {
 
   return (
     <Table
-      className="all-members-table"
+      className="all-products-table"
       size="small"
       tableLayout="auto"
       columns={columns}
@@ -540,7 +679,7 @@ const AllProducts: FC = () => {
       pagination={false}
       showSorterTooltip={false}
       sticky={{ offsetHeader: 74 }}
-      scroll={{ x: true }}
+      scroll={{ x: "max-content" }}
       rowClassName={(_, index) =>
         "table-row " + (index % 2 === 0 ? "even" : "odd")
       }

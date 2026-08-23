@@ -6,7 +6,7 @@
   The `getPopupContainer` prop can be used to specify the container of the dropdown menu.
 */
 import Select, { SelectProps } from "antd/lib/select";
-import { FC, useContext, useMemo } from "react";
+import { type FC, useContext, useMemo } from "react";
 import { FacultiesCtx } from "../../services/context/faculties-ctx";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import GetLanguage from "../../utils/front-end/get-language";
@@ -56,7 +56,6 @@ const FacultyFilter: FC<Props> = ({
       options={options}
       allowClear
       showSearch={false}
-      showArrow
       onSelect={onSelect}
       onDeselect={onDelete}
       getPopupContainer={getPopupContainer}

@@ -2,7 +2,7 @@
 // It also uses the updateEventPublic API function from the services to update the event data on the backend
 
 import React, { FC, useContext, useState, useCallback, useEffect } from "react";
-import { Form, Input, Select, Button, DatePicker, Divider } from "antd";
+import { Form, Input, Select, Button, DatePicker } from "antd";
 import TextArea from "antd/lib/input/TextArea";
 
 import { useForm } from "antd/lib/form/Form";
@@ -11,12 +11,9 @@ import {
   SaveChangesCtx,
   useResetDirtyOnUnmount,
 } from "../../services/context/save-changes-ctx";
-import moment, { Moment } from "moment";
+import type { Dayjs } from "dayjs";
 import Notification from "../../services/notifications/notification";
-import type { event, organization } from "@prisma/client";
-import type { grant } from "@prisma/client";
-import type { product } from "@prisma/client";
-import type { topic } from "@prisma/client";
+import type { event, grant, organization, product, topic } from "@prisma/client";
 import type {
   EventPrivateInfo,
   EventPublicInfo,
@@ -34,6 +31,7 @@ import GetLanguage from "../../utils/front-end/get-language";
 import type { UpdateEventPublicParams } from "../../pages/api/update-event/[id]/public";
 import updateEventPublic from "../../services/update-event-public";
 import EventSelector from "./event-selector";
+import toDayjsDate from "../../utils/front-end/to-dayjs-date";
 
 const { Option } = Select;
 
@@ -55,8 +53,8 @@ type EventMemberInvolved = {
 type Data = {
   name_en: string;
   name_fr: string;
-  start_date: Moment | null;
-  end_date: Moment | null;
+  start_date: Dayjs | null;
+  end_date: Dayjs | null;
   event_type_id?: number;
   note?: string;
   topics: Map<number, topic>;
@@ -391,20 +389,8 @@ const PublicEventForm: FC<Props> = ({ event, onSuccess }) => {
     // Set the initial values for the event form
     name_en: event.name_en,
     name_fr: event.name_fr,
-    start_date: event.start_date
-      ? moment(
-          event.start_date instanceof Date
-            ? event.start_date.toISOString().split("T")[0]
-            : (event.start_date as string).split("T")[0]
-        )
-      : null,
-    end_date: event.end_date
-      ? moment(
-          event.end_date instanceof Date
-            ? event.end_date.toISOString().split("T")[0]
-            : (event.end_date as string).split("T")[0]
-        )
-      : null,
+    start_date: toDayjsDate(event.start_date),
+    end_date: toDayjsDate(event.end_date),
     event_type_id: event.event_type?.id,
     note: event.note || "",
     products: getInitialProducts(),

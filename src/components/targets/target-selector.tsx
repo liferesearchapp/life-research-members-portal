@@ -1,15 +1,13 @@
 // See https://ant.design/components/form/#components-form-demo-customized-form-controls
 
-import PlusOutlined from "@ant-design/icons/lib/icons/PlusOutlined";
 import type { target } from "@prisma/client";
-import AutoComplete from "antd/lib/auto-complete";
-import Button from "antd/lib/button/button";
-import Card from "antd/lib/card";
-import { FC, useContext, useEffect, useState } from "react";
+import { type FC, useContext, useEffect, useState } from "react";
 import { AllTargetsCtx } from "../../services/context/all-targets-ctx";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import type { TargetInfo } from "../../services/_types";
 import TargetTag from "./target-tag";
+import { AutoComplete, Button, Card } from "antd";
+import { PlusOutlined } from "@ant-design/icons";
 
 type Props = {
   id?: string; // For connecting a label - antd form will pass this in

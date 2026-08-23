@@ -3,7 +3,7 @@
 // Uses the context `LanguageCtx` to determine the language for the title
 
 import Select, { SelectProps } from "antd/lib/select";
-import { FC, useContext, useMemo } from "react";
+import { type FC, useContext, useMemo } from "react";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import { AllProductsCtx } from "../../services/context/all-products-ctx";
 import type { ProductPublicInfo } from "../../services/_types";

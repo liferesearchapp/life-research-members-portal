@@ -1,14 +1,11 @@
 import MenuOutlined from "@ant-design/icons/lib/icons/MenuOutlined";
 import Menu from "antd/lib/menu";
-import type { MenuItemType } from "antd/lib/menu/hooks/useItems";
 import Spin from "antd/lib/spin";
 import { useRouter } from "next/router";
 import {
+  type ComponentProps,
   FC,
-  JSXElementConstructor,
-  ReactElement,
-  ReactFragment,
-  ReactPortal,
+  type ReactNode,
   useContext,
 } from "react";
 import { ActiveAccountCtx } from "../../services/context/active-account-ctx";
@@ -16,22 +13,52 @@ import { LanguageCtx } from "../../services/context/language-ctx";
 import PageRoutes from "../../routing/page-routes";
 import SafeLink from "../link/safe-link";
 import type { UrlObject } from "url";
+import { useAdminDetails, useMemberDetails } from "../../services/context/selected-institute-ctx";
 
-const NavMenu: FC = () => {
+type MenuItemType = NonNullable<ComponentProps<typeof Menu>["items"]>[number];
+
+const NavMenu: FC<{ urlIdentifier: string | undefined }> = ({
+  urlIdentifier,
+}) => {
   const { localAccount, loading } = useContext(ActiveAccountCtx);
   const router = useRouter();
   const { en } = useContext(LanguageCtx);
+  const isAdmin = useAdminDetails();
+  const isMember = useMemberDetails();
+  const isSuperAdmin = !!localAccount?.is_super_admin;
+  const hasInstituteAccess =
+    isSuperAdmin ||
+    (localAccount?.instituteAdmin.length || 0) > 0 ||
+    (localAccount?.member?.institutes.length || 0) > 0;
+  const canAccessAdminPages = !!isAdmin || isSuperAdmin;
+  const canAccessMemberPages = !!isMember || canAccessAdminPages;
+
+  if (!urlIdentifier && !hasInstituteAccess) return null;
+
+  const id = urlIdentifier || "";
 
   // Everyone
   const generalItems = [
-    { label: en ? "Home" : "Accueil", href: PageRoutes.home },
+    {
+      label: en ? "Home" : "Accueil",
+      href: PageRoutes.instituteHome(id),
+    },
   ];
 
-  // Registered Acounts
+  // Member Acounts
   const registeredItemsFirst = [
-    { label: en ? "Members" : "Membres", href: PageRoutes.allMembers },
-    { label: en ? "Products" : "Produits", href: PageRoutes.products },
-    { label: en ? "Partners" : "Partenaires", href: PageRoutes.allPartners },
+    {
+      label: en ? "Members" : "Membres",
+      href: PageRoutes.allMembers(id),
+    },
+    {
+      label: en ? "Products" : "Produits",
+      href: PageRoutes.allProducts(id),
+    },
+    {
+      label: en ? "Partners" : "Partenaires",
+      href: PageRoutes.allPartners(id),
+    },
   ];
 
   // Registered Acounts
@@ -41,34 +68,59 @@ const NavMenu: FC = () => {
 
   // Admins
   const adminItems = [
-    { label: en ? "Grants" : "Subventions", href: PageRoutes.allGrants },
-    { label: en ? "Events" : "Événements", href: PageRoutes.allEvents },
+    {
+      label: en ? "Grants" : "Subventions",
+      href: PageRoutes.allGrants(id),
+    },
+    {
+      label: en ? "Events" : "Événements",
+      href: PageRoutes.allEvents(id),
+    },
     {
       label: en ? "Supervisions" : "Supervisions",
-      href: PageRoutes.allSupervisions,
+      href: PageRoutes.allSupervisions(id),
     },
-
     {
-      label: en ? "Accounts" : "Comptes",
-      href: PageRoutes.allAccounts,
-      children: [
-        {
-          label: en ? "All accounts" : "Tous les comptes",
-          href: PageRoutes.allAccounts,
-        },
-        {
-          label: en ? "Register an account" : "Enregistrer un compte",
-          href: PageRoutes.register,
-        },
-      ],
+      label: en ? "Grant Topics" : "Sujets de subvention",
+      href: PageRoutes.instituteTopics(id),
     },
   ];
 
-  const items: { label: string; href: string; children?: any }[] = generalItems;
+  const adminSuperAdminItems = {
+    label: en ? "Accounts" : "Comptes",
+    href: PageRoutes.allAccounts(id),
+    children: [
+      {
+        label: en ? "All accounts" : "Tous les comptes",
+        href: PageRoutes.allAccounts(id),
+      },
+      {
+        label: en ? "Register an account" : "Enregistrer un compte",
+        href: PageRoutes.register,
+      },
+    ],
+  };
+
+  const superAdminItems = [
+    {
+      label: en ? "Institutes" : "Instituts",
+      href: PageRoutes.allInstitutes(),
+    },
+  ];
+
+  const items: { label: string; href: string; children?: any }[] = [];
+  if (urlIdentifier) {
+    for (const it of generalItems) items.push(it);
+  }
   if (!loading) {
-    if (localAccount) for (const it of registeredItemsFirst) items.push(it);
-    if (localAccount?.is_admin) for (const it of adminItems) items.push(it);
-    if (localAccount) for (const it of registeredItemsLast) items.push(it);
+    if (urlIdentifier && canAccessMemberPages)
+      for (const it of registeredItemsFirst) items.push(it);
+    if (urlIdentifier && canAccessAdminPages)
+      for (const it of adminItems) items.push(it);
+    if (urlIdentifier && canAccessAdminPages) items.push(adminSuperAdminItems);
+    if (hasInstituteAccess)
+      for (const it of superAdminItems) items.push(it);
+    if (urlIdentifier && localAccount) for (const it of registeredItemsLast) items.push(it);
   }
 
   function isMenuItemActive(item: { href: string; children?: any }): boolean {
@@ -95,15 +147,7 @@ const NavMenu: FC = () => {
         children: it.children.map(
           (child: {
             href: string | UrlObject;
-            label:
-              | string
-              | number
-              | boolean
-              | ReactElement<any, string | JSXElementConstructor<any>>
-              | ReactFragment
-              | ReactPortal
-              | null
-              | undefined;
+            label: ReactNode;
           }) => ({
             label: <SafeLink href={child.href}>{child.label}</SafeLink>,
             key: child.label,
@@ -128,7 +172,6 @@ const NavMenu: FC = () => {
         overflowedIndicator={<MenuOutlined className="collapsed-icon" />}
         style={{ fontSize: "inherit" }}
         selectedKeys={activeItem ? [activeItem.label] : []}
-        activeKey={activeItem?.label}
         getPopupContainer={() =>
           document.querySelector(".navbar") || document.body
         }

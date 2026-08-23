@@ -2,14 +2,13 @@
 //It takes the ID of the organization as a prop and uses the usePublicOrganizationInfo hook to retrieve the information of the organization.
 //The component also makes use of the LanguageCtx context to toggle the language of the component between English and French.
 
-import Empty from "antd/lib/empty";
-import Card from "antd/lib/card/Card";
-import Title from "antd/lib/typography/Title";
-import { FC, useContext } from "react";
+import { type FC, useContext } from "react";
 import usePublicOrganizationInfo from "../../services/use-public-partner-info";
 import CardSkeleton from "../loading/card-skeleton";
 import PublicPartnerDescription from "./partner-public-description";
 import { LanguageCtx } from "../../services/context/language-ctx";
+import { Empty, Card, Typography } from "antd";
+const Title = Typography.Title;
 
 type Props = {
   id: number;

@@ -9,13 +9,13 @@ import Form from "antd/lib/form";
 import Input from "antd/lib/input";
 import React, { FC, useContext } from "react";
 import { useForm } from "antd/lib/form/Form";
-import moment from "moment";
-import type { Moment } from "moment";
+import type { Dayjs } from "dayjs";
 import registerSupervision from "../../services/register-supervision-member";
 import { LanguageCtx } from "../../services/context/language-ctx";
 import { FacultiesCtx } from "../../services/context/faculties-ctx";
 import { LevelsCtx } from "../../services/context/levels-ctx";
 import GetLanguage from "../../utils/front-end/get-language";
+import { useSelectedInstitute } from "../../services/context/selected-institute-ctx";
 
 const { Option } = Select;
 const { RangePicker } = DatePicker;
@@ -23,7 +23,7 @@ const { RangePicker } = DatePicker;
 type SupervisionData = {
   last_name: string;
   first_name: string;
-  date_range: [Moment | null, Moment | null];
+  date_range: [Dayjs | null, Dayjs | null] | null;
   faculty_id: number | null;
   level_id: number | null;
   note: string | null;
@@ -34,6 +34,7 @@ const RegisterSupervision: FC = () => {
   const { en } = useContext(LanguageCtx);
   const { faculties } = useContext(FacultiesCtx);
   const { levels } = useContext(LevelsCtx);
+  const { institute } = useSelectedInstitute();
 
   async function handleRegister({
     last_name,
@@ -43,14 +44,16 @@ const RegisterSupervision: FC = () => {
     level_id,
     note,
   }: SupervisionData) {
+    if (!institute) return;
     const res = await registerSupervision({
       last_name,
       first_name,
-      start_date: date_range[0] ? date_range[0].toDate() : null, // Access start_date from date_range
-      end_date: date_range[1] ? date_range[1].toDate() : null, // Access end_date from date_range
+      start_date: date_range?.[0] ? date_range[0].toDate() : null,
+      end_date: date_range?.[1] ? date_range[1].toDate() : null,
       faculty_id: faculty_id || null,
       level_id: level_id || null,
       note: note || null,
+      institute_id: institute.id,
     });
     if (res) form.resetFields();
   }

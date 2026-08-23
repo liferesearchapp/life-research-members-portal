@@ -1,6 +1,10 @@
 import { Prisma } from "@prisma/client";
 import type { NextApiRequest, NextApiResponse } from "next";
 import db from "../../../prisma/prisma-client";
+import {
+  assertAuthorized,
+  hasAdministrativeRole,
+} from "../../utils/api/authorization";
 import getAccountFromRequest from "../../utils/api/get-account-from-request";
 
 export type RegisterKeywordParams = { name_en: string; name_fr: string };
@@ -24,9 +28,14 @@ export default async function handler(
   try {
     const currentUser = await getAccountFromRequest(req, res);
     if (!currentUser) return;
-
-    const authorized = currentUser.is_admin || currentUser.member;
-    if (!authorized) return res.status(401).send("You are not authorized to create keywords.");
+    if (
+      !assertAuthorized(
+        res,
+        hasAdministrativeRole(currentUser) || !!currentUser.member,
+        "You are not authorized to create keywords."
+      )
+    )
+      return;
 
     const keyword = await registerKeyword(params);
 

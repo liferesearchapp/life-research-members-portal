@@ -1,8 +1,9 @@
-import Button from "antd/lib/button";
-import { FC, useContext } from "react";
+import { type FC, useContext } from "react";
 import updateAccountRegisterMember from "../../services/update-account-register-member";
 import { ActiveAccountCtx } from "../../services/context/active-account-ctx";
 import { LanguageCtx } from "../../services/context/language-ctx";
+import { Button } from "antd";
+import InstituteMembershipInvitations from "../accounts/institute-membership-invitations";
 
 const MyProfileRegister: FC = () => {
   const { en } = useContext(LanguageCtx);
@@ -22,6 +23,13 @@ const MyProfileRegister: FC = () => {
         textAlign: "center",
       }}
     >
+      <div style={{ maxWidth: 700, margin: "0 auto", textAlign: "left" }}>
+        <InstituteMembershipInvitations
+          account={localAccount}
+          setAccount={setLocalAccount}
+          interactive
+        />
+      </div>
       <div style={{ height: "20vh" }}></div>
       <h1>
         {en ? "You have no member information!" : "Vous n'avez aucune information de membre !"}

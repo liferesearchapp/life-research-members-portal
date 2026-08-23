@@ -1,6 +1,10 @@
 import { Prisma } from "@prisma/client";
 import type { NextApiRequest, NextApiResponse } from "next";
 import db from "../../../prisma/prisma-client";
+import {
+  assertAuthorized,
+  hasAnyInstituteAccess,
+} from "../../utils/api/authorization";
 import getAccountFromRequest from "../../utils/api/get-account-from-request";
 import isAuthorMatch from "../../components/products/author-match"; // Import isAuthorMatch
 import removeDiacritics from "../../utils/front-end/remove-diacritics"; // Import removeDiacritics
@@ -17,6 +21,7 @@ export type RegisterGrantParams = {
   all_investigator: string;
   topic_id: number;
   note: string;
+  institute_id: number;
 };
 
 export type RegisterGrantRes = Awaited<ReturnType<typeof registerGrant>>;
@@ -35,6 +40,7 @@ function registerGrant(params: RegisterGrantParams) {
       all_investigator: params.all_investigator,
       topic_id: params.topic_id,
       note: params.note,
+      instituteId: params.institute_id,
     },
     select: {
       id: true,
@@ -63,21 +69,43 @@ export default async function handler(
     status_id,
     source_id,
     all_investigator,
+    submission_date,
+    topic_id,
   } = params;
 
   if (typeof title !== "string") return res.status(400).send("Please provide the title");
   if (isNaN(amount)) return res.status(400).send("Amount is required.");
-  if (typeof throught_lri !== "boolean") return res.status(400).send("Throught LRI is required.");
+  if (typeof throught_lri !== "boolean") return res.status(400).send("Through institute is required.");
   if (isNaN(status_id)) return res.status(400).send("Status ID is required.");
   if (isNaN(source_id)) return res.status(400).send("Source ID is required.");
   if (typeof all_investigator !== "string") return res.status(400).send("All investigator is required.");
+  if (!submission_date) return res.status(400).send("Submission date is required.");
+  if (!Number.isInteger(topic_id)) return res.status(400).send("Topic is required.");
 
   try {
     const currentUser = await getAccountFromRequest(req, res);
     if (!currentUser) return;
+    if (
+      !assertAuthorized(
+        res,
+        hasAnyInstituteAccess(currentUser, [params.institute_id]),
+        "You are not authorized to register a grant."
+      )
+    )
+      return;
 
-    if (!currentUser.is_admin)
-      return res.status(401).send("You are not authorized to register a grant");
+    const instituteTopic = await db.instituteTopic.findUnique({
+      where: {
+        instituteId_topicId: {
+          instituteId: params.institute_id,
+          topicId: params.topic_id,
+        },
+      },
+    });
+    if (!instituteTopic?.is_active)
+      return res
+        .status(400)
+        .send("Please select an active topic for the selected institute.");
 
     const newGrant = await registerGrant(params);
 
