@@ -10,10 +10,10 @@ import {
 } from "react";
 import { ActiveAccountCtx } from "../../services/context/active-account-ctx";
 import { LanguageCtx } from "../../services/context/language-ctx";
-import PageRoutes from "../../routing/page-routes";
 import SafeLink from "../link/safe-link";
 import type { UrlObject } from "url";
 import { useAdminDetails, useMemberDetails } from "../../services/context/selected-institute-ctx";
+import { buildNavItems } from "./nav-items";
 
 type MenuItemType = NonNullable<ComponentProps<typeof Menu>["items"]>[number];
 
@@ -35,93 +35,16 @@ const NavMenu: FC<{ urlIdentifier: string | undefined }> = ({
 
   if (!urlIdentifier && !hasInstituteAccess) return null;
 
-  const id = urlIdentifier || "";
-
-  // Everyone
-  const generalItems = [
-    {
-      label: en ? "Home" : "Accueil",
-      href: PageRoutes.instituteHome(id),
-    },
-  ];
-
-  // Member Acounts
-  const registeredItemsFirst = [
-    {
-      label: en ? "Members" : "Membres",
-      href: PageRoutes.allMembers(id),
-    },
-    {
-      label: en ? "Products" : "Produits",
-      href: PageRoutes.allProducts(id),
-    },
-    {
-      label: en ? "Partners" : "Partenaires",
-      href: PageRoutes.allPartners(id),
-    },
-  ];
-
-  // Registered Acounts
-  const registeredItemsLast = [
-    { label: en ? "My Profile" : "Mon profil", href: PageRoutes.myProfile },
-  ];
-
-  // Admins
-  const adminItems = [
-    {
-      label: en ? "Grants" : "Subventions",
-      href: PageRoutes.allGrants(id),
-    },
-    {
-      label: en ? "Events" : "Événements",
-      href: PageRoutes.allEvents(id),
-    },
-    {
-      label: en ? "Supervisions" : "Supervisions",
-      href: PageRoutes.allSupervisions(id),
-    },
-    {
-      label: en ? "Grant Topics" : "Sujets de subvention",
-      href: PageRoutes.instituteTopics(id),
-    },
-  ];
-
-  const adminSuperAdminItems = {
-    label: en ? "Accounts" : "Comptes",
-    href: PageRoutes.allAccounts(id),
-    children: [
-      {
-        label: en ? "All accounts" : "Tous les comptes",
-        href: PageRoutes.allAccounts(id),
-      },
-      {
-        label: en ? "Register an account" : "Enregistrer un compte",
-        href: PageRoutes.register,
-      },
-    ],
-  };
-
-  const superAdminItems = [
-    {
-      label: en ? "Institutes" : "Instituts",
-      href: PageRoutes.allInstitutes(),
-    },
-  ];
-
-  const items: { label: string; href: string; children?: any }[] = [];
-  if (urlIdentifier) {
-    for (const it of generalItems) items.push(it);
-  }
-  if (!loading) {
-    if (urlIdentifier && canAccessMemberPages)
-      for (const it of registeredItemsFirst) items.push(it);
-    if (urlIdentifier && canAccessAdminPages)
-      for (const it of adminItems) items.push(it);
-    if (urlIdentifier && canAccessAdminPages) items.push(adminSuperAdminItems);
-    if (hasInstituteAccess)
-      for (const it of superAdminItems) items.push(it);
-    if (urlIdentifier && localAccount) for (const it of registeredItemsLast) items.push(it);
-  }
+  const items = buildNavItems({
+    urlIdentifier,
+    en,
+    loading,
+    canAccessMemberPages,
+    canAccessAdminPages,
+    isSuperAdmin,
+    hasInstituteAccess,
+    hasLocalAccount: !!localAccount,
+  });
 
   function isMenuItemActive(item: { href: string; children?: any }): boolean {
     if (router.pathname === item.href) {
