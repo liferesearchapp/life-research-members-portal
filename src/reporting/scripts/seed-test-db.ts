@@ -50,7 +50,31 @@ const FIRST = ["Ana","Ben","Chloe","Daniel","Elena","Farid","Grace","Hugo","Ines
 const LAST = ["Arsenault","Bouchard","Chen","Dubois","Eze","Fontaine","Gagnon","Haddad","Ibrahim","Jansen","Kowalski","Lemay","Moreau","Nguyen","Okafor","Petrov","Quinn","Roy","Sauve","Tremblay","Ueda","Vaillancourt","Wong","Xu","Yousef","Zhang"];
 const CITIES: [string, string][] = [["Ottawa","Canada"],["Gatineau","Canada"],["Toronto","Canada"],["Montreal","Canada"],["Kingston","Canada"],["Vancouver","Canada"],["Paris","France"],["Brussels","Belgium"]];
 
+/**
+ * Refuses to run against anything but a local database.
+ *
+ * This script deletes every row before repopulating, so pointing DATABASE_URL at Azure (or any
+ * remote host) would wipe real data. The host must be localhost/127.0.0.1; override only with a
+ * deliberate SEED_ALLOW_REMOTE=1 if you ever genuinely need to seed a remote test instance.
+ */
+function assertLocalDatabase() {
+  if (process.env.SEED_ALLOW_REMOTE === "1") return;
+  const url = process.env.DATABASE_URL ?? "";
+  // sqlserver://HOST:port;... -- grab the host between the scheme and the first : or ;
+  const host = url.replace(/^sqlserver:\/\//, "").split(/[:;/]/)[0].toLowerCase();
+  const local = host === "localhost" || host === "127.0.0.1" || host === "" ;
+  if (!local) {
+    throw new Error(
+      `Refusing to seed: DATABASE_URL host is "${host}", not local. This script DELETES every ` +
+        `row first. Point it at the local test container, or set SEED_ALLOW_REMOTE=1 if you ` +
+        `really mean it.`
+    );
+  }
+}
+
 async function main() {
+  assertLocalDatabase();
+
   // Children before parents.
   await db.product_member_author.deleteMany();
   await db.product_topic.deleteMany();
