@@ -1,24 +1,12 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { selectPublicGrantInfo } from "../../../prisma/helpers";
 import db from "../../../prisma/prisma-client";
+import requireInstituteAccess from "../../utils/api/require-institute-access";
 import type { PublicGrantRes } from "./grant/[id]/public";
 
-async function allGrants(urlIdentifier: string): Promise<PublicGrantRes[]> {
-  const institute = await db.institute.findUnique({
-    where: {
-      urlIdentifier: urlIdentifier,
-    },
-    select: {
-      id: true,
-    },
-  });
-
-  if (!institute) throw new Error("Institute not found.");
-
+function allGrants(instituteId: number): Promise<PublicGrantRes[]> {
   return db.grant.findMany({
-    where: {
-      instituteId: institute.id,
-    },
+    where: { instituteId },
     select: selectPublicGrantInfo,
   });
 }
@@ -27,15 +15,14 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<PublicGrantRes[] | string>
 ) {
-  const { instituteId } = req.query;
-
-  if (typeof instituteId !== "string") {
+  const { instituteId } = req.query; // the institute's urlIdentifier
+  if (typeof instituteId !== "string")
     return res.status(400).json("Institute identifier must be provided.");
-  }
 
   try {
-    const grants = await allGrants(instituteId);
-    return res.status(200).send(grants);
+    const id = await requireInstituteAccess(req, res, instituteId);
+    if (id === null) return;
+    return res.status(200).send(await allGrants(id));
   } catch (e: any) {
     return res.status(500).send({ ...e, message: e.message });
   }

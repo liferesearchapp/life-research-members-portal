@@ -9,11 +9,16 @@ import {
 } from "react";
 import ApiRoutes from "../../routing/api-routes";
 import Notification from "../notifications/notification";
+import getAuthHeader from "../headers/auth-header";
 import { LanguageCtx } from "./language-ctx";
 
 async function fetchAllOrganizations(): Promise<organization[]> {
   try {
-    const res = await fetch(ApiRoutes.allOrganizations);
+    // /api/all-organizations now requires authentication; skip silently when logged out (this
+    // list only feeds admin forms, not anonymous visitors).
+    const authHeader = await getAuthHeader();
+    if (!authHeader) return [];
+    const res = await fetch(ApiRoutes.allOrganizations, { headers: authHeader });
     if (!res.ok) throw await res.text();
     return await res.json();
   } catch (e: any) {

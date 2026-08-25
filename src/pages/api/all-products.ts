@@ -1,28 +1,12 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { selectPublicProductInfo } from "../../../prisma/helpers";
 import db from "../../../prisma/prisma-client";
+import requireInstituteAccess from "../../utils/api/require-institute-access";
 import type { PublicProductRes } from "./product/[id]/public";
 
-async function allProducts(urlIdentifier: string): Promise<PublicProductRes[]> {
-  const institute = await db.institute.findUnique({
-    where: {
-      urlIdentifier: urlIdentifier,
-    },
-    select: {
-      id: true,
-    },
-  });
-
-  if (!institute) throw new Error("Institute not found.");
-
+function allProducts(instituteId: number): Promise<PublicProductRes[]> {
   return db.product.findMany({
-    where: {
-      institutes: {
-        some: {
-          instituteId: institute.id,
-        },
-      },
-    },
+    where: { institutes: { some: { instituteId } } },
     select: selectPublicProductInfo,
   });
 }
@@ -31,15 +15,14 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<PublicProductRes[] | string>
 ) {
-  const { instituteId } = req.query;
-
-  if (typeof instituteId !== "string") {
+  const { instituteId } = req.query; // the institute's urlIdentifier
+  if (typeof instituteId !== "string")
     return res.status(400).json("Institute identifier must be provided.");
-  }
 
   try {
-    const products = await allProducts(instituteId);
-    return res.status(200).send(products);
+    const id = await requireInstituteAccess(req, res, instituteId);
+    if (id === null) return;
+    return res.status(200).send(await allProducts(id));
   } catch (e: any) {
     return res.status(500).send({ ...e, message: e.message });
   }
