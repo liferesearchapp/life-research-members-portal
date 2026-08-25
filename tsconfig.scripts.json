@@ -1,0 +1,18 @@
+{
+  // ts-node config for the standalone scripts under src/reporting/scripts.
+  //
+  // The app's tsconfig.json targets the browser bundle: ESM modules and `noEmit`. Node needs
+  // CommonJS and real output, so the scripts extend it and override just those two settings
+  // rather than each caller passing --compiler-options on the command line (which is unquotable
+  // on Windows cmd, where npm scripts run).
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "noEmit": false,
+    // Each script is compiled as part of one program, so cross-file const enums and type-only
+    // re-exports are resolvable; the isolated-modules constraint only matters for the bundler.
+    "isolatedModules": false
+  }
+}

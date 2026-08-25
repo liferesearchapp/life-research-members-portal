@@ -48,5 +48,86 @@ jobs:
       - name: Unit tests
         run: npm run test
 
+      # Both are pure logic -- no database, no queries -- so they belong in the fast job rather
+      # than in the SQL Server one below.
+      - name: Reporting spec validation
+        run: npm run reporting:validate
+
+      - name: Reporting fold rules
+        run: npm run reporting:fold
+
       - name: Production build
         run: npm run build
+
+  # The reporting metrics are SQL: their correctness lives in the queries, not in the TypeScript,
+  # so unit tests with a mocked Prisma cannot see a regression in them. This job stands up a real
+  # SQL Server, pushes the schema, seeds the deterministic fixture, and runs the parity and
+  # cross-filter assertions that already caught real count bugs during the Power BI port.
+  reporting-integration:
+    runs-on: ubuntu-latest
+
+    services:
+      sqlserver:
+        image: mcr.microsoft.com/mssql/server:2022-latest
+        env:
+          ACCEPT_EULA: "Y"
+          # Throwaway credential for a container that exists only for this job, on the runner's
+          # private network, holding nothing but synthetic seed data. Keep in sync with
+          # DATABASE_URL below. SQL Server enforces its own complexity rules on this value.
+          MSSQL_SA_PASSWORD: "RimsCi!2026run"
+          MSSQL_PID: Developer
+        ports:
+          - 1433:1433
+
+    env:
+      DATABASE_URL: "sqlserver://localhost:1433;database=rims_ci;user=sa;password=RimsCi!2026run;encrypt=true;trustServerCertificate=true"
+      # Seeds a sign-in account so the fixture matches what a reviewer sees locally. Synthetic
+      # address on purpose -- no real person's email belongs in a public workflow file.
+      SEED_ADMIN_EMAIL: "ci-admin@example.invalid"
+      SEED_ADMIN_NAME: "CI Admin"
+      NEXT_TELEMETRY_DISABLED: "1"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # SQL Server accepts TCP connections before it finishes recovering its system databases, so
+      # a service health check that only probes the port can pass too early. Retrying the real
+      # first query instead -- `db push`, which creates the `rims_ci` database as well -- waits on
+      # the condition that actually matters. The image typically takes 20-40s on a cold runner.
+      - name: Create database and push schema
+        run: |
+          for attempt in $(seq 1 30); do
+            if npm run db:push -- --accept-data-loss; then
+              exit 0
+            fi
+            echo "SQL Server not ready (attempt $attempt/30); retrying in 5s"
+            sleep 5
+          done
+          echo "SQL Server never became reachable"
+          exit 1
+
+      # Deterministic fixture (fixed-seed PRNG): institutes alpha/beta/gamma/delta, and rows that
+      # deliberately have no linked author/member/supervisor -- the case the old Power BI count
+      # dropped silently.
+      - name: Seed the fixture
+        run: npm run db:seed
+
+      # Institute report: the corrected-vs-Power BI delta, plus assertions that compute ground
+      # truth with independent queries (counting join tables directly) so a metric cannot pass by
+      # agreeing with itself. Also asserts institute isolation and that declared table columns
+      # exist in what each metric returns.
+      - name: Institute report parity and assertions
+        run: npm run reporting:parity
+
+      # Cross-institute report: every super-admin metric runs, and selecting an institute or a
+      # login-recency bucket must scope the whole page.
+      - name: Cross-institute report assertions
+        run: npm run reporting:admin
