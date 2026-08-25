@@ -4,6 +4,7 @@ import {
   getVisibleInstituteIds,
 } from "../../utils/api/authorization";
 import getAccountFromRequest from "../../utils/api/get-account-from-request";
+import methodAllowed from "../../utils/api/method-allowed";
 
 export type InstituteSelectorRes = {
     id: number;
@@ -80,6 +81,8 @@ export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse<InstituteSelectorRes[] | string>
   ) {
+  if (!methodAllowed(req, res, ["GET"])) return;
+
     try {
       const instituteSelection = await getInstitutesForSelector(req, res);
       if (!instituteSelection) return;

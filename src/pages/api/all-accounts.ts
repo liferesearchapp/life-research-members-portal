@@ -8,6 +8,7 @@ import {
 import getAccountFromRequest from "../../utils/api/get-account-from-request";
 import type { AccountDBRes } from "./account/[id]";
 import { instituteMembershipInvitationStatus } from "../../utils/institute-membership-invitations";
+import methodAllowed from "../../utils/api/method-allowed";
 
 function getAllAccounts(instituteId: number): Promise<AccountDBRes[]> {
   return db.account.findMany({
@@ -49,6 +50,8 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<AccountDBRes[] | string>
 ) {
+  if (!methodAllowed(req, res, ["GET"])) return;
+
   try {
     if (!req.query.instituteId || typeof req.query.instituteId !== "string")
       return res.status(400).send("Institute ID is required.");

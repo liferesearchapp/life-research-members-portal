@@ -8,6 +8,7 @@ import {
   isProductAuthor,
 } from "../../../../utils/api/authorization";
 import getAccountFromRequest from "../../../../utils/api/get-account-from-request";
+import methodAllowed from "../../../../utils/api/method-allowed";
 
 export type PrivateProductDBRes = Awaited<ReturnType<typeof getPrivateProductInfo>>;
 
@@ -29,6 +30,8 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<PrivateProductDBRes | string>
 ) {
+  if (!methodAllowed(req, res, ["GET"])) return;
+
   if (!req.query.id || typeof req.query.id !== "string")
     return res.status(400).send("Product ID is required.");
 

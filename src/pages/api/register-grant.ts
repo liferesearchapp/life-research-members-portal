@@ -6,6 +6,7 @@ import {
   hasAnyInstituteAccess,
 } from "../../utils/api/authorization";
 import getAccountFromRequest from "../../utils/api/get-account-from-request";
+import methodAllowed from "../../utils/api/method-allowed";
 import isAuthorMatch from "../../components/products/author-match"; // Import isAuthorMatch
 import removeDiacritics from "../../utils/front-end/remove-diacritics"; // Import removeDiacritics
 
@@ -61,6 +62,8 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<RegisterGrantRes | string>
 ) {
+  if (!methodAllowed(req, res, ["PUT"])) return;
+
   const params: RegisterGrantParams = req.body;
   const {
     title,

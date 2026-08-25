@@ -6,6 +6,7 @@ import {
   hasAllInstituteAccess,
 } from "../../utils/api/authorization";
 import getAccountFromRequest from "../../utils/api/get-account-from-request";
+import methodAllowed from "../../utils/api/method-allowed";
 
 export type RegisterPartnerParams = {
   name_en: string;
@@ -33,6 +34,8 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<RegisterPartnerRes | string>
 ) {
+  if (!methodAllowed(req, res, ["PUT"])) return;
+
   const params: RegisterPartnerParams = req.body;
   const { name_en, name_fr, scope_id, type_id } = params;
   if (typeof name_en !== "string")

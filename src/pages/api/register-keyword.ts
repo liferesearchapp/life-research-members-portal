@@ -6,6 +6,7 @@ import {
   hasAdministrativeRole,
 } from "../../utils/api/authorization";
 import getAccountFromRequest from "../../utils/api/get-account-from-request";
+import methodAllowed from "../../utils/api/method-allowed";
 
 export type RegisterKeywordParams = { name_en: string; name_fr: string };
 export type RegisterKeywordRes = Awaited<ReturnType<typeof registerKeyword>>;
@@ -20,6 +21,8 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<RegisterKeywordRes | string>
 ) {
+  if (!methodAllowed(req, res, ["PUT"])) return;
+
   const params: RegisterKeywordParams = req.body;
   const { name_en, name_fr } = params;
   if (typeof name_en !== "string" && typeof name_fr !== "string")

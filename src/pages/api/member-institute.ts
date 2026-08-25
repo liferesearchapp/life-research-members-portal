@@ -1,6 +1,7 @@
 import db from "../../../prisma/prisma-client";
 import getAccountFromRequest from "../../utils/api/get-account-from-request";
 import type { NextApiRequest, NextApiResponse } from "next";
+import methodAllowed from "../../utils/api/method-allowed";
 
 export type MemberInstitutesRes = {
   id: number;
@@ -47,6 +48,8 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<MemberInstitutesRes[] | string>
 ) {
+  if (!methodAllowed(req, res, ["GET"])) return;
+
   try {
     const currentAccount = await getAccountFromRequest(req, res);
     if (!currentAccount) {

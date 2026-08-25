@@ -3,6 +3,7 @@ import { selectPublicEventInfo } from "../../../prisma/helpers";
 import db from "../../../prisma/prisma-client";
 import requireInstituteAccess from "../../utils/api/require-institute-access";
 import type { PublicEventRes } from "./event/[id]/public";
+import methodAllowed from "../../utils/api/method-allowed";
 
 function allEvents(instituteId: number): Promise<PublicEventRes[]> {
   return db.event.findMany({
@@ -15,6 +16,8 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<PublicEventRes[] | string>
 ) {
+  if (!methodAllowed(req, res, ["GET"])) return;
+
   const { instituteId } = req.query; // the institute's urlIdentifier
   if (typeof instituteId !== "string")
     return res.status(400).json("Institute identifier must be provided.");

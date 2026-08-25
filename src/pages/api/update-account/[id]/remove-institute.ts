@@ -7,6 +7,7 @@ import {
 import getAccountFromRequest from "../../../../utils/api/get-account-from-request";
 import db from "../../../../../prisma/prisma-client";
 import { includeAllAccountInfo } from "../../../../../prisma/helpers";
+import methodAllowed from "../../../../utils/api/method-allowed";
 
 export type RemoveInstituteParams = {
   instituteId: number[];
@@ -42,6 +43,8 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<AccountDBRes | string>
 ) {
+  if (!methodAllowed(req, res, ["PATCH"])) return;
+
   if (!req.query.id || typeof req.query.id !== "string")
     return res.status(400).send("Account ID is required.");
 

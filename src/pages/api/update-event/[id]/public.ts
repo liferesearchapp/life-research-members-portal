@@ -7,6 +7,7 @@ import {
   hasAnyInstituteAccess,
 } from "../../../../utils/api/authorization";
 import type { PrivateEventDBRes } from "../../event/[id]/private";
+import methodAllowed from "../../../../utils/api/method-allowed";
 
 export type UpdateEventPublicParams = {
 
@@ -180,6 +181,8 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<PrivateEventDBRes | string>
 ) {
+  if (!methodAllowed(req, res, ["PATCH"])) return;
+
   if (!req.query.id || typeof req.query.id !== "string")
     return res.status(400).send("Event ID is required.");
 

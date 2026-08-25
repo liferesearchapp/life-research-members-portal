@@ -3,6 +3,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import db from "../../../../prisma/prisma-client";
 import getAccountFromRequest from "../../../utils/api/get-account-from-request";
 import type { PrivateProductDBRes } from "../product/[id]/private";
+import methodAllowed from "../../../utils/api/method-allowed";
 
 async function deleteProduct(productId: number): Promise<product | null> {
   const transaction = await db.$transaction(async (prisma) => {
@@ -37,6 +38,8 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Prisma.PromiseReturnType<typeof deleteProduct> | string>
 ) {
+  if (!methodAllowed(req, res, ["DELETE"])) return;
+
   if (!req.query.id || typeof req.query.id !== "string")
     return res.status(400).send("Product ID is required.");
 

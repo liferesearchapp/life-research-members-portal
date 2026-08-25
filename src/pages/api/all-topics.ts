@@ -1,12 +1,14 @@
 import type { topic } from "@prisma/client";
 import type { NextApiRequest, NextApiResponse } from "next";
 import db from "../../../prisma/prisma-client";
+import methodAllowed from "../../utils/api/method-allowed";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<topic[] | string>
 ) {
-  if (req.method !== "GET") return res.status(405).end();
+  if (!methodAllowed(req, res, ["GET"])) return;
+
   if (!req.query.instituteId || typeof req.query.instituteId !== "string")
     return res.status(400).send("Institute URL identifier is required.");
 

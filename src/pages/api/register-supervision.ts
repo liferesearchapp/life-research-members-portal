@@ -6,6 +6,7 @@ import {
   hasAnyInstituteAccess,
 } from "../../utils/api/authorization";
 import getAccountFromRequest from "../../utils/api/get-account-from-request";
+import methodAllowed from "../../utils/api/method-allowed";
 
 export type RegisterSupervisionParams = {
   last_name: string;
@@ -48,6 +49,8 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<RegisterSupervisionRes | string>
 ) {
+  if (!methodAllowed(req, res, ["PUT"])) return;
+
   const params: RegisterSupervisionParams = req.body;
   const {
     last_name,

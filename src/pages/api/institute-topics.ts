@@ -6,6 +6,7 @@ import {
   hasAnyInstituteAccess,
 } from "../../utils/api/authorization";
 import getAccountFromRequest from "../../utils/api/get-account-from-request";
+import methodAllowed from "../../utils/api/method-allowed";
 
 export type InstituteTopicInfo = topic & { is_active: boolean };
 export type RegisterInstituteTopicParams = {
@@ -74,6 +75,8 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<InstituteTopicInfo[] | InstituteTopicInfo | string>
 ) {
+  if (!methodAllowed(req, res, ["GET", "POST"])) return;
+
   const instituteId =
     req.method === "GET"
       ? Number(req.query.instituteId)

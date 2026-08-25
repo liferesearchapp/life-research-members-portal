@@ -2,6 +2,7 @@ import type { product } from "@prisma/client";
 import type { NextApiRequest, NextApiResponse } from "next";
 import db from "../../../prisma/prisma-client";
 import getAccountFromRequest from "../../utils/api/get-account-from-request";
+import methodAllowed from "../../utils/api/method-allowed";
 
 export type ProductTitle = Pick<product, "id" | "title_en" | "title_fr">;
 
@@ -9,6 +10,8 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<ProductTitle[] | string>
 ) {
+  if (!methodAllowed(req, res, ["GET"])) return;
+
   try {
     // Cross-institute helper (title lookup / duplicate check), so not institute-scoped -- but no
     // longer anonymous. Also narrowed to id + titles: the previous `findMany()` returned every

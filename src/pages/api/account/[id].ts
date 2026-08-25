@@ -7,6 +7,7 @@ import {
 } from "../../../utils/api/authorization";
 import getAccountFromRequest from "../../../utils/api/get-account-from-request";
 import type { PrivateMemberRes } from "../member/[id]/private";
+import methodAllowed from "../../../utils/api/method-allowed";
 
 export type AccountDBRes = Awaited<ReturnType<typeof getAccountById>>;
 
@@ -27,6 +28,8 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<AccountDBRes | string>
 ) {
+  if (!methodAllowed(req, res, ["GET"])) return;
+
   if (!req.query.id || typeof req.query.id !== "string")
     return res.status(400).send("Account ID is required.");
 

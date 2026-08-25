@@ -9,6 +9,7 @@ import {
   hasAnyInstituteAccess,
 } from "../../../../utils/api/authorization";
 import type { PrivatePartnerRes } from "../../partner/[id]/private";
+import methodAllowed from "../../../../utils/api/method-allowed";
 
 export type UpdatePartnerPublicParams = {
   name_en: string;
@@ -91,6 +92,8 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<PrivatePartnerRes | string>
 ) {
+  if (!methodAllowed(req, res, ["PATCH"])) return;
+
   if (!req.query.id || typeof req.query.id !== "string")
     return res.status(400).send("Partner ID is required.");
 

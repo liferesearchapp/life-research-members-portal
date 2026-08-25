@@ -7,6 +7,7 @@ import {
 } from "../../utils/api/authorization";
 import getAccountFromRequest from "../../utils/api/get-account-from-request";
 import type { InstituteInfo } from "../../services/_types";
+import methodAllowed from "../../utils/api/method-allowed";
 
 function getAllInstitutesForUser(
   currentUser: Awaited<ReturnType<typeof getAccountFromRequest>>
@@ -29,6 +30,8 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<InstituteInfo[] | string>
 ) {
+  if (!methodAllowed(req, res, ["GET"])) return;
+
   try {
     const currentUser = await getAccountFromRequest(req, res);
     if (!currentUser) return;

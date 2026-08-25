@@ -6,6 +6,7 @@ import {
   hasAnyInstituteAccess,
 } from "../../utils/api/authorization";
 import getAccountFromRequest from "../../utils/api/get-account-from-request";
+import methodAllowed from "../../utils/api/method-allowed";
 
 export type RegisterEventParams = {
   name_en: string;
@@ -40,6 +41,8 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<RegisterEventRes | string>
 ) {
+  if (!methodAllowed(req, res, ["PUT"])) return;
+
   const params: RegisterEventParams = req.body;
   const {
     name_en,

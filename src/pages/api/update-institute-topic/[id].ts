@@ -6,6 +6,7 @@ import {
   hasAnyInstituteAccess,
 } from "../../../utils/api/authorization";
 import getAccountFromRequest from "../../../utils/api/get-account-from-request";
+import methodAllowed from "../../../utils/api/method-allowed";
 
 export type UpdateInstituteTopicParams = {
   institute_id: number;
@@ -20,10 +21,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<UpdateInstituteTopicRes | string>
 ) {
-  if (req.method !== "PATCH") {
-    res.setHeader("Allow", ["PATCH"]);
-    return res.status(405).send("Method not allowed.");
-  }
+  if (!methodAllowed(req, res, ["PATCH"])) return;
 
   const topicId = Number(req.query.id);
   const instituteId = Number(req.body?.institute_id);

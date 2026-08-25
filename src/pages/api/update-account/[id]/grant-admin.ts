@@ -4,6 +4,7 @@ import db from "../../../../../prisma/prisma-client";
 import { assertAuthorized } from "../../../../utils/api/authorization";
 import getAccountFromRequest from "../../../../utils/api/get-account-from-request";
 import type { AccountDBRes } from "../../account/[id]";
+import methodAllowed from "../../../../utils/api/method-allowed";
 
 export async function updateAccountGrantAdmin(id: number, urlIdentifier: string) {
   const institute = await db.institute.findUnique({
@@ -47,6 +48,8 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<AccountDBRes | string>
 ) {
+  if (!methodAllowed(req, res, ["PATCH"])) return;
+
   if (!req.query.id || typeof req.query.id !== "string")
     return res.status(400).send("Account ID is required.");
 

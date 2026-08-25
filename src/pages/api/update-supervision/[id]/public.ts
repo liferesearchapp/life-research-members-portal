@@ -7,6 +7,7 @@ import {
   hasAnyInstituteAccess,
 } from "../../../../utils/api/authorization";
 import type { PrivateSupervisionDBRes } from "../../supervision/[id]/private";
+import methodAllowed from "../../../../utils/api/method-allowed";
 
 export type UpdateSupervisionPublicParams = {
   last_name: string;
@@ -81,6 +82,8 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<PrivateSupervisionDBRes | string>
 ) {
+  if (!methodAllowed(req, res, ["PATCH"])) return;
+
   if (!req.query.id || typeof req.query.id !== "string")
     return res.status(400).send("Supervision ID is required.");
 

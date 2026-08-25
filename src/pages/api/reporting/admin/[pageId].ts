@@ -4,6 +4,7 @@ import { getSuperMetric } from "../../../../reporting/metrics/admin";
 import type { MetricFilters } from "../../../../reporting/metrics/types";
 import { adminReport } from "../../../../reporting/spec/admin-report";
 import { parseLang, parseSelections, type ReportPageRes } from "../[instituteId]/[pageId]";
+import methodAllowed from "../../../../utils/api/method-allowed";
 
 /**
  * Serves one page of the RIMS administrator report.
@@ -16,6 +17,8 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<ReportPageRes | string>
 ) {
+  if (!methodAllowed(req, res, ["GET"])) return;
+
   const { pageId } = req.query;
   if (typeof pageId !== "string") return res.status(400).send("Page is required.");
 
