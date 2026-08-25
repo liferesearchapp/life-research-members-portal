@@ -9,6 +9,12 @@
     "start": "next start",
     "lint": "next lint",
     "test": "vitest run",
+    "db:push": "prisma db push --skip-generate",
+    "db:seed": "ts-node --project tsconfig.scripts.json src/reporting/scripts/seed-test-db.ts",
+    "reporting:fold": "ts-node --project tsconfig.scripts.json src/reporting/scripts/test-fold.ts",
+    "reporting:validate": "ts-node --project tsconfig.scripts.json src/reporting/scripts/validate-specs.ts",
+    "reporting:parity": "ts-node --project tsconfig.scripts.json src/reporting/scripts/parity-report.ts",
+    "reporting:admin": "ts-node --project tsconfig.scripts.json src/reporting/scripts/run-admin-metrics.ts",
     "postinstall": "prisma generate"
   },
   "dependencies": {
@@ -36,6 +42,7 @@
     "mssql": "^12.5.4",
     "prisma": "4.16.2",
     "sass": "~1.55.0",
+    "ts-node": "^10.9.2",
     "typescript": "^5.9.3",
     "vitest": "^3.2.6"
   }

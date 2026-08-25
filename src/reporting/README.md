@@ -123,28 +123,45 @@ from the single-PK side instead. `scripts/probe-prisma.ts` re-checks this if Pri
 
 ## Scripts
 
-All are runnable with:
-`npx ts-node@10 --compiler-options '{"module":"commonjs","esModuleInterop":true}' <script>`
+The five used routinely have npm scripts, so CI and a person run the identical command:
 
-They read `portal/.env` via `scripts/load-env.ts` (Prisma Client, unlike the Prisma CLI and
+| npm script | Runs | Does |
+|---|---|---|
+| `npm run db:seed` | `seed-test-db.ts` | Synthetic data that exposes the count bug + tenant isolation. **Test DB only — it deletes every row first**, and refuses a non-local `DATABASE_URL` unless `SEED_ALLOW_REMOTE=1`. Set `SEED_ADMIN_EMAIL` to also seed a sign-in account (super admin + institute admin of alpha/beta/gamma). |
+| `npm run reporting:validate` | `validate-specs.ts` | Every tile resolves to a metric of the right shape. No DB needed. |
+| `npm run reporting:fold` | `test-fold.ts` | Donut folding rules. No DB needed. |
+| `npm run reporting:parity` | `parity-report.ts` | All institute metrics + the delta vs Power BI, with assertions. `-- --no-assert` against real data, `-- --fr` for French labels. |
+| `npm run reporting:admin` | `run-admin-metrics.ts` | All cross-institute metrics + cross-filter assertions. |
+
+`probe-prisma.ts` is occasional -- it re-checks which query shapes SQL Server accepts, worth
+running after a Prisma upgrade -- and runs through ts-node directly:
+
+```bash
+npx ts-node --project tsconfig.scripts.json src/reporting/scripts/probe-prisma.ts
+```
+
+`tsconfig.scripts.json` supplies the CommonJS settings Node needs; the app's own tsconfig targets
+the browser bundle. (The older `--compiler-options '{"module":"commonjs"}'` invocation still
+works, but is unquotable on Windows `cmd`, where npm scripts run.)
+
+Scripts read `portal/.env` via `scripts/load-env.ts` (Prisma Client, unlike the Prisma CLI and
 Next.js, does not read `.env` itself). A real `DATABASE_URL` in the environment still wins.
 
-| Script | Does |
-|---|---|
-| `validate-specs.ts` | Every tile resolves to a metric of the right shape. No DB needed. **Run in CI.** |
-| `test-fold.ts` | Donut folding rules. No DB needed. **Run in CI.** |
-| `seed-test-db.ts` | Synthetic data that exposes the count bug + tenant isolation. **Test DB only — it deletes everything first.** Set `SEED_ADMIN_EMAIL` in `.env` to also seed a real sign-in account (super admin + institute admin of both institutes). |
-| `parity-report.ts` | All metrics + the delta vs Power BI. `--no-assert` against real data. |
-| `run-admin-metrics.ts` | All cross-institute metrics. |
-| `probe-prisma.ts` | Which Prisma query shapes work on SQL Server. |
+**All five run in CI on every pull request** (`.github/workflows/ci.yml`), in two jobs.
+`reporting:validate` and `reporting:fold` touch no database, so they run in the fast `check`
+job. `db:seed`, `reporting:parity` and `reporting:admin` run in `reporting-integration`,
+which stands up a real SQL Server, pushes the schema, seeds this fixture, and fails the build
+on any assertion. That job exists because metric correctness lives in the SQL, where unit
+tests with a mocked Prisma cannot see it; the assertions compute ground truth with
+independent queries, so a metric cannot pass by agreeing with itself.
 
 Local test database:
 
 ```bash
 docker run -d --name rims-test -e ACCEPT_EULA=Y -e MSSQL_SA_PASSWORD='RimsTest!2026dev' \
   -e MSSQL_PID=Developer -p 14330:1433 mcr.microsoft.com/mssql/server:2022-latest
-# create database rims_test, then:
-npx prisma db push --skip-generate
+npm run db:push   # creates the database named in DATABASE_URL if it does not exist
+npm run db:seed
 ```
 
 ## Known gaps
