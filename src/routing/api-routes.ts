@@ -95,6 +95,7 @@ const ApiRoutes = {
   allEventTypes: "/api/all-event-types",
   allSupervisions: "/api/all-supervisions",
   allLevels: "/api/all-levels",
+  publicCounts: "/api/public-counts",
   reportPage: (urlIdentifier: string, pageId: string, query?: string) =>
     `/api/reporting/${urlIdentifier}/${pageId}` + (query ? `?${query}` : ""),
   adminReportPage: (pageId: string, query?: string) =>

@@ -90,6 +90,23 @@ export const includeAllAccountInfo: CheckKeysAreValid<
 
 > = _includeAllAccountInfo;
 
+/**
+ * The only member fields safe to expose on an UNAUTHENTICATED endpoint when a member is nested
+ * inside another record (co-supervisor, author, involved member, …).
+ *
+ * Use `select` — never `include` — for any member reached without a token. A bare
+ * `include: { member: ... }` returns every scalar Prisma knows about, which for `member` means
+ * `address`, `postal_code`, `mobile_phone`, and for `account` means `login_email`,
+ * `microsoft_id`, `is_super_admin`. `select` is a fixed allow-list that cannot widen when a
+ * column is later added to the schema.
+ */
+const _selectPublicMemberSummary = {
+  id: true,
+  account: { select: { first_name: true, last_name: true } },
+  work_email: true,
+  work_phone: true,
+} as const;
+
 const _selectPublicMemberInfo = {
     id: true,
     account: { select: { first_name: true, last_name: true } },
@@ -137,16 +154,7 @@ const _selectPublicPartnerInfo = {
   },
   partnership_member_org: {
     include: {
-      member: {
-        include: {
-          account: {
-            select: {
-              first_name: true,
-              last_name: true,
-            },
-          },
-        },
-      },
+      member: { select: _selectPublicMemberSummary },
     },
   },
   product_partnership: {
@@ -313,16 +321,7 @@ const _selectPublicProductInfo = {
   },
   product_member_author: {
     include: {
-      member: {
-        include: {
-          account: {
-            select: {
-              first_name: true,
-              last_name: true,
-            },
-          },
-        },
-      },
+      member: { select: _selectPublicMemberSummary },
     },
   },
 } as const;
@@ -410,30 +409,12 @@ const _selectPublicGrantInfo = {
   event_grant_resulted: { include: { event: true } },
   grant_member_involved: {
     include: {
-      member: {
-        include: {
-          account: {
-            select: {
-              first_name: true,
-              last_name: true,
-            },
-          },
-        },
-      },
+      member: { select: _selectPublicMemberSummary },
     },
   },
   grant_investigator_member: {
     include: {
-      member: {
-        include: {
-          account: {
-            select: {
-              first_name: true,
-              last_name: true,
-            },
-          },
-        },
-      },
+      member: { select: _selectPublicMemberSummary },
     },
   },
   topic: true,
@@ -549,16 +530,7 @@ const _selectPublicEventInfo = {
   event_grant_resulted: { include: { grant: true } },
   event_member_involved: {
     include: {
-      member: {
-        include: {
-          account: {
-            select: {
-              first_name: true,
-              last_name: true,
-            },
-          },
-        },
-      },
+      member: { select: _selectPublicMemberSummary },
     },
   },
   event_product_resulted: { include: { product: true } },
@@ -655,38 +627,16 @@ const _selectPublicSupervisionInfo = {
   level: true,
   note: true,
   supervision_co_supervisor: {
-    include: { member: { include: { account: true } } },
+    include: { member: { select: _selectPublicMemberSummary } },
   },
   supervision_committee: {
-    include: { member: { include: { account: true } } },
+    include: { member: { select: _selectPublicMemberSummary } },
   },
   supervision_principal_supervisor: {
-    include: {
-      member: {
-        include: {
-          account: {
-            select: {
-              first_name: true,
-              last_name: true,
-            },
-          },
-        },
-      },
-    },
+    include: { member: { select: _selectPublicMemberSummary } },
   },
   supervision_trainee: {
-    include: {
-      member: {
-        include: {
-          account: {
-            select: {
-              first_name: true,
-              last_name: true,
-            },
-          },
-        },
-      },
-    },
+    include: { member: { select: _selectPublicMemberSummary } },
   },
   institute: true,
 } as const;

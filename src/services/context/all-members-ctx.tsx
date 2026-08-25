@@ -38,12 +38,16 @@ export const AllMembersCtxProvider: FC<AllMembersCtxProviderProps> = ({
 
     try {
       const queryParam = `?instituteId=${institute?.urlIdentifier}`;
-      //const authHeader = await getAuthHeader();
-      //if (!authHeader) return;
-      //const result = await fetch(`${ApiRoutes.allMembers}${queryParam}`, {
-      //  headers: authHeader,
-      //});
-      const result = await fetch(`${ApiRoutes.allMembers}${queryParam}`);
+      // /api/all-members now requires authentication (it returns the member roster). Send the
+      // token; the anonymous landing-page counts come from /api/public-counts instead.
+      const authHeader = await getAuthHeader();
+      if (!authHeader) {
+        setLoading(false);
+        return;
+      }
+      const result = await fetch(`${ApiRoutes.allMembers}${queryParam}`, {
+        headers: authHeader,
+      });
       if (!result.ok) throw await result.text();
       const members: MemberPublicInfo[] = await result.json();
 
