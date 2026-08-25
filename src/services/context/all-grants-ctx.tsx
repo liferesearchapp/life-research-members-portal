@@ -10,6 +10,7 @@ import {
 import ApiRoutes from "../../routing/api-routes";
 import Notification from "../notifications/notification";
 import type { GrantPublicInfo } from "../_types";
+import getAuthHeader from "../headers/auth-header";
 import { useSelectedInstitute } from "./selected-institute-ctx"; // Adjust this path as necessary.
 
 export const AllGrantsCtx = createContext<{
@@ -33,7 +34,15 @@ export const AllGrantsCtxProvider: FC<PropsWithChildren> = ({ children }) => {
 
     try {
       const queryParam = `?instituteId=${institute.urlIdentifier}`;
-      const result = await fetch(`${ApiRoutes.allGrants}${queryParam}`);
+      // /api/all-grants now requires authentication.
+      const authHeader = await getAuthHeader();
+      if (!authHeader) {
+        setLoading(false);
+        return;
+      }
+      const result = await fetch(`${ApiRoutes.allGrants}${queryParam}`, {
+        headers: authHeader,
+      });
       if (!result.ok) throw await result.text();
       let grants: GrantPublicInfo[] = await result.json();
 

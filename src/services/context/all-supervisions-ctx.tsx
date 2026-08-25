@@ -8,6 +8,7 @@ import {
   useState,
 } from "react";
 import ApiRoutes from "../../routing/api-routes";
+import getAuthHeader from "../headers/auth-header";
 import Notification from "../notifications/notification";
 import type { SupervisionPublicInfo } from "../_types";
 import { useSelectedInstitute } from "./selected-institute-ctx"; // Adjust this path as necessary.
@@ -37,7 +38,15 @@ export const AllSupervisionsCtxProvider: FC<PropsWithChildren> = ({
 
     try {
       const queryParam = `?instituteId=${institute.urlIdentifier}`;
-      const result = await fetch(`${ApiRoutes.allSupervisions}${queryParam}`);
+      // /api/all-supervisions now requires authentication.
+      const authHeader = await getAuthHeader();
+      if (!authHeader) {
+        setLoading(false);
+        return;
+      }
+      const result = await fetch(`${ApiRoutes.allSupervisions}${queryParam}`, {
+        headers: authHeader,
+      });
       if (!result.ok) throw await result.text();
       let supervisions: SupervisionPublicInfo[] = await result.json();
 

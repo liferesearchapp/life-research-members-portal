@@ -9,6 +9,7 @@ import {
 } from "react";
 import ApiRoutes from "../../routing/api-routes";
 import Notification from "../notifications/notification";
+import getAuthHeader from "../headers/auth-header";
 import { LanguageCtx } from "./language-ctx";
 
 function enSorter(a: product, b: product) {
@@ -26,7 +27,10 @@ export const ProductTitlesCtx = createContext<{
 
 async function fetchAllProductTitle(): Promise<product[]> {
   try {
-    const res = await fetch(ApiRoutes.allProductTitles);
+    // /api/all-product-titles now requires authentication; skip silently when logged out.
+    const authHeader = await getAuthHeader();
+    if (!authHeader) return [];
+    const res = await fetch(ApiRoutes.allProductTitles, { headers: authHeader });
     if (!res.ok) throw await res.text();
     return await res.json();
   } catch (e: any) {
