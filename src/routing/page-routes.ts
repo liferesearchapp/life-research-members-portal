@@ -10,6 +10,10 @@ const PageRoutes = {
   allPartners: (urlIdentifier: string) => `/${urlIdentifier}/partners`,
   allAccounts: (urlIdentifier: string) => `/${urlIdentifier}/accounts`,
   allInstitutes: () => "/institutes",
+  reports: (urlIdentifier: string) => `/${urlIdentifier}/reports`,
+  reportPage: (urlIdentifier: string, pageId: string) => `/${urlIdentifier}/reports/${pageId}`,
+  adminReports: () => "/admin-reports",
+  adminReportPage: (pageId: string) => `/admin-reports/${pageId}`,
   registerPartner: (urlIdentifier: string) =>
     `/${urlIdentifier}/partners/register-partner`,
   registerSupervision: (urlIdentifier: string) =>

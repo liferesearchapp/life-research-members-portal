@@ -95,6 +95,10 @@ const ApiRoutes = {
   allEventTypes: "/api/all-event-types",
   allSupervisions: "/api/all-supervisions",
   allLevels: "/api/all-levels",
+  reportPage: (urlIdentifier: string, pageId: string, query?: string) =>
+    `/api/reporting/${urlIdentifier}/${pageId}` + (query ? `?${query}` : ""),
+  adminReportPage: (pageId: string, query?: string) =>
+    `/api/reporting/admin/${pageId}` + (query ? `?${query}` : ""),
 } as const;
 
 export default ApiRoutes;
