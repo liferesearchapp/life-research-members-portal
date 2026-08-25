@@ -1,0 +1,52 @@
+name: CI
+
+# Runs on every pull request and on pushes to main, so a regression in types,
+# lint, tests, or the production build is caught before it can merge.
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+# Cancel an in-progress run when new commits are pushed to the same PR/branch.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    env:
+      # A well-formed but unused connection string. `prisma generate` and `next build`
+      # do not connect to the database; the unit tests mock Prisma. No live DB is needed.
+      DATABASE_URL: "sqlserver://localhost:1433;database=ci;user=ci;password=ci;encrypt=true;trustServerCertificate=true"
+      NEXT_TELEMETRY_DISABLED: "1"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      # `npm ci` installs exactly from package-lock.json and fails if it is out of sync.
+      # The repo's postinstall runs `prisma generate`, so the client is generated here too.
+      - name: Install dependencies
+        run: npm ci
+
+      # `next-env.d.ts` provides the ambient module types for image imports (*.png, …) and is
+      # git-ignored, generated only when Next runs. Recreate it before the standalone typecheck
+      # so a clean checkout resolves those imports the same way `next build` would.
+      - name: Generate Next type declarations
+        run: printf '/// <reference types="next" />\n/// <reference types="next/image-types/global" />\n' > next-env.d.ts
+
+      - name: Typecheck
+        run: npx tsc --noEmit
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Unit tests
+        run: npm run test
+
+      - name: Production build
+        run: npm run build
