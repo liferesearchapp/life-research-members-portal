@@ -73,6 +73,27 @@ describe("canManageMemberProfile", () => {
     ).toBeUndefined();
   });
 
+  it("distinguishes an account with no institutes from one that has not loaded", () => {
+    // The distinction the whole rule turns on. An empty list is a definite "no shared institute" --
+    // a loaded account that simply has no member record. `undefined` means "ask again later".
+    // Collapsing the two onto [] is what redirected institute admins away mid-load.
+    expect(
+      canManageMemberProfile({
+        isSuperAdmin: false,
+        adminInstituteIds: [1],
+        memberInstituteIds: [],
+      })
+    ).toBe(false);
+
+    expect(
+      canManageMemberProfile({
+        isSuperAdmin: false,
+        adminInstituteIds: [1],
+        memberInstituteIds: undefined,
+      })
+    ).toBeUndefined();
+  });
+
   it("still answers immediately for a super admin, loaded or not", () => {
     expect(
       canManageMemberProfile({
