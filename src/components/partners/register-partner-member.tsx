@@ -16,6 +16,7 @@ import { OrgScopeCtx } from "../../services/context/org-scopes-ctx";
 import GetLanguage from "../../utils/front-end/get-language";
 import { MemberInstituteCtx } from "../../services/context/member-institutes-ctx";
 import { useSelectedInstitute } from "../../services/context/selected-institute-ctx";
+import selectableInstitutes from "../../utils/front-end/selectable-institutes";
 
 const { Option } = Select;
 
@@ -115,7 +116,7 @@ const RegisterPartner: FC = () => {
           >
             <Select mode="multiple">
               <Option value="">{""}</Option>
-              {institutes.map((f) => (
+              {selectableInstitutes(institutes).map((f) => (
                 <Option key={f.id} value={f.id}>
                   {`${f.name} - ${f.urlIdentifier}`}
                 </Option>
