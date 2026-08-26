@@ -2,7 +2,7 @@ import Empty from "antd/lib/empty";
 import Button from "antd/lib/button";
 import Card from "antd/lib/card/Card";
 import Title from "antd/lib/typography/Title";
-import { FC, ReactNode, useCallback, useContext, useState } from "react";
+import { FC, ReactNode, useCallback, useContext, useEffect, useState } from "react";
 import CardSkeleton from "../loading/card-skeleton";
 import PublicMemberDescription from "./member-public-description";
 import PublicMemberForm from "./member-public-form";
@@ -19,6 +19,7 @@ import router from "next/router";
 import { ActiveAccountCtx } from "../../services/context/active-account-ctx";
 import { useAdminDetails } from "../../services/context/selected-institute-ctx";
 import PageRoutes from "../../routing/page-routes";
+import { canManageMemberProfile } from "../../utils/front-end/member-access";
 
 type Tab = { label: string; key: string; children: ReactNode };
 
@@ -42,15 +43,25 @@ const PrivateMemberProfile: FC<Props> = ({ id }) => {
   const { localAccount } = useContext(ActiveAccountCtx);
   const isAdmin = useAdminDetails();
 
-  /** Institute admins can only access private member profiles within institutes they manage. */
-  if (isAdmin && !localAccount?.is_super_admin) {
-    var adminInstituteIds = localAccount?.instituteAdmin.map((admin) => admin.institute.id) || [];
-    var memberInstituteIds = member?.institutes.map((institute) => institute.instituteId) || [];
-    var hasPermission = false;
-    for (var a of adminInstituteIds) if (memberInstituteIds.includes(a)) hasPermission = true;
-    if (!hasPermission)
-      router.replace(PageRoutes.publicMemberProfile(id));
-  }
+  /**
+   * Institute admins can only manage members of institutes they administer.
+   *
+   * This waits for the member to load. Evaluating it during the first render -- when the member is
+   * still undefined and so belongs to no institutes -- bounced institute admins to the public
+   * profile before their data arrived, which is why editing appeared to work for super admins
+   * only. Redirecting from an effect rather than mid-render also keeps React from being asked to
+   * navigate while it is still rendering.
+   */
+  const mayManage = canManageMemberProfile({
+    isSuperAdmin: !!localAccount?.is_super_admin,
+    adminInstituteIds: localAccount?.instituteAdmin.map((admin) => admin.instituteId) || [],
+    memberInstituteIds: member?.institutes.map((institute) => institute.instituteId),
+  });
+
+  useEffect(() => {
+    if (loading || mayManage !== false) return;
+    router.replace(PageRoutes.publicMemberProfile(id));
+  }, [loading, mayManage, id]);
 
   /** After saving changes via submit button - dependency of form's submit */
   const onSuccess = useCallback(
