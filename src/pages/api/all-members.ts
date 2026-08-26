@@ -3,6 +3,7 @@ import { selectPublicMemberInfo } from "../../../prisma/helpers";
 import db from "../../../prisma/prisma-client";
 import requireInstituteAccess from "../../utils/api/require-institute-access";
 import type { PublicMemberRes } from "./member/[id]/public";
+import methodAllowed from "../../utils/api/method-allowed";
 
 function allMembers(instituteId: number): Promise<PublicMemberRes[]> {
   return db.member.findMany({
@@ -15,6 +16,8 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<PublicMemberRes[] | string>
 ) {
+  if (!methodAllowed(req, res, ["GET"])) return;
+
   // Despite the parameter name, this is the institute's urlIdentifier.
   const { instituteId } = req.query;
   if (!instituteId || typeof instituteId !== "string")

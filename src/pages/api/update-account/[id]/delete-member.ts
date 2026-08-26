@@ -7,6 +7,7 @@ import {
   canAccessAccount,
 } from "../../../../utils/api/authorization";
 import getAccountFromRequest from "../../../../utils/api/get-account-from-request";
+import methodAllowed from "../../../../utils/api/method-allowed";
 
 function deleteMember(id: number) {
   return db.member.delete({ where: { id } });
@@ -16,6 +17,8 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<AccountDBRes | string>
 ) {
+  if (!methodAllowed(req, res, ["DELETE"])) return;
+
   if (!req.query.id || typeof req.query.id !== "string")
     return res.status(400).send("Account ID is required.");
 

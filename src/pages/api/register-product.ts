@@ -7,6 +7,7 @@ import {
 } from "../../utils/api/authorization";
 import getAccountFromRequest from "../../utils/api/get-account-from-request";
 import removeDiacritics from "../../utils/front-end/remove-diacritics";
+import methodAllowed from "../../utils/api/method-allowed";
 
 
 export type RegisterProductParams = {
@@ -58,6 +59,8 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<RegisterProductRes | string>
 ) {
+  if (!methodAllowed(req, res, ["PUT"])) return;
+
   const params: RegisterProductParams = req.body;
   const {
     title_en,

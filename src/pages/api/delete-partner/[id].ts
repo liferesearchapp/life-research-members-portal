@@ -7,6 +7,7 @@ import {
 } from "../../../utils/api/authorization";
 import getAccountFromRequest from "../../../utils/api/get-account-from-request";
 import type { PrivatePartnerDBRes } from "../partner/[id]/private";
+import methodAllowed from "../../../utils/api/method-allowed";
 
 async function deletePartner(
   organizationId: number
@@ -45,6 +46,8 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Prisma.PromiseReturnType<typeof deletePartner> | string>
 ) {
+  if (!methodAllowed(req, res, ["DELETE"])) return;
+
   if (!req.query.id || typeof req.query.id !== "string")
     return res.status(400).send("Partner ID is required.");
 

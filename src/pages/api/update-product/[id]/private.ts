@@ -4,6 +4,7 @@ import db from "../../../../../prisma/prisma-client";
 import type { ProductPrivateInfo } from "../../../../services/_types";
 import getAccountFromRequest from "../../../../utils/api/get-account-from-request";
 import type { PrivateProductDBRes } from "../../product/[id]/private";
+import methodAllowed from "../../../../utils/api/method-allowed";
 
 export type UpdateProductPrivateParams = {
 
@@ -37,6 +38,8 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<PrivateProductDBRes | string>
 ) {
+  if (!methodAllowed(req, res, ["PATCH"])) return;
+
   if (!req.query.id || typeof req.query.id !== "string")
     return res.status(400).send("Product ID is required.");
 

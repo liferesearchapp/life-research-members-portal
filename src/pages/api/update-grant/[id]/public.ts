@@ -7,6 +7,7 @@ import {
 } from "../../../../utils/api/authorization";
 import type { PrivateGrantDBRes } from "../../grant/[id]/private";
 import { selectAllGrantInfo } from "../../../../../prisma/helpers";
+import methodAllowed from "../../../../utils/api/method-allowed";
 
 export type UpdateGrantPublicParams = {
   title: string;
@@ -84,6 +85,8 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<PrivateGrantDBRes | string>
 ) {
+  if (!methodAllowed(req, res, ["PATCH"])) return;
+
   if (!req.query.id || typeof req.query.id !== "string")
     return res.status(400).send("Grant ID is required.");
 

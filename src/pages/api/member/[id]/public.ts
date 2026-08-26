@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { selectPublicMemberInfo } from "../../../../../prisma/helpers";
 import db from "../../../../../prisma/prisma-client";
+import methodAllowed from "../../../../utils/api/method-allowed";
 
 export type PublicMemberRes = Awaited<ReturnType<typeof getPublicMemberInfo>>;
 
@@ -15,6 +16,8 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<PublicMemberRes | string>
 ) {
+  if (!methodAllowed(req, res, ["GET"])) return;
+
   if (!req.query.id || typeof req.query.id !== "string")
     return res.status(400).send("Member ID is required.");
 

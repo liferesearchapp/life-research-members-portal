@@ -44,6 +44,20 @@ function response() {
 describe("grant-super-admin API", () => {
   beforeEach(() => vi.clearAllMocks());
 
+  it("refuses a verb it does not implement, before authenticating or touching the database", () => {
+    // The route is PATCH-only. Next matches a handler on path alone, so without the method gate
+    // a GET would run the promotion. Checked on a real route, not just on the helper: the guard
+    // has to be wired in, and wired in first.
+    const res = response();
+
+    handler({ ...request(), method: "GET" } as NextApiRequest, res);
+
+    expect(res.status).toHaveBeenCalledWith(405);
+    expect(res.setHeader).toHaveBeenCalledWith("Allow", "PATCH");
+    expect(mocks.getAccountFromRequest).not.toHaveBeenCalled();
+    expect(mocks.update).not.toHaveBeenCalled();
+  });
+
   it("rejects a caller who is not a super admin", async () => {
     mocks.getAccountFromRequest.mockResolvedValue({ is_super_admin: false });
     const res = response();

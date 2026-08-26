@@ -3,6 +3,7 @@ import { includeAllMemberInfo } from "../../../../../prisma/helpers";
 import db from "../../../../../prisma/prisma-client";
 import getAccountFromRequest from "../../../../utils/api/get-account-from-request";
 import type { PrivateMemberDBRes } from "../../member/[id]/private";
+import methodAllowed from "../../../../utils/api/method-allowed";
 
 export type UpdateMemberInsightParams = {
   interview_date?: string | null;
@@ -49,6 +50,8 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<PrivateMemberDBRes | string>
 ) {
+  if (!methodAllowed(req, res, ["PATCH"])) return;
+
   if (!req.query.id || typeof req.query.id !== "string")
     return res.status(400).send("Member ID is required.");
 

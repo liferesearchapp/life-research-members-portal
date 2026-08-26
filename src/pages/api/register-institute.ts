@@ -2,6 +2,7 @@ import { Prisma } from "@prisma/client";
 import type { NextApiRequest, NextApiResponse } from "next";
 import db from "../../../prisma/prisma-client";
 import getAccountFromRequest from "../../utils/api/get-account-from-request";
+import methodAllowed from "../../utils/api/method-allowed";
 
 export type RegisterInstituteParams = {
   name: string;
@@ -46,6 +47,8 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<RegisterInstituteRes | string>
 ) {
+  if (!methodAllowed(req, res, ["POST"])) return;
+
   const params: RegisterInstituteParams = req.body;
 
   const { name, urlIdentifier } = params;

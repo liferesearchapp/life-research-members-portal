@@ -7,6 +7,7 @@ import {
 } from "../../../utils/api/authorization";
 import getAccountFromRequest from "../../../utils/api/get-account-from-request";
 import type { PrivateSupervisionDBRes } from "../supervision/[id]/private";
+import methodAllowed from "../../../utils/api/method-allowed";
 
 async function deleteSupervision(id: number): Promise<supervision | null> {
   return db.supervision.delete({
@@ -27,6 +28,8 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Prisma.PromiseReturnType<typeof deleteSupervision> | string>
 ) {
+  if (!methodAllowed(req, res, ["DELETE"])) return;
+
   if (!req.query.id || typeof req.query.id !== "string")
     return res.status(400).send("Supervision ID is required.");
 

@@ -9,6 +9,7 @@ import type {
   Selection,
 } from "../../../../reporting/metrics/types";
 import { instituteReport } from "../../../../reporting/spec/institute-report";
+import methodAllowed from "../../../../utils/api/method-allowed";
 
 /**
  * Serves one page of the institute report.
@@ -78,6 +79,8 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<ReportPageRes | string>
 ) {
+  if (!methodAllowed(req, res, ["GET"])) return;
+
   const { instituteId, pageId } = req.query;
   if (typeof instituteId !== "string" || typeof pageId !== "string")
     return res.status(400).send("Institute and page are required.");

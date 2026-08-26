@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { selectPublicPartnerInfo } from "../../../../../prisma/helpers";
 import db from "../../../../../prisma/prisma-client";
+import methodAllowed from "../../../../utils/api/method-allowed";
 
 export type PublicPartnerRes = Awaited<ReturnType<typeof getPublicPartnerInfo>>;
 
@@ -16,6 +17,8 @@ export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse<PublicPartnerRes | string>
 ) {
+  if (!methodAllowed(req, res, ["GET"])) return;
+
     if (!req.query.id || typeof req.query.id !== "string")
         return res.status(400).send("Organization ID is required.");
 

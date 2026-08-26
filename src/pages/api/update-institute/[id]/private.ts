@@ -7,6 +7,7 @@ import {
   assertAuthorized,
   hasAnyInstituteAccess,
 } from "../../../../utils/api/authorization";
+import methodAllowed from "../../../../utils/api/method-allowed";
 
 export type UpdateInstituteParams = {
   name: string;
@@ -100,6 +101,8 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<InstituteInfo | string>
 ) {
+  if (!methodAllowed(req, res, ["PATCH"])) return;
+
   if (!req.query.id || typeof req.query.id !== "string")
     return res.status(400).send("Institute ID is required.");
 

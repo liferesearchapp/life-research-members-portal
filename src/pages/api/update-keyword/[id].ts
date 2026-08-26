@@ -7,12 +7,15 @@ import {
   hasAdministrativeRole,
 } from "../../../utils/api/authorization";
 import getAccountFromRequest from "../../../utils/api/get-account-from-request";
+import methodAllowed from "../../../utils/api/method-allowed";
 
 function updateKeyword(id: number, { name_en, name_fr }: KeywordInfo): Promise<keyword> {
   return db.keyword.update({ where: { id }, data: { name_en, name_fr } });
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse<keyword | string>) {
+  if (!methodAllowed(req, res, ["PATCH"])) return;
+
   if (!req.query.id || typeof req.query.id !== "string")
     return res.status(400).send("Keyword ID is required.");
 

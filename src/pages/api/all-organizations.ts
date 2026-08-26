@@ -2,11 +2,14 @@ import type { organization } from "@prisma/client";
 import type { NextApiRequest, NextApiResponse } from "next";
 import db from "../../../prisma/prisma-client";
 import getAccountFromRequest from "../../utils/api/get-account-from-request";
+import methodAllowed from "../../utils/api/method-allowed";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<organization[] | string>
 ) {
+  if (!methodAllowed(req, res, ["GET"])) return;
+
   try {
     // Cross-institute helper list (organization picker for forms), so it is intentionally not
     // scoped to one institute -- but it must not be anonymous. Any registered account may read

@@ -4,7 +4,11 @@ import { dirname, join, relative, resolve, sep } from "path";
 import { describe, expect, it } from "vitest";
 
 /**
- * Architecture test: every API route must gate access, or be explicitly listed as public.
+ * Architecture tests over `src/pages/api/**`. Two properties, both of the kind that decay the
+ * moment they depend on someone remembering:
+ *
+ *   1. every route gates access, or is explicitly listed as public;
+ *   2. every route declares the HTTP methods it accepts, as its first act.
  *
  * Rather than a bespoke test per route, this scans `src/pages/api/**` and asserts each handler
  * either references an authentication/authorization primitive, or appears in the
@@ -105,5 +109,82 @@ describe("every API route gates access or is explicitly public", () => {
     }
 
     expect({ stale, nowGuarded }).toEqual({ stale: [], nowGuarded: [] });
+  });
+});
+
+/** Verbs `methodAllowed` accepts. Keep in sync with HttpMethod in the helper. */
+const VALID_METHODS = ["GET", "POST", "PUT", "PATCH", "DELETE"];
+
+/**
+ * The body of the default handler, from the opening brace of its parameter list, with any
+ * leading comments stripped -- a note explaining the chosen verbs is welcome above the guard and
+ * does not make the guard any less first.
+ *
+ * Returns null when the route does not use the repo's one handler shape.
+ */
+function handlerBody(source: string): string | null {
+  const start = source.indexOf("export default async function handler(");
+  if (start === -1) return null;
+  const open = source.indexOf(") {", start);
+  if (open === -1) return null;
+
+  let body = source.slice(open + ") {".length);
+  let previous;
+  do {
+    previous = body;
+    body = body.replace(/^\s*\/\/[^\n]*/, "").replace(/^\s*\/\*[\s\S]*?\*\//, "");
+  } while (body !== previous);
+
+  return body;
+}
+
+const GUARD = /^\s*if \(!methodAllowed\(req, res, \[([^\]]*)\]\)\) return;/;
+
+describe("every API route declares the HTTP methods it accepts", () => {
+  it("guards every route, as the first statement of its handler", () => {
+    // First statement specifically: a method check that runs after a query has already been
+    // issued protects nothing. Placing it first is the whole point.
+    const offenders = routes
+      .filter((r) => {
+        const body = handlerBody(r.source);
+        return body === null || !GUARD.test(body);
+      })
+      .map((r) => r.rel);
+
+    // If this fails: add `if (!methodAllowed(req, res, ["GET"])) return;` as the first line of
+    // the handler, naming the verbs this route actually implements.
+    expect(offenders).toEqual([]);
+  });
+
+  it("declares only real HTTP methods, and no duplicates", () => {
+    const bad: Record<string, string[]> = {};
+
+    for (const r of routes) {
+      const body = handlerBody(r.source);
+      const match = body?.match(GUARD);
+      if (!match) continue;
+
+      const declared = match[1]
+        .split(",")
+        .map((v) => v.trim().replace(/"/g, ""))
+        .filter(Boolean);
+
+      const unknown = declared.filter((v) => !VALID_METHODS.includes(v));
+      const duplicated = declared.filter((v, i) => declared.indexOf(v) !== i);
+      if (unknown.length || duplicated.length) bad[r.rel] = [...unknown, ...duplicated];
+    }
+
+    expect(bad).toEqual({});
+  });
+
+  it("leaves no hand-rolled method check behind", () => {
+    // The helper is the single mechanism. A leftover `req.method !== "PATCH"` gate is a second
+    // one that can drift from it. Reading req.method to *dispatch* between verbs is fine, so
+    // only comparison-against-a-literal in a guard position is flagged.
+    const offenders = routes
+      .filter((r) => /req\.method\s*!==\s*"/.test(r.source))
+      .map((r) => r.rel);
+
+    expect(offenders).toEqual([]);
   });
 });

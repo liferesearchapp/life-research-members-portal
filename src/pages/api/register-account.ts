@@ -7,6 +7,7 @@ import {
   hasAllInstituteAccess,
 } from "../../utils/api/authorization";
 import getAccountFromRequest from "../../utils/api/get-account-from-request";
+import methodAllowed from "../../utils/api/method-allowed";
 
 
 export type RegisterAccountParams = {
@@ -103,6 +104,8 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<RegisterAccountRes | string>
 ) {
+  if (!methodAllowed(req, res, ["PUT"])) return;
+
   const params: RegisterAccountParams = req.body;
   const { login_email, first_name, last_name, is_admin } = params;
   if (typeof login_email !== "string")

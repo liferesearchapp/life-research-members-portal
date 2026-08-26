@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import db from "../../../prisma/prisma-client";
+import methodAllowed from "../../utils/api/method-allowed";
 
 /**
  * Anonymous, PII-free counts for one institute's landing-page tiles.
@@ -30,6 +31,8 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<PublicCounts | string>
 ) {
+  if (!methodAllowed(req, res, ["GET"])) return;
+
   const { instituteId } = req.query; // really the urlIdentifier
   if (!instituteId || typeof instituteId !== "string") return res.status(200).json(ZERO);
 

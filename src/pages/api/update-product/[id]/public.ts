@@ -9,6 +9,7 @@ import {
   isProductAuthor,
 } from "../../../../utils/api/authorization";
 import type { PrivateProductDBRes } from "../../product/[id]/private";
+import methodAllowed from "../../../../utils/api/method-allowed";
 
 export type UpdateProductPublicParams = {
   title_en: string;
@@ -117,6 +118,8 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<PrivateProductDBRes | string>
 ) {
+  if (!methodAllowed(req, res, ["PATCH"])) return;
+
   if (!req.query.id || typeof req.query.id !== "string")
     return res.status(400).send("Product ID is required.");
 
