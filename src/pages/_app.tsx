@@ -6,6 +6,7 @@ import { MsalProvider } from "@azure/msal-react";
 import { useRouter } from "next/router";
 import { msalInstance } from "../../auth-config";
 import InstituteGuard from "../components/institute-guard";
+import { bypassesInstituteSelection } from "../utils/front-end/institute-routes";
 import Navbar from "../components/navbar/_navbar";
 import AllContextProviders from "../services/context/_ctx-bundler";
 import InstituteBrandingTheme from "../components/institutes/institute-branding-theme";
@@ -14,7 +15,7 @@ import PageTitle from "../components/page-title";
 function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter();
 
-  const isInstitutesPage = router.pathname.startsWith("/institutes");
+  const isInstitutesPage = bypassesInstituteSelection(router.pathname);
 
   return (
     <>
