@@ -43,6 +43,7 @@ import MemberSelector from "../members/member-selector";
 import { MemberInstituteCtx } from "../../services/context/member-institutes-ctx";
 import { useSelectedInstitute } from "../../services/context/selected-institute-ctx";
 import toDayjsDate from "../../utils/front-end/to-dayjs-date";
+import selectableInstitutes from "../../utils/front-end/selectable-institutes";
 
 const { Option } = Select;
 
@@ -366,7 +367,7 @@ const PublicProductForm: FC<Props> = ({ product, onSuccess }) => {
         >
           <Select mode="multiple">
             <Option value="">{""}</Option>
-            {institutes.map((f) => (
+            {selectableInstitutes(institutes).map((f) => (
               <Option key={f.id} value={f.id}>
                 {`${f.name} - ${f.urlIdentifier}`}
               </Option>

@@ -29,6 +29,7 @@ import { Select } from "antd";
 import GetLanguage from "../../utils/front-end/get-language";
 import { MemberInstituteCtx } from "../../services/context/member-institutes-ctx";
 import { useSelectedInstitute } from "../../services/context/selected-institute-ctx";
+import selectableInstitutes from "../../utils/front-end/selectable-institutes";
 
 type Props = {
   partner: PartnerPublicInfo;
@@ -183,7 +184,7 @@ const PublicPartnerForm: FC<Props> = ({ partner, onSuccess }) => {
         >
           <Select mode="multiple">
             <Option value="">{""}</Option>
-            {institutes.map((f) => (
+            {selectableInstitutes(institutes).map((f) => (
               <Option key={f.id} value={f.id}>
                 {`${f.name} - ${f.urlIdentifier}`}
               </Option>
