@@ -28,6 +28,7 @@ import RemoveInstituteButton from "./remove-institute-button";
 import { ActiveAccountCtx } from "../../services/context/active-account-ctx";
 import { isPendingInstituteMembershipInvitation } from "../../utils/institute-membership-invitations";
 import GrantSuperAdminButton from "./grant-super-admin-button";
+import { canManageMemberProfile } from "../../utils/front-end/member-access";
 import RemoveSuperAdminButton from "./remove-super-admin-button";
 
 const { Item } = Descriptions;
@@ -41,17 +42,25 @@ const AccountProfile: FC<Props> = ({ id }) => {
   const { account, setAccount, loading, refresh } = useAccount(id);
   const { institute } = useSelectedInstitute();
   const { localAccount } = useContext(ActiveAccountCtx);
-  var hasPermission = false;
-
-  if (localAccount?.is_super_admin) hasPermission = true;
-  var permissions = localAccount?.instituteAdmin.map((admin) => admin.instituteId) || [];
-  var memberInstituteIds = account?.member?.institutes.map((institute) => institute.instituteId) || [];
-  for (var a of permissions) {
-    if (memberInstituteIds.includes(a)) {
-      hasPermission = true;
-      break;
-    }
-  }
+  /**
+   * The same rule the member profile uses, from the same place, so the two cannot drift apart.
+   *
+   * Note the mapping of the third argument: once the account has loaded, an account with no member
+   * record has *no* institutes -- an empty list, a definite answer -- while an account that has not
+   * loaded yet is `undefined`, meaning "ask again later". Collapsing those two onto `[]` is what
+   * made the member profile redirect institute admins away mid-load.
+   *
+   * Every use of this sits below the loading guard, so it resolves to a real answer by then. Using
+   * the shared rule means that stays true even if the guard or the uses move.
+   */
+  const hasPermission =
+    canManageMemberProfile({
+      isSuperAdmin: !!localAccount?.is_super_admin,
+      adminInstituteIds: localAccount?.instituteAdmin.map((admin) => admin.instituteId) || [],
+      memberInstituteIds: account
+        ? account.member?.institutes.map((institute) => institute.instituteId) ?? []
+        : undefined,
+    }) === true;
 
   const isAdminOfInstitute = (
     account: AccountInfo,
