@@ -8,12 +8,13 @@ import {
 } from "../../../utils/api/authorization";
 import getAccountFromRequest from "../../../utils/api/get-account-from-request";
 import methodAllowed from "../../../utils/api/method-allowed";
+import withAudit from "../../../utils/api/audit";
 
 function updateKeyword(id: number, { name_en, name_fr }: KeywordInfo): Promise<keyword> {
   return db.keyword.update({ where: { id }, data: { name_en, name_fr } });
 }
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse<keyword | string>) {
+async function handler(req: NextApiRequest, res: NextApiResponse<keyword | string>) {
   if (!methodAllowed(req, res, ["PATCH"])) return;
 
   if (!req.query.id || typeof req.query.id !== "string")
@@ -41,3 +42,5 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     return res.status(500).send({ ...e, message: e.message }); // prisma error messages are getters
   }
 }
+
+export default withAudit(handler, { action: "update-keyword/[id]" });

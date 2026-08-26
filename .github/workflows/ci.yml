@@ -126,6 +126,14 @@ jobs:
           echo "SQL Server never became reachable"
           exit 1
 
+      # The append-only guarantee on the audit log is a property of the database, not of the
+      # TypeScript: tests/api/audit.test.ts mocks Prisma, which can say nothing about whether a
+      # server will actually refuse to let someone edit the record of their own actions. This
+      # applies the migration on top of the db-push schema (proving the two agree), writes an
+      # event through Prisma, and checks that UPDATE and DELETE are refused.
+      - name: Audit log integrity
+        run: npm run audit:check
+
       # Deterministic fixture (fixed-seed PRNG): institutes alpha/beta/gamma/delta, and rows that
       # deliberately have no linked author/member/supervisor -- the case the old Power BI count
       # dropped silently.

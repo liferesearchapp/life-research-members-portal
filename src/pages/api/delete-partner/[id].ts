@@ -8,6 +8,7 @@ import {
 import getAccountFromRequest from "../../../utils/api/get-account-from-request";
 import type { PrivatePartnerDBRes } from "../partner/[id]/private";
 import methodAllowed from "../../../utils/api/method-allowed";
+import withAudit from "../../../utils/api/audit";
 
 async function deletePartner(
   organizationId: number
@@ -42,7 +43,7 @@ function getPartnerAccessInfo(id: number) {
   });
 }
 
-export default async function handler(
+async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Prisma.PromiseReturnType<typeof deletePartner> | string>
 ) {
@@ -78,3 +79,5 @@ export default async function handler(
     return res.status(500).send({ ...e, message: e.message }); // prisma error messages are getters
   }
 }
+
+export default withAudit(handler, { action: "delete-partner/[id]" });

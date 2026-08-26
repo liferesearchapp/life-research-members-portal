@@ -7,6 +7,7 @@ import {
 } from "../../../utils/api/authorization";
 import getAccountFromRequest from "../../../utils/api/get-account-from-request";
 import methodAllowed from "../../../utils/api/method-allowed";
+import withAudit from "../../../utils/api/audit";
 
 export type UpdateInstituteTopicParams = {
   institute_id: number;
@@ -17,7 +18,7 @@ export type UpdateInstituteTopicParams = {
 
 type UpdateInstituteTopicRes = topic & { is_active: boolean };
 
-export default async function handler(
+async function handler(
   req: NextApiRequest,
   res: NextApiResponse<UpdateInstituteTopicRes | string>
 ) {
@@ -83,3 +84,5 @@ export default async function handler(
     return res.status(500).send(error?.message || "Failed to update topic.");
   }
 }
+
+export default withAudit(handler, { action: "update-institute-topic/[id]" });

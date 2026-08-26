@@ -7,6 +7,7 @@ import {
 } from "../../utils/api/authorization";
 import getAccountFromRequest from "../../utils/api/get-account-from-request";
 import methodAllowed from "../../utils/api/method-allowed";
+import withAudit from "../../utils/api/audit";
 
 export type InstituteTopicInfo = topic & { is_active: boolean };
 export type RegisterInstituteTopicParams = {
@@ -71,7 +72,7 @@ async function registerInstituteTopic(params: RegisterInstituteTopicParams) {
   });
 }
 
-export default async function handler(
+async function handler(
   req: NextApiRequest,
   res: NextApiResponse<InstituteTopicInfo[] | InstituteTopicInfo | string>
 ) {
@@ -121,3 +122,5 @@ export default async function handler(
     return res.status(500).send(error?.message || "Failed to manage topics.");
   }
 }
+
+export default withAudit(handler, { action: "institute-topics" });

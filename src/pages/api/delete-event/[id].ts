@@ -8,6 +8,7 @@ import {
 import getAccountFromRequest from "../../../utils/api/get-account-from-request";
 import type { PrivateEventDBRes } from "../event/[id]/private";
 import methodAllowed from "../../../utils/api/method-allowed";
+import withAudit from "../../../utils/api/audit";
 
 async function deleteEvent(id: number): Promise<event | null> {
   return db.event.delete({
@@ -22,7 +23,7 @@ function getEventAccessInfo(id: number) {
   });
 }
 
-export default async function handler(
+async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Prisma.PromiseReturnType<typeof deleteEvent> | string>
 ) {
@@ -57,3 +58,5 @@ export default async function handler(
     return res.status(500).send({ ...e, message: e.message }); // prisma error messages are getters
   }
 }
+
+export default withAudit(handler, { action: "delete-event/[id]" });

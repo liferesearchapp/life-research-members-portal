@@ -8,6 +8,7 @@ import getAccountFromRequest from "../../../../utils/api/get-account-from-reques
 import db from "../../../../../prisma/prisma-client";
 import { includeAllAccountInfo } from "../../../../../prisma/helpers";
 import methodAllowed from "../../../../utils/api/method-allowed";
+import withAudit from "../../../../utils/api/audit";
 
 export type RemoveInstituteParams = {
   instituteId: number[];
@@ -39,7 +40,7 @@ async function removeInstitute(id: number, params: RemoveInstituteParams) {
   }
 }
 
-export default async function handler(
+async function handler(
   req: NextApiRequest,
   res: NextApiResponse<AccountDBRes | string>
 ) {
@@ -75,3 +76,5 @@ export default async function handler(
     return res.status(500).send({ ...e, message: e.message }); // prisma error messages are getters
   }
 }
+
+export default withAudit(handler, { action: "update-account/[id]/remove-institute" });
