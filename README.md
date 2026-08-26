@@ -21,9 +21,23 @@ The `pages/api` directory is mapped to `/api/*`. Files in this directory are tre
 ## Tests and CI
 
 ```bash
-npm run test            # vitest unit tests
+npm run test            # vitest, both projects
 npm run test:coverage   # the same, plus coverage; writes coverage/ and enforces thresholds
+npm run test -- --project components   # component tests only
 ```
+
+Tests are split into two vitest projects, because the suites need different globals:
+
+| Project | Files | Environment |
+|---|---|---|
+| `node` | `tests/**/*.test.ts`, `src/**/*.test.ts` | node |
+| `components` | `tests/**/*.test.tsx` | jsdom, via `tests/setup/jsdom-setup.ts` |
+
+A component test renders with `@testing-library/react` and asserts on the DOM; see
+`tests/components/nav-menu.test.tsx`. The setup file registers the jest-dom matchers, unmounts
+between tests, and stubs `matchMedia` and `ResizeObserver`, which jsdom does not implement and
+antd requires. Those stubs report no real size, so a component test must not assert on responsive
+behaviour or on which items antd decided to overflow.
 
 Two GitHub Actions jobs run on every pull request (`.github/workflows/ci.yml`):
 
