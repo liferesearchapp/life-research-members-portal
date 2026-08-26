@@ -8,6 +8,7 @@ import {
 import getAccountFromRequest from "../../../utils/api/get-account-from-request";
 import type { PrivateSupervisionDBRes } from "../supervision/[id]/private";
 import methodAllowed from "../../../utils/api/method-allowed";
+import withAudit from "../../../utils/api/audit";
 
 async function deleteSupervision(id: number): Promise<supervision | null> {
   return db.supervision.delete({
@@ -24,7 +25,7 @@ function getSupervisionAccessInfo(id: number) {
 
 
 
-export default async function handler(
+async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Prisma.PromiseReturnType<typeof deleteSupervision> | string>
 ) {
@@ -64,3 +65,5 @@ export default async function handler(
     return res.status(500).send({ ...e, message: e.message }); // prisma error messages are getters
   }
 }
+
+export default withAudit(handler, { action: "delete-supervision/[id]" });

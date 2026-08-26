@@ -4,6 +4,7 @@ import db from "../../../../prisma/prisma-client";
 import getAccountFromRequest from "../../../utils/api/get-account-from-request";
 import type { PrivateProductDBRes } from "../product/[id]/private";
 import methodAllowed from "../../../utils/api/method-allowed";
+import withAudit from "../../../utils/api/audit";
 
 async function deleteProduct(productId: number): Promise<product | null> {
   const transaction = await db.$transaction(async (prisma) => {
@@ -34,7 +35,7 @@ async function isProductMemberAuthor(memberId: number | undefined, productId: nu
   return !!productAuthor;
 }
 
-export default async function handler(
+async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Prisma.PromiseReturnType<typeof deleteProduct> | string>
 ) {
@@ -78,3 +79,5 @@ export default async function handler(
     return res.status(500).send({ ...e, message: e.message }); // prisma error messages are getters
   }
 }
+
+export default withAudit(handler, { action: "delete-product/[id]" });

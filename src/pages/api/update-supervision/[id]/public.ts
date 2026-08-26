@@ -8,6 +8,7 @@ import {
 } from "../../../../utils/api/authorization";
 import type { PrivateSupervisionDBRes } from "../../supervision/[id]/private";
 import methodAllowed from "../../../../utils/api/method-allowed";
+import withAudit from "../../../../utils/api/audit";
 
 export type UpdateSupervisionPublicParams = {
   last_name: string;
@@ -78,7 +79,7 @@ function updateSupervision(
   });
 }
 
-export default async function handler(
+async function handler(
   req: NextApiRequest,
   res: NextApiResponse<PrivateSupervisionDBRes | string>
 ) {
@@ -116,3 +117,5 @@ export default async function handler(
     return res.status(500).send({ ...e, message: e.message }); // prisma error messages are getters
   }
 }
+
+export default withAudit(handler, { action: "update-supervision/[id]/public" });

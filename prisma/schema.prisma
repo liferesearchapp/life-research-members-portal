@@ -8,30 +8,30 @@ datasource db {
 }
 
 model institute {
-  id             Int                     @id @default(autoincrement())
-  name           String                  @unique
-  name_fr        String?
-  urlIdentifier  String                  @unique
-  description_en String?
-  description_fr String?
-  largeLogo      String?                 @db.NVarChar(Max)
-  smallLogoEn    String?                 @db.NVarChar(Max)
-  smallLogoFr    String?                 @db.NVarChar(Max)
-  primaryColor   String?                 @db.NVarChar(7)
-  primaryColorDark String?               @db.NVarChar(7)
-  secondaryColor String?                 @db.NVarChar(7)
-  secondaryColorDark String?             @db.NVarChar(7)
-  accentColor    String?                 @db.NVarChar(7)
-  events         event[]
-  grants         grant[]
-  instituteAdmin instituteAdmin[]
+  id                    Int                             @id @default(autoincrement())
+  name                  String                          @unique
+  name_fr               String?
+  urlIdentifier         String                          @unique
+  description_en        String?
+  description_fr        String?
+  largeLogo             String?                         @db.NVarChar(Max)
+  smallLogoEn           String?                         @db.NVarChar(Max)
+  smallLogoFr           String?                         @db.NVarChar(Max)
+  primaryColor          String?                         @db.NVarChar(7)
+  primaryColorDark      String?                         @db.NVarChar(7)
+  secondaryColor        String?                         @db.NVarChar(7)
+  secondaryColorDark    String?                         @db.NVarChar(7)
+  accentColor           String?                         @db.NVarChar(7)
+  events                event[]
+  grants                grant[]
+  instituteAdmin        instituteAdmin[]
   membershipInvitations instituteMembershipInvitation[]
-  members        memberInstitute[]
-  organizations  organizationInstitute[]
-  products       productInstitute[]
-  supervisions   supervision[]
-  topics         instituteTopic[]
-  is_active      Boolean @default(true, map: "DF_institute_is_active")
+  members               memberInstitute[]
+  organizations         organizationInstitute[]
+  products              productInstitute[]
+  supervisions          supervision[]
+  topics                instituteTopic[]
+  is_active             Boolean                         @default(true, map: "DF_institute_is_active")
 }
 
 model instituteMembershipInvitation {
@@ -79,17 +79,17 @@ model organizationInstitute {
 }
 
 model account {
-  id             Int              @id(map: "PK_account") @default(autoincrement())
-  login_email    String           @unique(map: "UK_login_email") @db.NVarChar(255)
-  microsoft_id   String?          @db.NVarChar(255)
-  first_name     String           @db.NVarChar(255)
-  last_name      String           @db.NVarChar(255)
-  last_login     DateTime?        @db.Date
-  is_super_admin Boolean          @default(false, map: "DF_account_is_super_admin")
+  id                                     Int                             @id(map: "PK_account") @default(autoincrement())
+  login_email                            String                          @unique(map: "UK_login_email") @db.NVarChar(255)
+  microsoft_id                           String?                         @db.NVarChar(255)
+  first_name                             String                          @db.NVarChar(255)
+  last_name                              String                          @db.NVarChar(255)
+  last_login                             DateTime?                       @db.Date
+  is_super_admin                         Boolean                         @default(false, map: "DF_account_is_super_admin")
   receivedInstituteMembershipInvitations instituteMembershipInvitation[] @relation("InstituteMembershipInvitationAccount")
   sentInstituteMembershipInvitations     instituteMembershipInvitation[] @relation("InstituteMembershipInvitationInvitedBy")
-  instituteAdmin instituteAdmin[]
-  member         member?
+  instituteAdmin                         instituteAdmin[]
+  member                                 member?
 }
 
 model current_promotion_strategy {
@@ -616,9 +616,9 @@ model target {
 }
 
 model topic {
-  id            Int             @id(map: "PK_topic") @default(autoincrement())
-  name_fr       String          @db.NVarChar(300)
-  name_en       String          @db.NVarChar(300)
+  id            Int              @id(map: "PK_topic") @default(autoincrement())
+  name_fr       String           @db.NVarChar(300)
+  name_en       String           @db.NVarChar(300)
   event         event[]
   event_topic   event_topic[]
   grant         grant[]
@@ -643,4 +643,35 @@ model instituteAdmin {
   institute   institute @relation(fields: [instituteId], references: [id], onUpdate: NoAction, map: "FK_instituteAdmin_instituteId")
 
   @@id([accountId, instituteId], map: "PK_instituteAdmin")
+}
+
+/// Append-only record of who did what, when.
+///
+/// Deliberately carries NO foreign keys. Two reasons, both about the log outliving what it
+/// describes: a cascade from institute or account would silently erase the audit trail for the
+/// very entity someone is investigating, and a FK would let a delete fail because of the log.
+/// The actor's email is snapshotted for the same reason -- the account row may be gone.
+///
+/// Writes are blocked from UPDATE and DELETE by a trigger (see the migration); purging requires
+/// deliberately setting SESSION_CONTEXT('audit_purge').
+model auditEvent {
+  id               Int      @id(map: "PK_auditEvent") @default(autoincrement())
+  occurred_at      DateTime @default(now(), map: "DF_auditEvent_occurred_at") @db.DateTime2
+  /// Null only when the request was never authenticated (a refused or anonymous call).
+  actor_account_id Int?
+  actor_email      String?  @db.NVarChar(255)
+  /// The route pattern, e.g. "update-account/[id]/grant-admin". Says what was attempted.
+  action           String   @db.NVarChar(200)
+  /// The `[id]` from the route, when it has one.
+  target_id        String?  @db.NVarChar(100)
+  institute_id     Int?
+  method           String   @db.NVarChar(10)
+  status           Int
+  /// Small JSON blob for route-specific context. Never request bodies -- they carry PII.
+  detail           String?  @db.NVarChar(Max)
+
+  @@index([occurred_at], map: "IX_auditEvent_occurred_at")
+  @@index([actor_account_id], map: "IX_auditEvent_actor")
+  @@index([institute_id], map: "IX_auditEvent_institute")
+  @@index([action], map: "IX_auditEvent_action")
 }
