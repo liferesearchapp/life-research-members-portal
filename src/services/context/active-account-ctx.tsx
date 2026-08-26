@@ -69,7 +69,9 @@ export const ActiveAccountCtxProvider: FC<PropsWithChildren> = ({
     try {
       const authHeader = await getAuthHeader();
       if (!authHeader) return setLocalAccount(null);
+      // POST: this stamps last_login server-side, so it is not a safe/repeatable GET.
       const res = await fetch(ApiRoutes.activeAccountUpdateLastLogin, {
+        method: "POST",
         headers: authHeader,
       });
       if (!res.ok) throw await res.text();

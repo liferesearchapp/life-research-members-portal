@@ -17,11 +17,9 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<AccountDBRes | string>
 ) {
-  // GET, because that is what the client sends (src/services/context/active-account-ctx.tsx).
-  // Note this route WRITES on a GET -- it stamps account.last_login. Gating it to POST would be
-  // more correct but breaks that caller, so the verb is recorded here as-is rather than changed
-  // silently; fixing it is a coordinated client + server change.
-  if (!methodAllowed(req, res, ["GET"])) return;
+  // POST, not GET: this route stamps account.last_login, and a write does not belong on a verb
+  // that browsers, proxies, and retry logic are entitled to treat as safe and repeatable.
+  if (!methodAllowed(req, res, ["POST"])) return;
 
   try {
     const currentAccount = await getAccountFromRequest(req, res);
