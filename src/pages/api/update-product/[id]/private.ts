@@ -5,6 +5,7 @@ import type { ProductPrivateInfo } from "../../../../services/_types";
 import getAccountFromRequest from "../../../../utils/api/get-account-from-request";
 import type { PrivateProductDBRes } from "../../product/[id]/private";
 import methodAllowed from "../../../../utils/api/method-allowed";
+import withAudit from "../../../../utils/api/audit";
 
 export type UpdateProductPrivateParams = {
 
@@ -34,7 +35,7 @@ function updateProduct(id: number, params: UpdateProductPrivateParams) {
   });
 }
 
-export default async function handler(
+async function handler(
   req: NextApiRequest,
   res: NextApiResponse<PrivateProductDBRes | string>
 ) {
@@ -80,3 +81,5 @@ export default async function handler(
     return res.status(500).send({ ...e, message: e.message }); // prisma error messages are getters
   }
 }
+
+export default withAudit(handler, { action: "update-product/[id]/private" });

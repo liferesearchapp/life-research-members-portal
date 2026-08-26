@@ -4,11 +4,12 @@ import { dirname, join, relative, resolve, sep } from "path";
 import { describe, expect, it } from "vitest";
 
 /**
- * Architecture tests over `src/pages/api/**`. Two properties, both of the kind that decay the
+ * Architecture tests over `src/pages/api/**`. Three properties, all of the kind that decay the
  * moment they depend on someone remembering:
  *
  *   1. every route gates access, or is explicitly listed as public;
- *   2. every route declares the HTTP methods it accepts, as its first act.
+ *   2. every route declares the HTTP methods it accepts, as its first act;
+ *   3. every route that mutates, or serves personal data, is audited.
  *
  * Rather than a bespoke test per route, this scans `src/pages/api/**` and asserts each handler
  * either references an authentication/authorization primitive, or appears in the
@@ -123,7 +124,9 @@ const VALID_METHODS = ["GET", "POST", "PUT", "PATCH", "DELETE"];
  * Returns null when the route does not use the repo's one handler shape.
  */
 function handlerBody(source: string): string | null {
-  const start = source.indexOf("export default async function handler(");
+  // Matches both shapes: a bare `export default async function handler(...)`, and the
+  // `async function handler(...)` that an audited route exports through withAudit at the bottom.
+  const start = source.indexOf("async function handler(");
   if (start === -1) return null;
   const open = source.indexOf(") {", start);
   if (open === -1) return null;
@@ -186,5 +189,71 @@ describe("every API route declares the HTTP methods it accepts", () => {
       .map((r) => r.rel);
 
     expect(offenders).toEqual([]);
+  });
+});
+
+/** Verbs that change state. A route accepting any of them has to be audited. */
+const WRITE_METHODS = ["POST", "PUT", "PATCH", "DELETE"];
+
+/** The verbs a route declares, from its methodAllowed guard. */
+function declaredMethods(source: string): string[] {
+  const body = handlerBody(source);
+  const match = body?.match(GUARD);
+  if (!match) return [];
+  return match[1]
+    .split(",")
+    .map((v) => v.trim().replace(/"/g, ""))
+    .filter(Boolean);
+}
+
+/** The action a route passes to withAudit, or null when it is not wrapped. */
+function auditedAction(source: string): string | null {
+  const match = source.match(/export default withAudit\(handler, \{ action: "([^"]+)" \}\)/);
+  return match ? match[1] : null;
+}
+
+/**
+ * Which routes must be audited (issue #16), and why:
+ *
+ *  - anything that changes state, so a grant/act/revoke sequence like issue #12 leaves a trail;
+ *  - the `private` routes, which serve personal data, so "who read what" is answerable too.
+ *
+ * Plain reads of reference data and public projections are deliberately not audited: the volume
+ * would bury the rows that matter, and they expose nothing personal.
+ */
+function mustBeAudited(rel: string, source: string): boolean {
+  const mutates = declaredMethods(source).some((m) => WRITE_METHODS.includes(m));
+  return mutates || rel.endsWith("/private.ts");
+}
+
+describe("every route that mutates or serves personal data is audited", () => {
+  it("wraps each of them in withAudit", () => {
+    const offenders = routes
+      .filter((r) => mustBeAudited(r.rel, r.source) && auditedAction(r.source) === null)
+      .map((r) => r.rel);
+
+    // If this fails: wrap the handler, i.e. rename `export default async function handler` to
+    // `async function handler` and add, at the bottom of the file,
+    //   export default withAudit(handler, { action: "<this file's path without .ts>" });
+    expect(offenders).toEqual([]);
+  });
+
+  it("names each audited route after its own path, so actions are unique and greppable", () => {
+    const mismatched = routes
+      .filter((r) => auditedAction(r.source) !== null)
+      .filter((r) => auditedAction(r.source) !== r.rel.replace(/\.ts$/, ""))
+      .map((r) => ({ route: r.rel, action: auditedAction(r.source) }));
+
+    expect(mismatched).toEqual([]);
+  });
+
+  it("does not audit plain reads of reference or public data", () => {
+    // Not a style rule: auditing these would add a row per page view of a dropdown, and the point
+    // of the log is that a human can read it.
+    const overreach = routes
+      .filter((r) => auditedAction(r.source) !== null && !mustBeAudited(r.rel, r.source))
+      .map((r) => r.rel);
+
+    expect(overreach).toEqual([]);
   });
 });

@@ -3,6 +3,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import db from "../../../prisma/prisma-client";
 import getAccountFromRequest from "../../utils/api/get-account-from-request";
 import methodAllowed from "../../utils/api/method-allowed";
+import withAudit from "../../utils/api/audit";
 
 export type RegisterInstituteParams = {
   name: string;
@@ -43,7 +44,7 @@ function registerInstitute(params: RegisterInstituteParams) {
   });
 }
 
-export default async function handler(
+async function handler(
   req: NextApiRequest,
   res: NextApiResponse<RegisterInstituteRes | string>
 ) {
@@ -99,3 +100,5 @@ export default async function handler(
     return res.status(500).send({ ...e, message: e.message }); // Adjust this according to how you handle errors
   }
 }
+
+export default withAudit(handler, { action: "register-institute" });

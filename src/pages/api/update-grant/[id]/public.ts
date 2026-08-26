@@ -8,6 +8,7 @@ import {
 import type { PrivateGrantDBRes } from "../../grant/[id]/private";
 import { selectAllGrantInfo } from "../../../../../prisma/helpers";
 import methodAllowed from "../../../../utils/api/method-allowed";
+import withAudit from "../../../../utils/api/audit";
 
 export type UpdateGrantPublicParams = {
   title: string;
@@ -81,7 +82,7 @@ function updateGrant(
   });
 }
 
-export default async function handler(
+async function handler(
   req: NextApiRequest,
   res: NextApiResponse<PrivateGrantDBRes | string>
 ) {
@@ -131,3 +132,5 @@ export default async function handler(
     return res.status(500).send({ ...e, message: e.message }); // prisma error messages are getters
   }
 }
+
+export default withAudit(handler, { action: "update-grant/[id]/public" });

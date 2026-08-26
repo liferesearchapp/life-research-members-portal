@@ -8,6 +8,7 @@ import {
 import getAccountFromRequest from "../../utils/api/get-account-from-request";
 import removeDiacritics from "../../utils/front-end/remove-diacritics";
 import methodAllowed from "../../utils/api/method-allowed";
+import withAudit from "../../utils/api/audit";
 
 
 export type RegisterProductParams = {
@@ -55,7 +56,7 @@ async function fetchMembers() {
 
 // Replace the useState line in the handler function with this line:
 
-export default async function handler(
+async function handler(
   req: NextApiRequest,
   res: NextApiResponse<RegisterProductRes | string>
 ) {
@@ -179,3 +180,5 @@ export default async function handler(
     });
   }
 }
+
+export default withAudit(handler, { action: "register-product" });

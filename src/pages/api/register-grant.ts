@@ -7,6 +7,7 @@ import {
 } from "../../utils/api/authorization";
 import getAccountFromRequest from "../../utils/api/get-account-from-request";
 import methodAllowed from "../../utils/api/method-allowed";
+import withAudit from "../../utils/api/audit";
 import isAuthorMatch from "../../components/products/author-match"; // Import isAuthorMatch
 import removeDiacritics from "../../utils/front-end/remove-diacritics"; // Import removeDiacritics
 
@@ -58,7 +59,7 @@ async function fetchMembers() {
   });
 }
 
-export default async function handler(
+async function handler(
   req: NextApiRequest,
   res: NextApiResponse<RegisterGrantRes | string>
 ) {
@@ -157,3 +158,5 @@ export default async function handler(
     return res.status(500).send({ ...e, message: "An error occurred while registering the grant." });
   }
 }
+
+export default withAudit(handler, { action: "register-grant" });

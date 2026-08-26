@@ -5,6 +5,7 @@ import type { MemberPrivateInfo } from "../../../../services/_types";
 import getAccountFromRequest from "../../../../utils/api/get-account-from-request";
 import type { PrivateMemberDBRes } from "../../member/[id]/private";
 import methodAllowed from "../../../../utils/api/method-allowed";
+import withAudit from "../../../../utils/api/audit";
 
 export type UpdateMemberPrivateParams = {
   address?: string;
@@ -42,7 +43,7 @@ function updateMember(id: number, params: UpdateMemberPrivateParams) {
   });
 }
 
-export default async function handler(
+async function handler(
   req: NextApiRequest,
   res: NextApiResponse<PrivateMemberDBRes | string>
 ) {
@@ -89,3 +90,5 @@ export default async function handler(
     return res.status(500).send({ ...e, message: e.message }); // prisma error messages are getters
   }
 }
+
+export default withAudit(handler, { action: "update-member/[id]/private" });

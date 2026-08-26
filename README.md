@@ -52,6 +52,45 @@ Coverage is deliberately scoped to the logic that can be unit-tested without a D
 thresholds are a ratchet against regression rather than a claim of good coverage. What is out of
 scope, and what verifies each of those areas instead, is documented in `vitest.config.mts`.
 
+## Audit log
+
+Every request that changes data, and every read of a `private` (personal-data) route, is recorded
+in the `auditEvent` table: who acted, what route, which `[id]`, the method, and the status it
+ended with. Refusals are recorded too — a run of denied attempts is exactly what an audit is for.
+
+The log exists to make sequences visible. A single request is usually unremarkable; the pattern
+that motivated this (issue #12) was an institute admin adding a member, using the edit rights that
+grants, and removing them again, where every individual step looks legitimate on its own.
+
+A route opts in by wrapping its handler, and `tests/api/route-authorization.test.ts` requires that
+wrapper on every route that mutates or serves personal data, so a new route cannot quietly skip it:
+
+```ts
+export default withAudit(handler, { action: "update-account/[id]/grant-admin" });
+```
+
+**The table is append-only.** A trigger refuses `UPDATE` outright, and refuses `DELETE` unless the
+session has deliberately opted in, so no application code path can rewrite history — including
+code written by whoever is being audited. A retention purge is therefore an explicit act:
+
+```sql
+EXEC sp_set_session_context @key = N'audit_purge', @value = N'1';
+DELETE FROM [dbo].[auditEvent] WHERE [occurred_at] < DATEADD(year, -2, SYSUTCDATETIME());
+EXEC sp_set_session_context @key = N'audit_purge', @value = NULL;
+```
+
+Two properties worth knowing before relying on it:
+
+- **Logging fails open.** If the log write fails, the request still succeeds and the failure goes
+  to the server log. A logging outage does not take the portal down, and the trade is that events
+  can be lost. Making it fail closed is a policy decision; `record()` in `src/utils/api/audit.ts`
+  is the one place to change.
+- **The rows are personal data.** They name who did what, and when. Access to the table deserves
+  the same treatment as access to the accounts it describes, and a retention period should be
+  agreed rather than assumed.
+
+`npm run audit:check` verifies all of this against a real SQL Server, and runs in CI.
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:

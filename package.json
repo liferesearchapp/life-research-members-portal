@@ -13,6 +13,7 @@
     "db:push": "prisma db push --skip-generate",
     "db:seed": "ts-node --project tsconfig.scripts.json src/reporting/scripts/seed-test-db.ts",
     "reporting:fold": "ts-node --project tsconfig.scripts.json src/reporting/scripts/test-fold.ts",
+    "audit:check": "ts-node --project tsconfig.scripts.json scripts/check-audit-log.ts",
     "reporting:validate": "ts-node --project tsconfig.scripts.json src/reporting/scripts/validate-specs.ts",
     "reporting:parity": "ts-node --project tsconfig.scripts.json src/reporting/scripts/parity-report.ts",
     "reporting:admin": "ts-node --project tsconfig.scripts.json src/reporting/scripts/run-admin-metrics.ts",
