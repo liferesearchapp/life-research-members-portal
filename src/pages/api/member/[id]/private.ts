@@ -9,6 +9,7 @@ import {
 } from "../../../../utils/api/authorization";
 import getAccountFromRequest from "../../../../utils/api/get-account-from-request";
 import methodAllowed from "../../../../utils/api/method-allowed";
+import withAudit from "../../../../utils/api/audit";
 
 export type PrivateMemberDBRes = Awaited<ReturnType<typeof getPrivateMemberInfo>>;
 
@@ -29,7 +30,7 @@ function getPrivateMemberInfo(id: number) {
   });
 }
 
-export default async function handler(
+async function handler(
   req: NextApiRequest,
   res: NextApiResponse<PrivateMemberDBRes | string>
 ) {
@@ -64,3 +65,5 @@ export default async function handler(
     return res.status(500).send({ ...e, message: e.message }); // prisma error messages are getters
   }
 }
+
+export default withAudit(handler, { action: "member/[id]/private" });

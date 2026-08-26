@@ -7,6 +7,7 @@ import {
 } from "../../utils/api/authorization";
 import getAccountFromRequest from "../../utils/api/get-account-from-request";
 import methodAllowed from "../../utils/api/method-allowed";
+import withAudit from "../../utils/api/audit";
 
 export type RegisterEventParams = {
   name_en: string;
@@ -37,7 +38,7 @@ function registerEvent(params: RegisterEventParams) {
   });
 }
 
-export default async function handler(
+async function handler(
   req: NextApiRequest,
   res: NextApiResponse<RegisterEventRes | string>
 ) {
@@ -76,3 +77,5 @@ export default async function handler(
     return res.status(500).send({ ...e, message: "An error occurred while registering the event." });
   }
 }
+
+export default withAudit(handler, { action: "register-event" });

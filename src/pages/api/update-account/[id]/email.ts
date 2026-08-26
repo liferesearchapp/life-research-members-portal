@@ -8,6 +8,7 @@ import {
 import getAccountFromRequest from "../../../../utils/api/get-account-from-request";
 import type { AccountDBRes } from "../../account/[id]";
 import methodAllowed from "../../../../utils/api/method-allowed";
+import withAudit from "../../../../utils/api/audit";
 
 export type UpdateAccountEmailParams = { login_email: string };
 
@@ -22,7 +23,7 @@ function updateAccountEmail(
   });
 }
 
-export default async function handler(
+async function handler(
   req: NextApiRequest,
   res: NextApiResponse<AccountDBRes | string>
 ) {
@@ -63,3 +64,5 @@ export default async function handler(
     return res.status(500).send({ ...e, message: e.message }); // prisma error messages are getters
   }
 }
+
+export default withAudit(handler, { action: "update-account/[id]/email" });

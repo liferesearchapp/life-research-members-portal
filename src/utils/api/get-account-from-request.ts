@@ -4,6 +4,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { includeAllAccountInfo } from "../../../prisma/helpers";
 import db from "../../../prisma/prisma-client";
 import type { AccountDBRes } from "../../pages/api/account/[id]";
+import { setRequestActor } from "./audit";
 
 type MsAccountInfo = {
   id: string;
@@ -76,6 +77,10 @@ export default async function getAccountFromRequest(
         include: includeAllAccountInfo,
       });
     }
+
+    // Tell the audit log who is acting. This is the only place that resolves a token to an
+    // account, so it is the only place that can answer it.
+    setRequestActor(req, account);
 
     return account;
   } catch (e: any) {
