@@ -80,6 +80,10 @@ Every one of the **83 API routes** authenticates, or is on a reviewed list of th
 public on purpose, with the reason written down. That is not a promise — it is a test that fails
 the build.
 
+And every change is on the record. Who did what, to which record, when — written to an
+**append-only** log the application itself cannot rewrite, because the database refuses. Single
+actions rarely tell you anything; the log exists so that a *sequence* does.
+
 ---
 
 ## See it running
@@ -164,6 +168,7 @@ access or be explicitly public, and every route must declare the HTTP methods it
 first act. Add a route without either and CI tells you, naming the fix.
 
 ---
+
 ## Audit log
 
 Every request that changes data, and every read of a `private` (personal-data) route, is recorded
@@ -203,7 +208,7 @@ Two properties worth knowing before relying on it:
 
 `npm run audit:check` verifies all of this against a real SQL Server, and runs in CI.
 
-## Learn More
+---
 
 ## Documentation
 
