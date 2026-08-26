@@ -29,6 +29,7 @@ import { ActiveAccountCtx } from "../../services/context/active-account-ctx";
 import { isPendingInstituteMembershipInvitation } from "../../utils/institute-membership-invitations";
 import GrantSuperAdminButton from "./grant-super-admin-button";
 import { canManageMemberProfile } from "../../utils/front-end/member-access";
+import RemoveSuperAdminButton from "./remove-super-admin-button";
 
 const { Item } = Descriptions;
 
@@ -161,12 +162,15 @@ const AccountProfile: FC<Props> = ({ id }) => {
       }
     >
       {account.is_super_admin ? (
-        <Text>
-          {trueSymbol}
-          {en
-            ? "This account has super admin privileges."
-            : "Ce compte possède des privilèges de super administrateur."}
-        </Text>
+        <>
+          <Text>
+            {trueSymbol}
+            {en
+              ? "This account has super admin privileges."
+              : "Ce compte possède des privilèges de super administrateur."}
+          </Text>
+          <RemoveSuperAdminButton account={account} setAccount={setAccount} />
+        </>
       ) : (
         <>
           <Text>
